@@ -26,8 +26,8 @@ devsetup:venv
 checks:venv
 	source $(VENV_NAME)/bin/activate && \
     pip install --upgrade -r requirements.txt && \
-    flake8 spark_auto_mapper_fhir && \
-    mypy spark_auto_mapper_fhir && \
+    flake8 spark_pipeline_framework_testing && \
+    mypy spark_pipeline_framework_testing && \
     flake8 tests && \
     mypy tests
 
