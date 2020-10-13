@@ -9,6 +9,7 @@ from typing import List, Optional, Match, Dict, Any
 
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import StructType
+from spark_pipeline_framework.progress_logger.progress_logger import ProgressLogger
 from spark_pipeline_framework.utilities.spark_data_frame_comparer import assert_compare_data_frames
 
 
@@ -37,8 +38,18 @@ class SparkPipelineFrameworkTestRunner:
                 filename: str
                 filename, _ = os.path.splitext(PurePath(input_file).name)
                 if file_extension.lower() == ".csv":
-                    spark_session.read.csv(path=os.path.join(input_folder, input_file),
-                                           header=True).createOrReplaceTempView(filename)
+                    spark_session.read.csv(
+                        path=os.path.join(input_folder, input_file),
+                        header=True).createOrReplaceTempView(filename)
+                elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
+                    spark_session.read.json(
+                        path=os.path.join(input_folder, input_file)
+                    ).createOrReplaceTempView(filename)
+                elif file_extension.lower() == ".parquet":
+                    spark_session.read.parquet(
+                        path=os.path.join(input_folder, input_file)
+                    ).createOrReplaceTempView(filename)
+
             # turn path into transformer name
             # call transformer
 
@@ -61,20 +72,24 @@ class SparkPipelineFrameworkTestRunner:
                 my_class = [md[c] for c in md if (isinstance(md[c], type) and md[c].__module__ == module.__name__)][0]
                 my_class_signature = signature(my_class.__init__)
                 my_class_args = [param.name for param in my_class_signature.parameters.values() if param.name != 'self']
-                # now figure out the class_parameters to use when instantiating the class
-                class_parameters: Dict[str, Any] = {"parameters": parameters, 'progress_logger': None}
+                with ProgressLogger() as progress_logger:
+                    # now figure out the class_parameters to use when instantiating the class
+                    class_parameters: Dict[str, Any] = {
+                        "parameters": parameters,
+                        'progress_logger': progress_logger
+                    }
 
-                if len(my_class_args) > 0 and len(class_parameters) > 0:
-                    my_instance = my_class(**{k: v for k, v in class_parameters.items() if k in my_class_args})
-                else:
-                    my_instance = my_class()
-                # now call transform
-                schema = StructType([])
+                    if len(my_class_args) > 0 and len(class_parameters) > 0:
+                        my_instance = my_class(**{k: v for k, v in class_parameters.items() if k in my_class_args})
+                    else:
+                        my_instance = my_class()
+                    # now call transform
+                    schema = StructType([])
 
-                df: DataFrame = spark_session.createDataFrame(
-                    spark_session.sparkContext.emptyRDD(), schema)
+                    df: DataFrame = spark_session.createDataFrame(
+                        spark_session.sparkContext.emptyRDD(), schema)
 
-                my_instance.transformers[0].transform(df)
+                    my_instance.transformers[0].transform(df)
 
             # for each file in output folder, loading into a view in Spark (prepend with "expected_")
             output_folder = Path(testable_folder).joinpath("output")
@@ -84,15 +99,27 @@ class SparkPipelineFrameworkTestRunner:
                 filename, _ = os.path.splitext(PurePath(output_file).name)
                 found_output_file: bool = False
                 if file_extension.lower() == ".csv":
-                    spark_session.read.csv(path=os.path.join(output_folder, output_file),
-                                           header=True).createOrReplaceTempView(f"expected_{filename}")
+                    spark_session.read.csv(
+                        path=os.path.join(output_folder, output_file),
+                        header=True).createOrReplaceTempView(f"expected_{filename}")
+                    found_output_file = True
+                elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
+                    spark_session.read.json(
+                        path=os.path.join(output_folder, output_file)
+                    ).createOrReplaceTempView(f"expected_{filename}")
+                    found_output_file = True
+                elif file_extension.lower() == ".parquet":
+                    spark_session.read.parquet(
+                        path=os.path.join(output_folder, output_file)
+                    ).createOrReplaceTempView(f"expected_{filename}")
                     found_output_file = True
 
                 if found_output_file:
                     # Do a data frame compare on each view
                     print(f"Comparing with view:[filename= with view:[expected_{filename}]")
+                    # drop any corrupted column
                     assert_compare_data_frames(
-                        expected_df=spark_session.table(f"expected_{filename}"),
+                        expected_df=spark_session.table(f"expected_{filename}").drop("_corrupt_record"),
                         result_df=spark_session.table(filename)
                     )
 
