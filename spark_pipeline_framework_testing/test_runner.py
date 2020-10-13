@@ -1,3 +1,4 @@
+import json
 import os
 from importlib import import_module
 from inspect import signature
@@ -94,23 +95,35 @@ class SparkPipelineFrameworkTestRunner:
             # for each file in output folder, loading into a view in Spark (prepend with "expected_")
             output_folder = Path(testable_folder).joinpath("output")
             output_files = [f for f in listdir(output_folder) if isfile(join(output_folder, f))]
+            output_schema_folder = Path(testable_folder).joinpath("output_schema")
             for output_file in output_files:
                 _, file_extension = os.path.splitext(output_file)
                 filename, _ = os.path.splitext(PurePath(output_file).name)
                 found_output_file: bool = False
+                output_file_path = os.path.join(output_folder, output_file)
                 if file_extension.lower() == ".csv":
                     spark_session.read.csv(
-                        path=os.path.join(output_folder, output_file),
+                        path=output_file_path,
                         header=True).createOrReplaceTempView(f"expected_{filename}")
                     found_output_file = True
                 elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
-                    spark_session.read.json(
-                        path=os.path.join(output_folder, output_file)
-                    ).createOrReplaceTempView(f"expected_{filename}")
+                    output_schema_file = os.path.join(output_schema_folder, output_file)
+                    if os.path.exists(output_schema_file):
+                        with open(output_schema_file) as file:
+                            schema_json: str = json.loads(file.read())
+                        schema = StructType.fromJson(schema_json)
+                        print(f"Reading file {output_file_path} using schema: {output_schema_file}")
+                        spark_session.read.schema(schema).json(
+                            path=output_file_path
+                        ).createOrReplaceTempView(f"expected_{filename}")
+                    else:
+                        spark_session.read.json(
+                            path=output_file_path
+                        ).createOrReplaceTempView(f"expected_{filename}")
                     found_output_file = True
                 elif file_extension.lower() == ".parquet":
                     spark_session.read.parquet(
-                        path=os.path.join(output_folder, output_file)
+                        path=output_file_path
                     ).createOrReplaceTempView(f"expected_{filename}")
                     found_output_file = True
 
