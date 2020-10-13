@@ -17,9 +17,8 @@ def test_all(spark_session: SparkSession) -> None:
 
     assert result_df.count() == 2
 
-    result_df: DataFrame = spark_session.table("diagnosis")
+    result_df = spark_session.table("diagnosis")
     result_df.printSchema()
     result_df.show(truncate=False)
 
     assert result_df.count() == 3
-

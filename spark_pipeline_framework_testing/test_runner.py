@@ -5,6 +5,7 @@ from pathlib import Path, PurePath
 from typing import List
 
 from pyspark.sql import SparkSession
+from spark_pipeline_framework.utilities.spark_data_frame_comparer import assert_compare_data_frames
 
 
 class SparkPipelineFrameworkTestRunner:
@@ -15,6 +16,7 @@ class SparkPipelineFrameworkTestRunner:
         print(testable_folder_list)
         # for each of them
         for testable_folder in testable_folder_list:
+            # read the input files
             input_folder: Path = Path(testable_folder).joinpath("input")
             input_files: List[str] = [f for f in listdir(input_folder) if isfile(join(input_folder, f))]
 
@@ -35,8 +37,26 @@ class SparkPipelineFrameworkTestRunner:
                                            header=True).createOrReplaceTempView(filename)
             # turn path into transformer name
             # call transformer
+
             # for each file in output folder, loading into a view in Spark (prepend with "expected_")
-            # Do a data frame compare on each
+            output_folder: Path = Path(testable_folder).joinpath("output")
+            output_files: List[str] = [f for f in listdir(output_folder) if isfile(join(output_folder, f))]
+            for output_file in output_files:
+                _, file_extension = os.path.splitext(output_file)
+                filename, _ = os.path.splitext(PurePath(output_file).name)
+                found_output_file: bool = False
+                if file_extension.lower() == ".csv":
+                    spark_session.read.csv(path=os.path.join(output_folder, output_file),
+                                           header=True).createOrReplaceTempView(f"expected_{filename}")
+                    found_output_file = True
+
+                if found_output_file:
+                    # Do a data frame compare on each view
+                    print(f"Comparing with view:[filename= with view:[expected_{filename}]")
+                    assert_compare_data_frames(
+                        expected_df=spark_session.table(f"expected_{filename}"),
+                        result_df=spark_session.table(filename)
+                    )
 
 
 def testable_folders(folder_path: Path) -> List[str]:
