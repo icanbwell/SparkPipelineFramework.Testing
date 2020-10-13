@@ -1,4 +1,5 @@
 numpy>=1.19.2
-pyspark>=3.0.0
+pyspark>=2.4.0
 logger
-sparkautomapper>=0.1.24
+sparkpipelineframework>=0.1.23
+
