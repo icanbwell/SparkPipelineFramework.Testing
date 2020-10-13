@@ -8,6 +8,8 @@ VENV_NAME=venv
 GIT_HASH=${CIRCLE_SHA1}
 SPARK_VER=3.0.1
 HADOOP_VER=3.2
+PACKAGES_FOLDER=venv/lib/python3.6/site-packages
+SPF_BASE=${PACKAGES_FOLDER}
 
 include spark_pipeline_framework_testing/Makefile.spark
 include spark_pipeline_framework_testing/Makefile.docker
@@ -67,3 +69,8 @@ tests:
 
 .PHONY:init
 init: installspark docker up devsetup proxies tests
+
+.PHONY:proxies
+proxies:
+	source ${VENV_NAME}/bin/activate && \
+	python3 ${PACKAGES_FOLDER}/spark_pipeline_framework/proxy_generator/generate_proxies.py

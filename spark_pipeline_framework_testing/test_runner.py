@@ -1,10 +1,14 @@
 import os
+from importlib import import_module
+from inspect import signature
 from os import listdir
 from os.path import isfile, join
 from pathlib import Path, PurePath
-from typing import List
+from re import search
+from typing import List, Optional, Match, Dict, Any
 
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql.types import StructType
 from spark_pipeline_framework.utilities.spark_data_frame_comparer import assert_compare_data_frames
 
 
@@ -37,6 +41,31 @@ class SparkPipelineFrameworkTestRunner:
                                            header=True).createOrReplaceTempView(filename)
             # turn path into transformer name
             # call transformer
+
+            # find name of transformer
+            search_result: Optional[Match[str]] = search(r'/library/', testable_folder)
+            if search_result:
+                transformer_file_name = testable_folder[search_result.end():].replace('/', '_')
+                lib_path = testable_folder[search_result.start() + 1:].replace('/', '.')
+                module = import_module(lib_path + "." + transformer_file_name)
+                md = module.__dict__
+                my_class = [md[c] for c in md if (isinstance(md[c], type) and md[c].__module__ == module.__name__)][0]
+                my_class_signature = signature(my_class.__init__)
+                my_class_args = [param.name for param in my_class_signature.parameters.values() if param.name != 'self']
+                # now figure out the class_parameters to use when instantiating the class
+                class_parameters: Dict[str, Any] = {"parameters": {}, 'progress_logger': None}
+
+                if len(my_class_args) > 0 and len(class_parameters) > 0:
+                    my_instance = my_class(**{k: v for k, v in class_parameters.items() if k in my_class_args})
+                else:
+                    my_instance = my_class()
+                # now call transform
+                schema = StructType([])
+
+                df: DataFrame = spark_session.createDataFrame(
+                    spark_session.sparkContext.emptyRDD(), schema)
+
+                my_instance.transformers[0].transform(df)
 
             # for each file in output folder, loading into a view in Spark (prepend with "expected_")
             output_folder: Path = Path(testable_folder).joinpath("output")
