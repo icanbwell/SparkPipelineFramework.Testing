@@ -14,7 +14,7 @@ from spark_pipeline_framework.utilities.spark_data_frame_comparer import assert_
 
 class SparkPipelineFrameworkTestRunner:
     @staticmethod
-    def run_tests(spark_session: SparkSession, folder_path: Path) -> None:
+    def run_tests(spark_session: SparkSession, folder_path: Path, parameters: Dict[str, Any] = {}) -> None:
         # iterate through sub_folders trying to find folders that contain input and output folders
         testable_folder_list: List[str] = testable_folders(folder_path=folder_path)
         print(testable_folder_list)
@@ -42,6 +42,15 @@ class SparkPipelineFrameworkTestRunner:
             # turn path into transformer name
             # call transformer
 
+            # set the view parameter
+            if "view" not in parameters:
+                output_folder: Path = Path(testable_folder).joinpath("output")
+                output_files: List[str] = [f for f in listdir(output_folder) if
+                                           isfile(join(output_folder, f)) and not f.endswith(".py")]
+                destination_view_name: Optional[str] = os.path.splitext(PurePath(output_files[0]).name)[0] if len(
+                    output_files) > 0 else "output"
+                parameters["view"] = destination_view_name
+
             # find name of transformer
             search_result: Optional[Match[str]] = search(r'/library/', testable_folder)
             if search_result:
@@ -53,7 +62,7 @@ class SparkPipelineFrameworkTestRunner:
                 my_class_signature = signature(my_class.__init__)
                 my_class_args = [param.name for param in my_class_signature.parameters.values() if param.name != 'self']
                 # now figure out the class_parameters to use when instantiating the class
-                class_parameters: Dict[str, Any] = {"parameters": {}, 'progress_logger': None}
+                class_parameters: Dict[str, Any] = {"parameters": parameters, 'progress_logger': None}
 
                 if len(my_class_args) > 0 and len(class_parameters) > 0:
                     my_instance = my_class(**{k: v for k, v in class_parameters.items() if k in my_class_args})
@@ -68,8 +77,8 @@ class SparkPipelineFrameworkTestRunner:
                 my_instance.transformers[0].transform(df)
 
             # for each file in output folder, loading into a view in Spark (prepend with "expected_")
-            output_folder: Path = Path(testable_folder).joinpath("output")
-            output_files: List[str] = [f for f in listdir(output_folder) if isfile(join(output_folder, f))]
+            output_folder = Path(testable_folder).joinpath("output")
+            output_files = [f for f in listdir(output_folder) if isfile(join(output_folder, f))]
             for output_file in output_files:
                 _, file_extension = os.path.splitext(output_file)
                 filename, _ = os.path.splitext(PurePath(output_file).name)
