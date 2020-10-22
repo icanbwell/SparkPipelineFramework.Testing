@@ -82,14 +82,30 @@ class SparkPipelineFrameworkTestRunner:
                     testable_folder=testable_folder
                 )
 
+            # write out any missing schemas
+            tables: List[Table] = spark_session.catalog.listTables("default")
+
+            output_schema_folder: Path = Path(testable_folder
+                                              ).joinpath("output_schema")
+            table_name: str
+            for table_name in [
+                t.name for t in tables if not t.name.startswith("expected_")
+            ]:
+                if not os.path.exists(output_schema_folder):
+                    os.mkdir(output_schema_folder)
+
+                SparkPipelineFrameworkTestRunner.write_schema_to_output(
+                    spark_session=spark_session,
+                    view_name=table_name,
+                    output_schema_folder=output_schema_folder
+                )
+
             # for each file in output folder, loading into a view in Spark (prepend with "expected_")
             output_folder = Path(testable_folder).joinpath("output")
             output_files = [
                 f for f in listdir(output_folder)
                 if isfile(join(output_folder, f))
             ]
-            output_schema_folder: Path = Path(testable_folder
-                                              ).joinpath("output_schema")
             views_found: List[str] = []
             for output_file in output_files:
                 found_output_file: bool = SparkPipelineFrameworkTestRunner.process_output_file(
@@ -105,8 +121,6 @@ class SparkPipelineFrameworkTestRunner:
                     )
 
             # write out any missing output files
-            tables: List[Table] = spark_session.catalog.listTables("default")
-
             if os.path.exists(output_folder.joinpath("temp")):
                 shutil.rmtree(output_folder.joinpath("temp"))
 
@@ -114,11 +128,10 @@ class SparkPipelineFrameworkTestRunner:
                 t.name for t in tables if t.name.lower() not in views_found
                 and not t.name.startswith("expected_")
             ]
-            table: str
-            for table in tables_to_write_to_output:
+            for table_name in tables_to_write_to_output:
                 SparkPipelineFrameworkTestRunner.write_table_to_output(
                     spark_session=spark_session,
-                    view_name=table,
+                    view_name=table_name,
                     output_folder=output_folder
                 )
             if os.path.exists(output_folder.joinpath("temp")):
@@ -345,6 +358,21 @@ class SparkPipelineFrameworkTestRunner:
                 )
             )
             copyfile(csv_files[0], output_folder.joinpath(f"{view_name}.csv"))
+
+    @staticmethod
+    def write_schema_to_output(
+        spark_session: SparkSession, view_name: str, output_schema_folder: Path
+    ) -> None:
+        df: DataFrame = spark_session.table(view_name)
+
+        # write out schema file if it does not exist
+        if not os.path.exists(
+            output_schema_folder.joinpath(f"{view_name}.json")
+        ):
+            with open(
+                output_schema_folder.joinpath(f"{view_name}.json"), "w"
+            ) as f:
+                json.dump(df.schema.jsonValue(), f, indent=4)
 
 
 def get_testable_folders(folder_path: Path) -> List[str]:

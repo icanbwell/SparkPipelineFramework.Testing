@@ -3,7 +3,7 @@
     "fields": [
         {
             "name": "member_id",
-            "type": "long",
+            "type": "string",
             "nullable": true,
             "metadata": {}
         },
