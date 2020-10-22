@@ -56,6 +56,22 @@ class SparkPipelineFrameworkTestRunner:
                     input_schema_folder=input_schema_folder
                 )
 
+            # write out any input schemas
+            tables: List[Table] = spark_session.catalog.listTables("default")
+
+            table_name: str
+            for table_name in [
+                t.name for t in tables if not t.name.startswith("expected_")
+            ]:
+                if not os.path.exists(input_schema_folder):
+                    os.mkdir(input_schema_folder)
+
+                SparkPipelineFrameworkTestRunner.write_schema_to_output(
+                    spark_session=spark_session,
+                    view_name=table_name,
+                    schema_folder=input_schema_folder
+                )
+
             # turn path into transformer name and call transformer
             # first set the view parameter since AutoMapper transformers require it
             if parameters and "view" not in parameters:
@@ -83,11 +99,10 @@ class SparkPipelineFrameworkTestRunner:
                 )
 
             # write out any missing schemas
-            tables: List[Table] = spark_session.catalog.listTables("default")
+            tables = spark_session.catalog.listTables("default")
 
             output_schema_folder: Path = Path(testable_folder
                                               ).joinpath("output_schema")
-            table_name: str
             for table_name in [
                 t.name for t in tables if not t.name.startswith("expected_")
             ]:
@@ -97,7 +112,7 @@ class SparkPipelineFrameworkTestRunner:
                 SparkPipelineFrameworkTestRunner.write_schema_to_output(
                     spark_session=spark_session,
                     view_name=table_name,
-                    output_schema_folder=output_schema_folder
+                    schema_folder=output_schema_folder
                 )
 
             # for each file in output folder, loading into a view in Spark (prepend with "expected_")
@@ -361,18 +376,22 @@ class SparkPipelineFrameworkTestRunner:
 
     @staticmethod
     def write_schema_to_output(
-        spark_session: SparkSession, view_name: str, output_schema_folder: Path
+        spark_session: SparkSession, view_name: str, schema_folder: Path
     ) -> None:
         df: DataFrame = spark_session.table(view_name)
 
         # write out schema file if it does not exist
-        if not os.path.exists(
-            output_schema_folder.joinpath(f"{view_name}.json")
-        ):
+        if not os.path.exists(schema_folder.joinpath(f"{view_name}.json")):
             with open(
-                output_schema_folder.joinpath(f"{view_name}.json"), "w"
-            ) as f:
-                json.dump(df.schema.jsonValue(), f, indent=4)
+                schema_folder.joinpath(f"{view_name}.json"), "w"
+            ) as file:
+                schema_as_dict: Dict[str, Any] = df.schema.jsonValue()
+                # schema_as_dict: Any = json.loads(s=schema_as_json)
+                # Adding $schema tag enables auto-complete and syntax checking in editors
+                schema_as_dict[
+                    "$schema"
+                ] = "https://raw.githubusercontent.com/imranq2/SparkPipelineFramework.Testing/main/spark_json_schema.json"
+                file.write(json.dumps(schema_as_dict, indent=4))
 
 
 def get_testable_folders(folder_path: Path) -> List[str]:
