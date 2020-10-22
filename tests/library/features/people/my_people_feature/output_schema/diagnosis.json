@@ -2,19 +2,19 @@
     "type": "struct",
     "fields": [
         {
-            "name": "member_id",
-            "type": "long",
-            "nullable": true,
-            "metadata": {}
-        },
-        {
-            "name": "name",
+            "name": "diagnosis_id",
             "type": "string",
             "nullable": true,
             "metadata": {}
         },
         {
-            "name": "birth_date",
+            "name": "member_id",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "icd_code",
             "type": "string",
             "nullable": true,
             "metadata": {}

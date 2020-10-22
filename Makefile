@@ -31,7 +31,7 @@ checks:venv
     flake8 spark_pipeline_framework_testing && \
     mypy spark_pipeline_framework_testing --strict && \
     flake8 tests && \
-    mypy tests
+    mypy tests --strict
 
 .PHONY:update
 update:
