@@ -25,6 +25,9 @@ class SparkPipelineFrameworkTestRunner:
         folder_path: Path,
         parameters: Optional[Dict[str, Any]] = None
     ) -> None:
+        if not parameters:
+            parameters = {}
+
         # iterate through sub_folders trying to find folders that contain input and output folders
         testable_folder_list: List[str] = get_testable_folders(
             folder_path=folder_path
