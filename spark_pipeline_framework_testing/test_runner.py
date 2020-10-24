@@ -77,7 +77,7 @@ class SparkPipelineFrameworkTestRunner:
 
             # turn path into transformer name and call transformer
             # first set the view parameter since AutoMapper transformers require it
-            if parameters and "view" not in parameters:
+            if "view" not in parameters:
                 output_folder: Path = Path(testable_folder).joinpath("output")
                 output_files: List[str] = [
                     f for f in listdir(output_folder) if
@@ -162,17 +162,22 @@ class SparkPipelineFrameworkTestRunner:
         spark_session: SparkSession, parameters: Optional[Dict[str, Any]],
         search_result: Match[str], testable_folder: str
     ) -> None:
+        # get name of transformer file
         transformer_file_name = testable_folder[search_result.end():].replace(
             '/', '_'
         )
+        # find parent folder of transformer file
         lib_path = testable_folder[search_result.start() +
                                    1:].replace('/', '.')
+        # load the transformer file (i.e., module)
         module = import_module(lib_path + "." + transformer_file_name)
         md = module.__dict__
+        # find the first class in that module (we assume the first class is the Transformer class)
         my_class = [
             md[c] for c in md if
             (isinstance(md[c], type) and md[c].__module__ == module.__name__)
         ][0]
+        # find the signature of the __init__ method
         my_class_signature = signature(my_class.__init__)
         my_class_args = [
             param.name for param in my_class_signature.parameters.values()
@@ -184,7 +189,7 @@ class SparkPipelineFrameworkTestRunner:
                 "parameters": parameters or {},
                 'progress_logger': progress_logger
             }
-
+            # instantiate the class passing in the parameters + progress_logger
             if len(my_class_args) > 0 and len(class_parameters) > 0:
                 my_instance = my_class(
                     **{
@@ -197,7 +202,7 @@ class SparkPipelineFrameworkTestRunner:
                 my_instance = my_class()
             # now call transform
             schema = StructType([])
-
+            # create an empty dataframe to pass into transform()
             df: DataFrame = spark_session.createDataFrame(
                 spark_session.sparkContext.emptyRDD(), schema
             )
