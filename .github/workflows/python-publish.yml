@@ -27,7 +27,7 @@ jobs:
       id: version
       uses: brettdorrans/write-version-to-file@master
       with:
-        filename: 'VERSION'        
+        filename: '../VERSION'        
     - name: Build and publish
       env:
         TWINE_USERNAME: __token__
