@@ -351,15 +351,22 @@ class SparkPipelineFrameworkTestRunner:
         df: DataFrame = spark_session.table(view_name)
         types: List[Tuple[str, Any]] = df.dtypes
         type_dict: Dict[str, Any] = {key: value for key, value in types}
-        if "array" in type_dict.values() or "struct" in type_dict.values():
+        # these type strings can look like 'array<struct<Field:string>>', so we
+        # have to check if "array" or "struct" appears in the type string, not
+        # just for exact matches
+        if [t for t in type_dict.values() if "array" in t or "struct" in t]:
             # save as json
             file_path: Path = output_folder.joinpath(
                 "temp", f"{view_name}.json"
             )
             print(f"Writing {file_path}")
-            df.repartition(1).mode("overwrite").write.json(path=str(file_path))
+            df.repartition(1).write.mode("overwrite").json(path=str(file_path))
             json_files: List[str] = glob.glob(
-                str(output_folder.joinpath("temp", "*.json"))
+                str(
+                    output_folder.joinpath(
+                        "temp", f"{view_name}.json", "*.json"
+                    )
+                )
             )
             copyfile(
                 json_files[0], output_folder.joinpath(f"{view_name}.json")
