@@ -78,16 +78,7 @@ class SparkPipelineFrameworkTestRunner:
             # turn path into transformer name and call transformer
             # first set the view parameter since AutoMapper transformers require it
             if "view" not in parameters:
-                output_folder: Path = Path(testable_folder).joinpath("output")
-                output_files: List[str] = [
-                    f for f in listdir(output_folder) if
-                    isfile(join(output_folder, f)) and not f.endswith(".py")
-                ]
-                destination_view_name: Optional[
-                    str
-                ] = SparkPipelineFrameworkTestRunner.get_view_name_from_file_path(
-                    output_files[0]
-                ) if len(output_files) > 0 else "output"
+                destination_view_name: str = "output"
                 parameters["view"] = destination_view_name
 
             # find name of transformer
