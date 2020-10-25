@@ -28,7 +28,7 @@ jobs:
     - name: Checkout Master
       uses: actions/checkout@master
     - name: Set release tag in VERSION
-      uses: "DamianReeves/write-file-action"
+      uses: DamianReeves/write-file-action@master
       with:
         path: ${{ env.home }}/VERSION
         contents: |
