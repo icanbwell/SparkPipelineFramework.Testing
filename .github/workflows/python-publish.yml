@@ -24,9 +24,7 @@ jobs:
         pip install setuptools wheel twine
     - name: Get Previous tag
       id: previoustag
-      uses: WyriHaximus/github-action-get-previous-tag@master        
-    - name: Checkout Master
-      uses: actions/checkout@master
+      uses: WyriHaximus/github-action-get-previous-tag@master
     - name: Set release tag in VERSION
       uses: DamianReeves/write-file-action@master
       with:
