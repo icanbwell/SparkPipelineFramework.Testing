@@ -30,7 +30,7 @@ jobs:
     - name: Set release tag in VERSION
       uses: DamianReeves/write-file-action@master
       with:
-        path: ${{ env.home }}/VERSION
+        path: VERSION
         contents: |
           ${{ steps.previoustag.outputs.tag }}
         write-mode: overwrite            
