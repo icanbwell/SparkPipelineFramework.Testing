@@ -1,6 +1,179 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string"
+    },
+    "fields": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "nullable": {
+              "type": "boolean"
+            },
+            "metadata": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "name",
             "type",
             "nullable",
             "metadata"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "nullable": {
+              "type": "boolean"
+            },
+            "metadata": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "name",
+            "type",
+            "nullable",
+            "metadata"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "nullable": {
+              "type": "boolean"
+            },
+            "metadata": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "name",
+            "type",
+            "nullable",
+            "metadata"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "nullable": {
+              "type": "boolean"
+            },
+            "metadata": {
+              "type": "object"
+            },
+            "type": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "containsNull": {
+                  "type": "boolean"
+                },
+                "elementType": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "fields": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            },
+                            "nullable": {
+                              "type": "boolean"
+                            },
+                            "metadata": {
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "type",
+                            "nullable",
+                            "metadata"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            },
+                            "nullable": {
+                              "type": "boolean"
+                            },
+                            "metadata": {
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "type",
+                            "nullable",
+                            "metadata"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "fields"
+                  ]
+                }
+              },
+              "required": [
+                "type",
+                "containsNull",
+                "elementType"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "nullable",
+            "metadata",
+            "type"
           ]
         },
         {
