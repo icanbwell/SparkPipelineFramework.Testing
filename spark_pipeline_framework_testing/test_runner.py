@@ -97,9 +97,12 @@ class SparkPipelineFrameworkTestRunner:
 
             output_schema_folder: Path = Path(testable_folder
                                               ).joinpath("output_schema")
-            for table_name in [
+            tables_for_writing_schema: List[str] = [
                 t.name for t in tables if not t.name.startswith("expected_")
-            ]:
+            ]
+            if "output" in tables_for_writing_schema:  # if there is an output table then ignore other tables
+                tables_for_writing_schema = ["output"]
+            for table_name in tables_for_writing_schema:
                 if not os.path.exists(output_schema_folder):
                     os.mkdir(output_schema_folder)
 
@@ -137,6 +140,8 @@ class SparkPipelineFrameworkTestRunner:
                 t.name for t in tables if t.name.lower() not in views_found
                 and not t.name.startswith("expected_")
             ]
+            if "output" in tables_to_write_to_output:  # if there is an output table then ignore other tables
+                tables_to_write_to_output = ["output"]
             for table_name in tables_to_write_to_output:
                 SparkPipelineFrameworkTestRunner.write_table_to_output(
                     spark_session=spark_session,
@@ -229,7 +234,7 @@ class SparkPipelineFrameworkTestRunner:
                 ).createOrReplaceTempView(f"expected_{view_name}")
             else:
                 spark_session.read.csv(
-                    path=output_file_path, header=True
+                    path=output_file_path, header=True, comment="#"
                 ).createOrReplaceTempView(f"expected_{view_name}")
 
             found_output_file = True
@@ -295,11 +300,12 @@ class SparkPipelineFrameworkTestRunner:
                     f"Reading file {input_file} using schema: {input_schema_file}"
                 )
                 spark_session.read.schema(schema).csv(
-                    path=input_file_path, header=True
+                    path=input_file_path, header=True, comment="#"
                 ).createOrReplaceTempView(view_name)
             else:
-                spark_session.read.csv(path=input_file_path, header=True
-                                       ).createOrReplaceTempView(view_name)
+                spark_session.read.csv(
+                    path=input_file_path, header=True, comment="#"
+                ).createOrReplaceTempView(view_name)
         elif file_extension.lower() == ".jsonl" or file_extension.lower(
         ) == ".json":
             input_file_path = os.path.join(input_folder, input_file)
@@ -368,7 +374,7 @@ class SparkPipelineFrameworkTestRunner:
             print(f"Writing {file_path}")
 
             df.repartition(1).write.mode("overwrite").csv(
-                path=str(file_path), header=True, quoteAll=True
+                path=str(file_path), header=True
             )
             csv_files: List[str] = glob.glob(
                 str(
