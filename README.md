@@ -29,3 +29,8 @@ Note: the test finds files in sub-folders too.
 ## Example
 For the transformer defined here: https://github.com/imranq2/SparkPipelineFramework.Testing/tree/main/library/features/people/my_people_feature
 You can find the test here: https://github.com/imranq2/SparkPipelineFramework.Testing/tree/main/tests/library/features/people/my_people_feature
+
+## Publishing a new package
+1. Create a new release
+2. The GitHub Action should automatically kick in and publish the package
+3. You can see the status in the Actions tab
