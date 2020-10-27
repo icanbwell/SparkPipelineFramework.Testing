@@ -19,6 +19,9 @@ from spark_pipeline_framework.utilities.spark_data_frame_comparer import assert_
 
 
 class SparkPipelineFrameworkTestRunner:
+
+    row_limit: int = 100
+
     @staticmethod
     def run_tests(
         spark_session: SparkSession,
@@ -301,11 +304,13 @@ class SparkPipelineFrameworkTestRunner:
                 )
                 spark_session.read.schema(schema).csv(
                     path=input_file_path, header=True, comment="#"
-                ).createOrReplaceTempView(view_name)
+                ).limit(SparkPipelineFrameworkTestRunner.row_limit
+                        ).createOrReplaceTempView(view_name)
             else:
                 spark_session.read.csv(
                     path=input_file_path, header=True, comment="#"
-                ).createOrReplaceTempView(view_name)
+                ).limit(SparkPipelineFrameworkTestRunner.row_limit
+                        ).createOrReplaceTempView(view_name)
         elif file_extension.lower() == ".jsonl" or file_extension.lower(
         ) == ".json":
             input_file_path = os.path.join(input_folder, input_file)
@@ -319,15 +324,18 @@ class SparkPipelineFrameworkTestRunner:
                 )
                 spark_session.read.schema(schema).json(
                     path=input_file_path
-                ).createOrReplaceTempView(view_name)
+                ).limit(SparkPipelineFrameworkTestRunner.row_limit
+                        ).createOrReplaceTempView(view_name)
             else:
-                spark_session.read.json(path=input_file_path
-                                        ).createOrReplaceTempView(view_name)
+                spark_session.read.json(path=input_file_path).limit(
+                    SparkPipelineFrameworkTestRunner.row_limit
+                ).createOrReplaceTempView(view_name)
 
         elif file_extension.lower() == ".parquet":
             spark_session.read.parquet(
                 path=os.path.join(input_folder, input_file)
-            ).createOrReplaceTempView(view_name)
+            ).limit(SparkPipelineFrameworkTestRunner.row_limit
+                    ).createOrReplaceTempView(view_name)
 
     @staticmethod
     def get_view_name_from_file_path(input_file: str) -> str:
@@ -357,7 +365,7 @@ class SparkPipelineFrameworkTestRunner:
                 "temp", f"{view_name}.json"
             )
             print(f"Writing {file_path}")
-            df.repartition(1).write.mode("overwrite").json(path=str(file_path))
+            df.coalesce(1).write.mode("overwrite").json(path=str(file_path))
             json_files: List[str] = glob.glob(
                 str(
                     output_folder.joinpath(
