@@ -368,8 +368,7 @@ class SparkPipelineFrameworkTestRunner:
             print(f"Writing {file_path}")
 
             df.repartition(1).write.mode("overwrite").csv(
-                path=str(file_path),
-                header=True,
+                path=str(file_path), header=True, quoteAll=True
             )
             csv_files: List[str] = glob.glob(
                 str(
