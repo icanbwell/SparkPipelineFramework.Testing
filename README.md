@@ -1,5 +1,5 @@
 # SparkPipelineFramework.Tests
-Testing framework that can tests SPF library by just providing input files to setup before running the transformer and output files to use for verifying the output
+Testing framework that can tests SparkPipelineFramework library by just providing input files to setup before running the transformer and output files to use for verifying the output
 
 ## Usage
 1. Create a folder structure similar to the folder structure of your library in SparkPipelineFramework (This is how the Testing Framework finds the Transformer to run)
