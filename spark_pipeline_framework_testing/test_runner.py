@@ -14,8 +14,8 @@ from typing import List, Optional, Match, Dict, Any, Tuple
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
 from pyspark.sql.types import StructType
+from spark_data_frame_comparer.spark_data_frame_comparer import assert_compare_data_frames
 from spark_pipeline_framework.progress_logger.progress_logger import ProgressLogger
-from spark_pipeline_framework.utilities.spark_data_frame_comparer import assert_compare_data_frames
 
 
 class SparkPipelineFrameworkTestRunner:
@@ -303,12 +303,18 @@ class SparkPipelineFrameworkTestRunner:
                     f"Reading file {input_file} using schema: {input_schema_file}"
                 )
                 spark_session.read.schema(schema).csv(
-                    path=input_file_path, header=True, comment="#"
+                    path=input_file_path,
+                    header=True,
+                    comment="#",
+                    emptyValue=None,
                 ).limit(SparkPipelineFrameworkTestRunner.row_limit
                         ).createOrReplaceTempView(view_name)
             else:
                 spark_session.read.csv(
-                    path=input_file_path, header=True, comment="#"
+                    path=input_file_path,
+                    header=True,
+                    comment="#",
+                    emptyValue=None,
                 ).limit(SparkPipelineFrameworkTestRunner.row_limit
                         ).createOrReplaceTempView(view_name)
         elif file_extension.lower() == ".jsonl" or file_extension.lower(
