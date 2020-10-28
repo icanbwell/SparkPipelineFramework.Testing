@@ -14,9 +14,8 @@ from typing import List, Optional, Match, Dict, Any, Tuple
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
 from pyspark.sql.types import StructType
+from spark_data_frame_comparer.spark_data_frame_comparer import assert_compare_data_frames
 from spark_pipeline_framework.progress_logger.progress_logger import ProgressLogger
-
-from spark_pipeline_framework_testing.utilities.spark_data_frame_comparer import assert_compare_data_frames
 
 
 class SparkPipelineFrameworkTestRunner:
