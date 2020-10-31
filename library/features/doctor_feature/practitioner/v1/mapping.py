@@ -52,18 +52,20 @@ def mapping(parameters: Dict[str, Any]) -> AutoMapper:
             ),
             active=True,
             name=FhirList(
-                HumanName(
-                    given=FhirList(
-                        [
-                            A.column("provider_first_name"),
-                            A.column("provider_middle_name")
-                        ]
-                    ),
-                    family=A.column("provider_last_name"),
-                    suffix=FhirList([A.column("provider_title")]),
-                    use=NameUseCode.usual,
-                    text=A.text("")
-                )
+                [
+                    HumanName(
+                        given=FhirList(
+                            [
+                                A.column("provider_first_name"),
+                                A.column("provider_middle_name")
+                            ]
+                        ),
+                        family=A.column("provider_last_name"),
+                        suffix=FhirList([A.column("provider_title")]),
+                        use=NameUseCode.usual,
+                        text=A.text("")
+                    )
+                ]
             ),
             # birthdate="",
             gender=AdministrativeGenderCode(
@@ -81,22 +83,24 @@ def mapping(parameters: Dict[str, Any]) -> AutoMapper:
             ),
             telecom=FhirList([]),
             address=FhirList(
-                Address(
-                    use=A.text("Work"),  # AddressUseCode.Work,
-                    type_=A.text("Physical"),  # AddressTypeCode.Physical,
-                    text=A.column("practice_name"),
-                    line=FhirList(
-                        [
-                            A.column("scheduling_location_address1"),
-                            A.column("scheduling_location_address2")
-                        ]
-                    ),
-                    city=A.column("scheduling_location_city"),
-                    district=A.text(""),
-                    state=A.column("scheduling_location_state"),
-                    postalCode=A.column("scheduling_location_zip"),
-                    country=A.text("USA")
-                )
+                [
+                    Address(
+                        use=A.text("Work"),  # AddressUseCode.Work,
+                        type_=A.text("Physical"),  # AddressTypeCode.Physical,
+                        text=A.column("practice_name"),
+                        line=FhirList(
+                            [
+                                A.column("scheduling_location_address1"),
+                                A.column("scheduling_location_address2")
+                            ]
+                        ),
+                        city=A.column("scheduling_location_city"),
+                        district=A.text(""),
+                        state=A.column("scheduling_location_state"),
+                        postalCode=A.column("scheduling_location_zip"),
+                        country=A.text("USA")
+                    )
+                ]
             )
         )
     )
