@@ -19,7 +19,6 @@ from spark_pipeline_framework.progress_logger.progress_logger import ProgressLog
 
 
 class SparkPipelineFrameworkTestRunner:
-
     row_limit: int = 100
 
     @staticmethod
@@ -77,6 +76,14 @@ class SparkPipelineFrameworkTestRunner:
                     view_name=table_name,
                     schema_folder=input_schema_folder
                 )
+
+            # read parameters.json if it exists
+            parameters_json_file: Path = Path(testable_folder
+                                              ).joinpath("parameters.json")
+            if os.path.exists(parameters_json_file):
+                with open(parameters_json_file, "r") as file:
+                    parameters = json.loads(file.read())
+                    assert parameters
 
             # turn path into transformer name and call transformer
             # first set the view parameter since AutoMapper transformers require it
