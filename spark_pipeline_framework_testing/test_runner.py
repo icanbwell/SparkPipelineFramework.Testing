@@ -62,12 +62,16 @@ class SparkPipelineFrameworkTestRunner:
                 )
 
             # write out any input schemas
-            tables: List[Table] = spark_session.catalog.listTables("default")
+            input_tables: List[Table] = spark_session.catalog.listTables(
+                "default"
+            )
 
+            input_table_names: List[str] = [
+                t.name for t in input_tables
+                if not t.name.startswith("expected_")
+            ]
             table_name: str
-            for table_name in [
-                t.name for t in tables if not t.name.startswith("expected_")
-            ]:
+            for table_name in input_table_names:
                 if not os.path.exists(input_schema_folder):
                     os.mkdir(input_schema_folder)
 
@@ -103,14 +107,18 @@ class SparkPipelineFrameworkTestRunner:
                 )
 
             # write out any missing schemas
-            tables = spark_session.catalog.listTables("default")
+            output_tables: List[Table] = spark_session.catalog.listTables(
+                "default"
+            )
 
             output_schema_folder: Path = Path(testable_folder
                                               ).joinpath("output_schema")
             tables_for_writing_schema: List[str] = [
-                t.name for t in tables if not t.name.startswith("expected_")
+                t.name for t in output_tables
+                if not t.name.startswith("expected_")
+                and t.name not in input_table_names
             ]
-            if "output" in tables_for_writing_schema:  # if there is an output table then ignore other tables
+            if "output" in tables_for_writing_schema:  # if there is an output table then ignore other input_tables
                 tables_for_writing_schema = ["output"]
             for table_name in tables_for_writing_schema:
                 if not os.path.exists(output_schema_folder):
@@ -146,13 +154,14 @@ class SparkPipelineFrameworkTestRunner:
             if os.path.exists(output_folder.joinpath("temp")):
                 shutil.rmtree(output_folder.joinpath("temp"))
 
-            tables_to_write_to_output: List[str] = [
-                t.name for t in tables if t.name.lower() not in views_found
-                and not t.name.startswith("expected_")
+            table_names_to_write_to_output: List[str] = [
+                t.name for t in output_tables
+                if t.name.lower() not in views_found and not t.name.
+                startswith("expected_") and t.name not in input_table_names
             ]
-            if "output" in tables_to_write_to_output:  # if there is an output table then ignore other tables
-                tables_to_write_to_output = ["output"]
-            for table_name in tables_to_write_to_output:
+            if "output" in table_names_to_write_to_output:  # if there is an output table then ignore other input_tables
+                table_names_to_write_to_output = ["output"]
+            for table_name in table_names_to_write_to_output:
                 SparkPipelineFrameworkTestRunner.write_table_to_output(
                     spark_session=spark_session,
                     view_name=table_name,
