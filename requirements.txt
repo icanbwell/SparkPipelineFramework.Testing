@@ -1,5 +1,5 @@
 numpy>=1.19.2
 pyspark>=2.4.0
 logger
-sparkpipelineframework>=0.1.29
-sparkdataframecomparer>=0.1.40
+sparkpipelineframework>=0.1.38
+sparkdataframecomparer>=0.1.41

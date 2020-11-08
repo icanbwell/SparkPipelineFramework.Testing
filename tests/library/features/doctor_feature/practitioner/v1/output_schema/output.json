@@ -2,12 +2,6 @@
     "type": "struct",
     "fields": [
         {
-            "name": "gecb_provider_number",
-            "type": "string",
-            "nullable": true,
-            "metadata": {}
-        },
-        {
             "name": "resourceType",
             "type": "string",
             "nullable": false,
