@@ -1,0 +1,162 @@
+{
+    "type": "struct",
+    "fields": [
+        {
+            "name": "_id",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "about",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "address",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "age",
+            "type": "long",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "balance",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "company",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "email",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "eyeColor",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "favoriteFruit",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "friends",
+            "type": {
+                "type": "array",
+                "elementType": {
+                    "type": "struct",
+                    "fields": [
+                        {
+                            "name": "id",
+                            "type": "long",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "nullable": true,
+                            "metadata": {}
+                        }
+                    ]
+                },
+                "containsNull": true
+            },
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "gender",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "greeting",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "guid",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "index",
+            "type": "long",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "isActive",
+            "type": "boolean",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "latitude",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "longitude",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "name",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "phone",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "picture",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "registered",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "tags",
+            "type": {
+                "type": "array",
+                "elementType": "string",
+                "containsNull": true
+            },
+            "nullable": true,
+            "metadata": {}
+        }
+    ],
+    "$schema": "https://raw.githubusercontent.com/imranq2/SparkPipelineFramework.Testing/main/spark_json_schema.json "
+}

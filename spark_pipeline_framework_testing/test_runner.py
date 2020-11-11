@@ -16,6 +16,7 @@ from pyspark.sql.catalog import Table
 from pyspark.sql.types import StructType
 from spark_data_frame_comparer.spark_data_frame_comparer import assert_compare_data_frames
 from spark_pipeline_framework.progress_logger.progress_logger import ProgressLogger
+from spark_pipeline_framework.utilities.json_to_jsonl_converter import convert_json_to_jsonl
 
 
 class SparkPipelineFrameworkTestRunner:
@@ -132,12 +133,15 @@ class SparkPipelineFrameworkTestRunner:
 
             # for each file in output folder, loading into a view in Spark (prepend with "expected_")
             output_folder = Path(testable_folder).joinpath("output")
+            if not os.path.exists(output_folder):
+                os.mkdir(output_folder)
             output_files = [
                 f for f in listdir(output_folder)
                 if isfile(join(output_folder, f))
             ]
             views_found: List[str] = []
             for output_file in output_files:
+
                 found_output_file: bool = SparkPipelineFrameworkTestRunner.process_output_file(
                     spark_session=spark_session,
                     output_file=output_file,
@@ -336,7 +340,19 @@ class SparkPipelineFrameworkTestRunner:
         elif file_extension.lower() == ".jsonl" or file_extension.lower(
         ) == ".json":
             input_file_path = os.path.join(input_folder, input_file)
+            # create json_input_folder if it does not exist
+            json_input_folder = os.path.join(input_folder, "..", "input_jsonl")
+            if not os.path.exists(json_input_folder):
+                os.mkdir(json_input_folder)
+            jsonl_input_file_path = os.path.join(json_input_folder, input_file)
+            # convert file to jsonl if needed
+            convert_json_to_jsonl(
+                src_file=Path(input_file_path),
+                dst_file=Path(jsonl_input_file_path)
+            )
+            # find schema file
             input_schema_file = os.path.join(input_schema_folder, input_file)
+            # if schema exists then use it when loading the file
             if os.path.exists(input_schema_file):
                 with open(input_schema_file) as file:
                     schema_json = json.loads(file.read())
@@ -345,11 +361,11 @@ class SparkPipelineFrameworkTestRunner:
                     f"Reading file {input_file} using schema: {input_schema_file}"
                 )
                 spark_session.read.schema(schema).json(
-                    path=input_file_path
+                    path=jsonl_input_file_path
                 ).limit(SparkPipelineFrameworkTestRunner.row_limit
                         ).createOrReplaceTempView(view_name)
-            else:
-                spark_session.read.json(path=input_file_path).limit(
+            else:  # if no schema found just load the file
+                spark_session.read.json(path=jsonl_input_file_path).limit(
                     SparkPipelineFrameworkTestRunner.row_limit
                 ).createOrReplaceTempView(view_name)
 
@@ -431,7 +447,8 @@ class SparkPipelineFrameworkTestRunner:
                 # Adding $schema tag enables auto-complete and syntax checking in editors
                 schema_as_dict[
                     "$schema"
-                ] = "https://raw.githubusercontent.com/imranq2/SparkPipelineFramework.Testing/main/spark_json_schema.json"
+                ] = "https://raw.githubusercontent.com/imranq2/SparkPipelineFramework.Testing/main/spark_json_schema" \
+                    ".json "
                 file.write(json.dumps(schema_as_dict, indent=4))
 
 
