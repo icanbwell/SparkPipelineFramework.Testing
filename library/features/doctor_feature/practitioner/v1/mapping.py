@@ -7,6 +7,7 @@ from spark_auto_mapper_fhir.complex_types.codeableConcept import CodeableConcept
 from spark_auto_mapper_fhir.complex_types.coding import Coding
 from spark_auto_mapper_fhir.complex_types.human_name import HumanName
 from spark_auto_mapper_fhir.complex_types.identifier import Identifier
+from spark_auto_mapper_fhir.fhir_types.id import FhirId
 from spark_auto_mapper_fhir.fhir_types.list import FhirList
 from spark_auto_mapper_fhir.resources.practitioner import Practitioner
 from spark_auto_mapper_fhir.valuesets.administrative_gender import AdministrativeGenderCode
@@ -22,16 +23,20 @@ def mapping(parameters: Dict[str, Any]) -> AutoMapper:
         keys=["gecb_provider_number"]
     ).complex(
         Practitioner(
-            id_=A.column("b.gecb_provider_number"),
+            id_=FhirId(A.column("b.gecb_provider_number")),
             identifier=FhirList(
                 [
                     Identifier(
                         use=IdentifierUseCode.Usual,
                         value=A.column("b.gecb_provider_number"),
                         type_=CodeableConcept(
-                            coding=Coding(
-                                system=IdentifierTypeCode.codeset,
-                                code=IdentifierTypeCode.ProviderNumber
+                            coding=FhirList(
+                                [
+                                    Coding(
+                                        system=IdentifierTypeCode.codeset,
+                                        code=IdentifierTypeCode.ProviderNumber
+                                    )
+                                ]
                             )
                         ),
                         system="medstarhealth.org"
@@ -40,10 +45,14 @@ def mapping(parameters: Dict[str, Any]) -> AutoMapper:
                         use=IdentifierUseCode.Official,
                         value=A.column("provider_npi"),
                         type_=CodeableConcept(
-                            coding=Coding(
-                                system=IdentifierTypeCode.codeset,
-                                code=IdentifierTypeCode.
-                                NationalProviderIdentifier
+                            coding=FhirList(
+                                [
+                                    Coding(
+                                        system=IdentifierTypeCode.codeset,
+                                        code=IdentifierTypeCode.
+                                        NationalProviderIdentifier
+                                    )
+                                ]
                             )
                         ),
                         system="http://hl7.org/fhir/sid/us-npi"
