@@ -21,9 +21,21 @@
                     "type": "struct",
                     "fields": [
                         {
+                            "name": "id",
+                            "type": "string",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "extension",
+                            "type": "string",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
                             "name": "use",
                             "type": "string",
-                            "nullable": false,
+                            "nullable": true,
                             "metadata": {}
                         },
                         {
@@ -32,36 +44,88 @@
                                 "type": "struct",
                                 "fields": [
                                     {
+                                        "name": "id",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "extension",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
                                         "name": "coding",
                                         "type": {
-                                            "type": "struct",
-                                            "fields": [
-                                                {
-                                                    "name": "system",
-                                                    "type": "string",
-                                                    "nullable": false,
-                                                    "metadata": {}
-                                                },
-                                                {
-                                                    "name": "code",
-                                                    "type": "string",
-                                                    "nullable": false,
-                                                    "metadata": {}
-                                                }
-                                            ]
+                                            "type": "array",
+                                            "elementType": {
+                                                "type": "struct",
+                                                "fields": [
+                                                    {
+                                                        "name": "id",
+                                                        "type": "string",
+                                                        "nullable": true,
+                                                        "metadata": {}
+                                                    },
+                                                    {
+                                                        "name": "extension",
+                                                        "type": "string",
+                                                        "nullable": true,
+                                                        "metadata": {}
+                                                    },
+                                                    {
+                                                        "name": "system",
+                                                        "type": "string",
+                                                        "nullable": true,
+                                                        "metadata": {}
+                                                    },
+                                                    {
+                                                        "name": "version",
+                                                        "type": "string",
+                                                        "nullable": true,
+                                                        "metadata": {}
+                                                    },
+                                                    {
+                                                        "name": "code",
+                                                        "type": "string",
+                                                        "nullable": true,
+                                                        "metadata": {}
+                                                    },
+                                                    {
+                                                        "name": "display",
+                                                        "type": "string",
+                                                        "nullable": true,
+                                                        "metadata": {}
+                                                    },
+                                                    {
+                                                        "name": "userSelected",
+                                                        "type": "boolean",
+                                                        "nullable": true,
+                                                        "metadata": {}
+                                                    }
+                                                ]
+                                            },
+                                            "containsNull": true
                                         },
-                                        "nullable": false,
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "text",
+                                        "type": "string",
+                                        "nullable": true,
                                         "metadata": {}
                                     }
                                 ]
                             },
-                            "nullable": false,
+                            "nullable": true,
                             "metadata": {}
                         },
                         {
                             "name": "system",
                             "type": "string",
-                            "nullable": false,
+                            "nullable": true,
                             "metadata": {}
                         },
                         {
@@ -69,10 +133,298 @@
                             "type": "string",
                             "nullable": true,
                             "metadata": {}
+                        },
+                        {
+                            "name": "period",
+                            "type": {
+                                "type": "struct",
+                                "fields": [
+                                    {
+                                        "name": "id",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "extension",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "start",
+                                        "type": "date",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "end",
+                                        "type": "date",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    }
+                                ]
+                            },
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "assigner",
+                            "type": {
+                                "type": "struct",
+                                "fields": [
+                                    {
+                                        "name": "id",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "extension",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "reference",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "type",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "identifier",
+                                        "type": {
+                                            "type": "struct",
+                                            "fields": [
+                                                {
+                                                    "name": "id",
+                                                    "type": "string",
+                                                    "nullable": true,
+                                                    "metadata": {}
+                                                },
+                                                {
+                                                    "name": "extension",
+                                                    "type": "string",
+                                                    "nullable": true,
+                                                    "metadata": {}
+                                                },
+                                                {
+                                                    "name": "use",
+                                                    "type": "string",
+                                                    "nullable": true,
+                                                    "metadata": {}
+                                                },
+                                                {
+                                                    "name": "type",
+                                                    "type": {
+                                                        "type": "struct",
+                                                        "fields": [
+                                                            {
+                                                                "name": "id",
+                                                                "type": "string",
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            },
+                                                            {
+                                                                "name": "extension",
+                                                                "type": "string",
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            },
+                                                            {
+                                                                "name": "coding",
+                                                                "type": {
+                                                                    "type": "array",
+                                                                    "elementType": {
+                                                                        "type": "struct",
+                                                                        "fields": [
+                                                                            {
+                                                                                "name": "id",
+                                                                                "type": "string",
+                                                                                "nullable": true,
+                                                                                "metadata": {}
+                                                                            },
+                                                                            {
+                                                                                "name": "extension",
+                                                                                "type": "string",
+                                                                                "nullable": true,
+                                                                                "metadata": {}
+                                                                            },
+                                                                            {
+                                                                                "name": "system",
+                                                                                "type": "string",
+                                                                                "nullable": true,
+                                                                                "metadata": {}
+                                                                            },
+                                                                            {
+                                                                                "name": "version",
+                                                                                "type": "string",
+                                                                                "nullable": true,
+                                                                                "metadata": {}
+                                                                            },
+                                                                            {
+                                                                                "name": "code",
+                                                                                "type": "string",
+                                                                                "nullable": true,
+                                                                                "metadata": {}
+                                                                            },
+                                                                            {
+                                                                                "name": "display",
+                                                                                "type": "string",
+                                                                                "nullable": true,
+                                                                                "metadata": {}
+                                                                            },
+                                                                            {
+                                                                                "name": "userSelected",
+                                                                                "type": "boolean",
+                                                                                "nullable": true,
+                                                                                "metadata": {}
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "containsNull": true
+                                                                },
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            },
+                                                            {
+                                                                "name": "text",
+                                                                "type": "string",
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            }
+                                                        ]
+                                                    },
+                                                    "nullable": true,
+                                                    "metadata": {}
+                                                },
+                                                {
+                                                    "name": "system",
+                                                    "type": "string",
+                                                    "nullable": true,
+                                                    "metadata": {}
+                                                },
+                                                {
+                                                    "name": "value",
+                                                    "type": "string",
+                                                    "nullable": true,
+                                                    "metadata": {}
+                                                },
+                                                {
+                                                    "name": "period",
+                                                    "type": {
+                                                        "type": "struct",
+                                                        "fields": [
+                                                            {
+                                                                "name": "id",
+                                                                "type": "string",
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            },
+                                                            {
+                                                                "name": "extension",
+                                                                "type": "string",
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            },
+                                                            {
+                                                                "name": "start",
+                                                                "type": "date",
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            },
+                                                            {
+                                                                "name": "end",
+                                                                "type": "date",
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            }
+                                                        ]
+                                                    },
+                                                    "nullable": true,
+                                                    "metadata": {}
+                                                },
+                                                {
+                                                    "name": "assigner",
+                                                    "type": {
+                                                        "type": "struct",
+                                                        "fields": [
+                                                            {
+                                                                "name": "id",
+                                                                "type": "string",
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            },
+                                                            {
+                                                                "name": "extension",
+                                                                "type": "string",
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            },
+                                                            {
+                                                                "name": "reference",
+                                                                "type": "string",
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            },
+                                                            {
+                                                                "name": "type",
+                                                                "type": "string",
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            },
+                                                            {
+                                                                "name": "identifier",
+                                                                "type": {
+                                                                    "type": "struct",
+                                                                    "fields": [
+                                                                        {
+                                                                            "name": "id",
+                                                                            "type": "string",
+                                                                            "nullable": true,
+                                                                            "metadata": {}
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            },
+                                                            {
+                                                                "name": "display",
+                                                                "type": "string",
+                                                                "nullable": true,
+                                                                "metadata": {}
+                                                            }
+                                                        ]
+                                                    },
+                                                    "nullable": true,
+                                                    "metadata": {}
+                                                }
+                                            ]
+                                        },
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "display",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    }
+                                ]
+                            },
+                            "nullable": true,
+                            "metadata": {}
                         }
                     ]
                 },
-                "containsNull": false
+                "containsNull": true
             },
             "nullable": false,
             "metadata": {}
@@ -91,15 +443,27 @@
                     "type": "struct",
                     "fields": [
                         {
+                            "name": "id",
+                            "type": "string",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "extension",
+                            "type": "string",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
                             "name": "use",
                             "type": "string",
-                            "nullable": false,
+                            "nullable": true,
                             "metadata": {}
                         },
                         {
                             "name": "text",
                             "type": "string",
-                            "nullable": false,
+                            "nullable": true,
                             "metadata": {}
                         },
                         {
@@ -115,7 +479,17 @@
                                 "elementType": "string",
                                 "containsNull": true
                             },
-                            "nullable": false,
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "prefix",
+                            "type": {
+                                "type": "array",
+                                "elementType": "string",
+                                "containsNull": true
+                            },
+                            "nullable": true,
                             "metadata": {}
                         },
                         {
@@ -125,12 +499,46 @@
                                 "elementType": "string",
                                 "containsNull": true
                             },
-                            "nullable": false,
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "period",
+                            "type": {
+                                "type": "struct",
+                                "fields": [
+                                    {
+                                        "name": "id",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "extension",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "start",
+                                        "type": "date",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "end",
+                                        "type": "date",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    }
+                                ]
+                            },
+                            "nullable": true,
                             "metadata": {}
                         }
                     ]
                 },
-                "containsNull": false
+                "containsNull": true
             },
             "nullable": false,
             "metadata": {}
@@ -139,8 +547,82 @@
             "name": "telecom",
             "type": {
                 "type": "array",
-                "elementType": "null",
-                "containsNull": false
+                "elementType": {
+                    "type": "struct",
+                    "fields": [
+                        {
+                            "name": "id",
+                            "type": "string",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "extension",
+                            "type": "string",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "system",
+                            "type": "string",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "value",
+                            "type": "string",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "use",
+                            "type": "string",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "rank",
+                            "type": "integer",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "period",
+                            "type": {
+                                "type": "struct",
+                                "fields": [
+                                    {
+                                        "name": "id",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "extension",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "start",
+                                        "type": "date",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "end",
+                                        "type": "date",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    }
+                                ]
+                            },
+                            "nullable": true,
+                            "metadata": {}
+                        }
+                    ]
+                },
+                "containsNull": true
             },
             "nullable": false,
             "metadata": {}
@@ -153,15 +635,27 @@
                     "type": "struct",
                     "fields": [
                         {
+                            "name": "id",
+                            "type": "string",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "extension",
+                            "type": "string",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
                             "name": "use",
                             "type": "string",
-                            "nullable": false,
+                            "nullable": true,
                             "metadata": {}
                         },
                         {
                             "name": "type",
                             "type": "string",
-                            "nullable": false,
+                            "nullable": true,
                             "metadata": {}
                         },
                         {
@@ -177,7 +671,7 @@
                                 "elementType": "string",
                                 "containsNull": true
                             },
-                            "nullable": false,
+                            "nullable": true,
                             "metadata": {}
                         },
                         {
@@ -189,7 +683,7 @@
                         {
                             "name": "district",
                             "type": "string",
-                            "nullable": false,
+                            "nullable": true,
                             "metadata": {}
                         },
                         {
@@ -207,12 +701,46 @@
                         {
                             "name": "country",
                             "type": "string",
-                            "nullable": false,
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "period",
+                            "type": {
+                                "type": "struct",
+                                "fields": [
+                                    {
+                                        "name": "id",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "extension",
+                                        "type": "string",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "start",
+                                        "type": "date",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    },
+                                    {
+                                        "name": "end",
+                                        "type": "date",
+                                        "nullable": true,
+                                        "metadata": {}
+                                    }
+                                ]
+                            },
+                            "nullable": true,
                             "metadata": {}
                         }
                     ]
                 },
-                "containsNull": false
+                "containsNull": true
             },
             "nullable": false,
             "metadata": {}
@@ -224,5 +752,5 @@
             "metadata": {}
         }
     ],
-    "$schema": "https://raw.githubusercontent.com/imranq2/SparkPipelineFramework.Testing/main/spark_json_schema.json"
+    "$schema": "https://raw.githubusercontent.com/imranq2/SparkPipelineFramework.Testing/main/spark_json_schema.json "
 }
