@@ -226,7 +226,7 @@ class SparkPipelineFrameworkTestRunner:
                 spark_session.sparkContext.emptyRDD(), schema
             )
 
-            my_instance.transformers[0].transform(df)
+            my_instance.transform(df)
 
     @staticmethod
     def process_output_file(
