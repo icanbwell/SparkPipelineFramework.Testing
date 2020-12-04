@@ -9,7 +9,7 @@ from os.path import isfile, join
 from pathlib import Path, PurePath
 from re import search
 from shutil import copyfile
-from typing import List, Optional, Match, Dict, Any, Tuple
+from typing import List, Optional, Match, Dict, Any, Tuple, Union
 
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
@@ -26,7 +26,8 @@ class SparkPipelineFrameworkTestRunner:
     def run_tests(
         spark_session: SparkSession,
         folder_path: Path,
-        parameters: Optional[Dict[str, Any]] = None
+        parameters: Optional[Dict[str, Any]] = None,
+        temp_folder: Optional[Union[Path, str]] = None
     ) -> None:
         if not parameters:
             parameters = {}
@@ -146,7 +147,8 @@ class SparkPipelineFrameworkTestRunner:
                     spark_session=spark_session,
                     output_file=output_file,
                     output_folder=output_folder,
-                    output_schema_folder=output_schema_folder
+                    output_schema_folder=output_schema_folder,
+                    temp_folder=temp_folder
                 )
                 if found_output_file:
                     views_found.append(
@@ -230,8 +232,11 @@ class SparkPipelineFrameworkTestRunner:
 
     @staticmethod
     def process_output_file(
-        spark_session: SparkSession, output_file: str, output_folder: Path,
-        output_schema_folder: Path
+        spark_session: SparkSession,
+        output_file: str,
+        output_folder: Path,
+        output_schema_folder: Path,
+        temp_folder: Optional[Union[Path, str]] = None
     ) -> bool:
         file_extension: str = SparkPipelineFrameworkTestRunner.get_file_extension_from_file_path(
             output_file
@@ -239,12 +244,20 @@ class SparkPipelineFrameworkTestRunner:
         view_name: str = SparkPipelineFrameworkTestRunner.get_view_name_from_file_path(
             output_file
         )
+        if file_extension.lower() not in [".csv", "json", "jsonl", ".parquet"]:
+            return True
+        result_df: DataFrame = spark_session.table(view_name)
+
         found_output_file: bool = False
         output_file_path = os.path.join(output_folder, output_file)
+        result_path: Optional[Path] = Path(temp_folder).joinpath(
+            f"{view_name}"
+        ) if temp_folder else None
         if file_extension.lower() == ".csv":
             output_schema_file = os.path.join(
                 output_schema_folder, f"{view_name}.json"
             )
+            # if we have an output schema file use it
             if os.path.exists(output_schema_file):
                 with open(output_schema_file) as file:
                     schema_json = json.loads(file.read())
@@ -255,10 +268,26 @@ class SparkPipelineFrameworkTestRunner:
                 spark_session.read.schema(schema).csv(
                     path=output_file_path, header=True
                 ).createOrReplaceTempView(f"expected_{view_name}")
-            else:
+                # write the result file to temp folder
+                if result_path:
+                    result_df.coalesce(1).write.schema(schema).csv(
+                        path=result_path, header=True
+                    )
+                    SparkPipelineFrameworkTestRunner.combine_spark_files_to_one_file(
+                        output_folder, view_name, file_extension="json"
+                    )
+            else:  # if we don't have schema file then load without a schema
                 spark_session.read.csv(
                     path=output_file_path, header=True, comment="#"
                 ).createOrReplaceTempView(f"expected_{view_name}")
+                # write the result file to temp folder
+                if result_path:
+                    result_df.coalesce(1).write.csv(
+                        path=result_path, header=True
+                    )
+                    SparkPipelineFrameworkTestRunner.combine_spark_files_to_one_file(
+                        output_folder, view_name, file_extension="json"
+                    )
 
             found_output_file = True
         elif file_extension.lower() == ".jsonl" or file_extension.lower(
@@ -276,10 +305,23 @@ class SparkPipelineFrameworkTestRunner:
                 spark_session.read.schema(schema).json(
                     path=output_file_path
                 ).createOrReplaceTempView(f"expected_{view_name}")
+                # write the result file to temp folder
+                if result_path:
+                    result_df.coalesce(1).write.schema(schema).json(
+                        path=result_path
+                    )
+                    SparkPipelineFrameworkTestRunner.combine_spark_files_to_one_file(
+                        output_folder, view_name, file_extension="json"
+                    )
             else:
                 spark_session.read.json(
                     path=output_file_path
                 ).createOrReplaceTempView(f"expected_{view_name}")
+                if result_path:
+                    result_df.coalesce(1).write.json(path=result_path)
+                    SparkPipelineFrameworkTestRunner.combine_spark_files_to_one_file(
+                        output_folder, view_name, file_extension="json"
+                    )
             found_output_file = True
         elif file_extension.lower() == ".parquet":
             spark_session.read.parquet(
@@ -295,7 +337,8 @@ class SparkPipelineFrameworkTestRunner:
             assert_compare_data_frames(
                 expected_df=spark_session.table(f"expected_{view_name}"
                                                 ).drop("_corrupt_record"),
-                result_df=spark_session.table(view_name)
+                result_df=result_df,
+                result_path=output_file_path
             )
         return found_output_file
 
@@ -399,37 +442,42 @@ class SparkPipelineFrameworkTestRunner:
         # just for exact matches
         if [t for t in type_dict.values() if "array" in t or "struct" in t]:
             # save as json
-            file_path: Path = output_folder.joinpath(
-                "temp", f"{view_name}.json"
-            )
+            output_folder_temp = output_folder.joinpath("temp")
+            file_path: Path = output_folder_temp.joinpath(f"{view_name}.json")
             print(f"Writing {file_path}")
             df.coalesce(1).write.mode("overwrite").json(path=str(file_path))
-            json_files: List[str] = glob.glob(
-                str(
-                    output_folder.joinpath(
-                        "temp", f"{view_name}.json", "*.json"
-                    )
-                )
-            )
-            copyfile(
-                json_files[0], output_folder.joinpath(f"{view_name}.json")
+            SparkPipelineFrameworkTestRunner.combine_spark_files_to_one_file(
+                output_folder_temp.joinpath(f"{view_name}.json"),
+                view_name,
+                file_extension="json"
             )
         else:
             # save as csv
-            file_path = output_folder.joinpath("temp", f"{view_name}.csv")
+            output_folder_temp = output_folder.joinpath("temp")
+            file_path = output_folder_temp.joinpath("temp", f"{view_name}.csv")
             print(f"Writing {file_path}")
 
-            df.repartition(1).write.mode("overwrite").csv(
-                path=str(file_path), header=True
+            df.coalesce(1).write.mode("overwrite"
+                                      ).csv(path=str(file_path), header=True)
+            SparkPipelineFrameworkTestRunner.combine_spark_files_to_one_file(
+                output_folder_temp.joinpath(f"{view_name}.csv"),
+                view_name,
+                file_extension="csv"
             )
-            csv_files: List[str] = glob.glob(
-                str(
-                    output_folder.joinpath(
-                        "temp", f"{view_name}.csv", "*.csv"
-                    )
-                )
+
+    @staticmethod
+    def combine_spark_files_to_one_file(
+        output_folder: Path, view_name: str, file_extension: str
+    ) -> None:
+        files: List[str] = glob.glob(
+            str(
+                output_folder.joinpath(f"{view_name}.{file_extension}"
+                                       ).joinpath(f"*.{file_extension}")
             )
-            copyfile(csv_files[0], output_folder.joinpath(f"{view_name}.csv"))
+        )
+        copyfile(
+            files[0], output_folder.joinpath(f"{view_name}.{file_extension}")
+        )
 
     @staticmethod
     def write_schema_to_output(
