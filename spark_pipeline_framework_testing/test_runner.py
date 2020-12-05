@@ -378,6 +378,9 @@ class SparkPipelineFrameworkTestRunner:
                     emptyValue=None,
                 ).limit(SparkPipelineFrameworkTestRunner.row_limit
                         ).createOrReplaceTempView(view_name)
+                assert "_corrupt_record" not in spark_session.table(
+                    view_name
+                ).columns, input_file_path
             else:
                 spark_session.read.csv(
                     path=input_file_path,
@@ -386,6 +389,9 @@ class SparkPipelineFrameworkTestRunner:
                     emptyValue=None,
                 ).limit(SparkPipelineFrameworkTestRunner.row_limit
                         ).createOrReplaceTempView(view_name)
+                assert "_corrupt_record" not in spark_session.table(
+                    view_name
+                ).columns, input_file_path
         elif file_extension.lower() == ".jsonl" or file_extension.lower(
         ) == ".json":
             input_file_path = os.path.join(input_folder, input_file)
@@ -413,16 +419,24 @@ class SparkPipelineFrameworkTestRunner:
                     path=jsonl_input_file_path
                 ).limit(SparkPipelineFrameworkTestRunner.row_limit
                         ).createOrReplaceTempView(view_name)
+                assert "_corrupt_record" not in spark_session.table(
+                    view_name
+                ).columns, input_file_path
             else:  # if no schema found just load the file
                 spark_session.read.json(path=jsonl_input_file_path).limit(
                     SparkPipelineFrameworkTestRunner.row_limit
                 ).createOrReplaceTempView(view_name)
-
+                assert "_corrupt_record" not in spark_session.table(
+                    view_name
+                ).columns, input_file_path
         elif file_extension.lower() == ".parquet":
-            spark_session.read.parquet(
-                path=os.path.join(input_folder, input_file)
-            ).limit(SparkPipelineFrameworkTestRunner.row_limit
-                    ).createOrReplaceTempView(view_name)
+            input_file_path = os.path.join(input_folder, input_file)
+            spark_session.read.parquet(path=input_file_path).limit(
+                SparkPipelineFrameworkTestRunner.row_limit
+            ).createOrReplaceTempView(view_name)
+            assert "_corrupt_record" not in spark_session.table(
+                view_name
+            ).columns, input_file_path
 
     @staticmethod
     def get_view_name_from_file_path(input_file: str) -> str:
