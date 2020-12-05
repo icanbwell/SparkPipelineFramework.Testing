@@ -29,6 +29,6 @@ repos:
             - logger
             - sparkautomapper
             - sparkautomapper.fhir
-            - sparkpipelineframework
-            - sparkdataframecomparer
+            - sparkpipelineframework>=0.1.54
+            - sparkdataframecomparer>=0.1.49
             - pytest
