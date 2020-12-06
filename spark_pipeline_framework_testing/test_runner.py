@@ -1,6 +1,6 @@
+import glob
 import json
 import os
-import glob
 import shutil
 from importlib import import_module
 from inspect import signature
@@ -8,7 +8,6 @@ from os import listdir
 from os.path import isfile, join
 from pathlib import Path, PurePath
 from re import search
-from shutil import copyfile
 from typing import List, Optional, Match, Dict, Any, Tuple, Union, Callable
 
 from pyspark.sql import SparkSession, DataFrame
@@ -501,8 +500,13 @@ class SparkPipelineFrameworkTestRunner:
         )
         # find files with that extension in source_folder
         files: List[str] = glob.glob(str(file_pattern_to_search))
-        # now copy the first file to the destination
-        copyfile(files[0], destination_file)
+        lines: List[str] = []
+        for file in files:
+            with open(file, "r") as file_source:
+                lines = lines + file_source.readlines()
+
+        with open(destination_file, "w") as file_destination:
+            file_destination.writelines(lines)
 
     @staticmethod
     def combine_spark_json_files_to_one_file(
