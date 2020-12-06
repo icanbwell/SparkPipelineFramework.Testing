@@ -14,8 +14,11 @@ from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
 from pyspark.sql.types import StructType
 from spark_data_frame_comparer.spark_data_frame_comparer import assert_compare_data_frames
+from spark_data_frame_comparer.spark_data_frame_comparer_exception import SparkDataFrameComparerException
 from spark_pipeline_framework.progress_logger.progress_logger import ProgressLogger
 from spark_pipeline_framework.utilities.json_to_jsonl_converter import convert_json_to_jsonl
+
+from spark_pipeline_framework_testing.testing_exception import SparkPipelineFrameworkTestingException
 
 
 class SparkPipelineFrameworkTestRunner:
@@ -29,6 +32,28 @@ class SparkPipelineFrameworkTestRunner:
         func_path_modifier: Optional[Callable[[Union[Path, str]],
                                               Union[Path, str]]] = None
     ) -> None:
+        """
+        Tests Spark Transformers without writing any code
+
+        1. Reads all the files in the `input` folder into Spark views (using filename as view name)
+        2. If input_schema folder is present then it uses those schemas when loading the files in input folder.
+        3. Runs the Spark Transformer at the same path in the project.  E.g., if your test is spf_tests/library/foo then
+            it will look for a transformer in library/foo. So basically it takes the path after `library` and looks
+            for a Transformer at that location
+        4. If output files or output_schema files are not present then this writes them out
+        5. If output files are present then this compares the actual view in Spark (after running the Transformer above)
+            with the view stored in the output file
+        6. If output_schema is present then it uses that when loading the output file
+
+
+        :param spark_session: Spark Session
+        :param folder_path: where to look for test files
+        :param parameters: (Optional) any parameters to pass to the transformer
+        :param func_path_modifier: (Optional) A function that can transform the paths
+        :return: Throws SparkPipelineFrameworkTestingException if there are mismatches between
+                    expected output files and actual output files.  The `exceptions` list in
+                    SparkPipelineFrameworkTestingException holds all the mismatch exceptions
+        """
         if not parameters:
             parameters = {}
 
@@ -144,8 +169,11 @@ class SparkPipelineFrameworkTestRunner:
             if os.path.exists(output_folder.joinpath("temp/result")):
                 shutil.rmtree(output_folder.joinpath("temp/result"))
 
+            data_frame_exceptions: List[SparkDataFrameComparerException] = []
             for output_file in output_files:
-                found_output_file: bool = SparkPipelineFrameworkTestRunner.process_output_file(
+                found_output_file: bool
+                data_frame_exception: Optional[SparkDataFrameComparerException]
+                found_output_file, data_frame_exception = SparkPipelineFrameworkTestRunner.process_output_file(
                     spark_session=spark_session,
                     output_file=output_file,
                     output_folder=output_folder,
@@ -158,6 +186,8 @@ class SparkPipelineFrameworkTestRunner:
                         SparkPipelineFrameworkTestRunner.
                         get_view_name_from_file_path(output_file).lower()
                     )
+                    if data_frame_exception:
+                        data_frame_exceptions.append(data_frame_exception)
 
             # write out any missing output files
             if os.path.exists(output_folder.joinpath("temp/output")):
@@ -180,6 +210,11 @@ class SparkPipelineFrameworkTestRunner:
                 shutil.rmtree(output_folder.joinpath("temp/output"))
 
             clean_spark_session(session=spark_session)
+
+            if len(data_frame_exceptions) > 0:
+                raise SparkPipelineFrameworkTestingException(
+                    exceptions=data_frame_exceptions
+                )
 
     @staticmethod
     def run_transformer(
@@ -242,7 +277,8 @@ class SparkPipelineFrameworkTestRunner:
         func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path,
                                                                         str]]],
         temp_folder: Optional[Union[Path, str]] = None,
-    ) -> bool:
+    ) -> Tuple[bool, Optional[SparkDataFrameComparerException]]:
+        data_frame_exception: Optional[SparkDataFrameComparerException] = None
         file_extension: str = SparkPipelineFrameworkTestRunner.get_file_extension_from_file_path(
             output_file
         )
@@ -252,7 +288,7 @@ class SparkPipelineFrameworkTestRunner:
         if file_extension.lower() not in [
             ".csv", ".json", ".jsonl", ".parquet"
         ]:
-            return True
+            return True, data_frame_exception
         result_df: DataFrame = spark_session.table(view_name)
 
         found_output_file: bool = False
@@ -342,17 +378,21 @@ class SparkPipelineFrameworkTestRunner:
             print(
                 f"Comparing with view:[view_name= with view:[expected_{view_name}]"
             )
-            # drop any corrupted column
-            assert_compare_data_frames(
-                expected_df=spark_session.table(f"expected_{view_name}"
-                                                ).drop("_corrupt_record"),
-                result_df=result_df,
-                result_path=result_file,
-                expected_path=output_file_path,
-                temp_folder=temp_folder,
-                func_path_modifier=func_path_modifier
-            )
-        return found_output_file
+            try:
+                # drop any corrupted column
+                assert_compare_data_frames(
+                    expected_df=spark_session.table(f"expected_{view_name}"
+                                                    ).drop("_corrupt_record"),
+                    result_df=result_df,
+                    result_path=result_file,
+                    expected_path=output_file_path,
+                    temp_folder=temp_folder,
+                    func_path_modifier=func_path_modifier
+                )
+            except SparkDataFrameComparerException as e:
+                data_frame_exception = e
+
+        return found_output_file, data_frame_exception
 
     @staticmethod
     def process_input_file(
