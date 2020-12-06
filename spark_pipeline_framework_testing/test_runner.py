@@ -9,7 +9,7 @@ from os.path import isfile, join
 from pathlib import Path, PurePath
 from re import search
 from shutil import copyfile
-from typing import List, Optional, Match, Dict, Any, Tuple, Union
+from typing import List, Optional, Match, Dict, Any, Tuple, Union, Callable
 
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
@@ -26,7 +26,9 @@ class SparkPipelineFrameworkTestRunner:
     def run_tests(
         spark_session: SparkSession,
         folder_path: Path,
-        parameters: Optional[Dict[str, Any]] = None
+        parameters: Optional[Dict[str, Any]] = None,
+        func_path_modifier: Optional[Callable[[Union[Path, str]],
+                                              Union[Path, str]]] = None
     ) -> None:
         if not parameters:
             parameters = {}
@@ -149,7 +151,8 @@ class SparkPipelineFrameworkTestRunner:
                     output_file=output_file,
                     output_folder=output_folder,
                     output_schema_folder=output_schema_folder,
-                    temp_folder=output_folder.joinpath("temp/result")
+                    temp_folder=output_folder.joinpath("temp/result"),
+                    func_path_modifier=func_path_modifier
                 )
                 if found_output_file:
                     views_found.append(
@@ -237,7 +240,9 @@ class SparkPipelineFrameworkTestRunner:
         output_file: str,
         output_folder: Path,
         output_schema_folder: Path,
-        temp_folder: Optional[Union[Path, str]] = None
+        func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path,
+                                                                        str]]],
+        temp_folder: Optional[Union[Path, str]] = None,
     ) -> bool:
         file_extension: str = SparkPipelineFrameworkTestRunner.get_file_extension_from_file_path(
             output_file
@@ -344,7 +349,8 @@ class SparkPipelineFrameworkTestRunner:
                 result_df=result_df,
                 result_path=result_file,
                 expected_path=output_file_path,
-                temp_folder=temp_folder
+                temp_folder=temp_folder,
+                func_path_modifier=func_path_modifier
             )
         return found_output_file
 
