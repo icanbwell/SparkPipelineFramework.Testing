@@ -7,7 +7,7 @@ from spark_pipeline_framework_testing.test_runner import SparkPipelineFrameworkT
 from spark_pipeline_framework_testing.testing_exception import SparkPipelineFrameworkTestingException
 
 
-def test_practitioner_fail(spark_session: SparkSession) -> None:
+def test_practitioner_fail_on_data(spark_session: SparkSession) -> None:
     data_dir: Path = Path(__file__).parent.joinpath('./')
 
     with pytest.raises(SparkPipelineFrameworkTestingException):

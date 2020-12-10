@@ -14,7 +14,7 @@ from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
 from pyspark.sql.types import StructType
 from spark_data_frame_comparer.spark_data_frame_comparer import assert_compare_data_frames
-from spark_data_frame_comparer.spark_data_frame_comparer_exception import SparkDataFrameComparerException
+from spark_data_frame_comparer.spark_data_frame_comparer_exception import SparkDataFrameComparerException, ExceptionType
 from spark_pipeline_framework.progress_logger.progress_logger import ProgressLogger
 from spark_pipeline_framework.utilities.json_to_jsonl_converter import convert_json_to_jsonl
 
@@ -297,6 +297,7 @@ class SparkPipelineFrameworkTestRunner:
             f"{view_name}"
         ) if temp_folder else None
         result_file: Optional[Path] = None
+        output_schema_file: Optional[str] = None
         if file_extension.lower() == ".csv":
             output_schema_file = os.path.join(
                 output_schema_folder, f"{view_name}.json"
@@ -391,8 +392,50 @@ class SparkPipelineFrameworkTestRunner:
                 )
             except SparkDataFrameComparerException as e:
                 data_frame_exception = e
+                # for schema errors, show a compare path for schema
+                if e.exception_type == ExceptionType.SchemaMismatch:
+                    if temp_folder and output_schema_file:
+                        # write the new schema to temp folder
+                        result_schema_path = SparkPipelineFrameworkTestRunner.write_schema_to_output(
+                            spark_session=spark_session,
+                            view_name=view_name,
+                            schema_folder=Path(temp_folder
+                                               ).joinpath(view_name)
+                        )
+                        e.compare_path = SparkPipelineFrameworkTestRunner.get_compare_path(
+                            result_path=result_schema_path,
+                            expected_path=Path(output_schema_file),
+                            temp_folder=temp_folder,
+                            func_path_modifier=func_path_modifier
+                        )
+                        if func_path_modifier and e.compare_path:
+                            e.compare_path = func_path_modifier(e.compare_path)
 
         return found_output_file, data_frame_exception
+
+    @staticmethod
+    def get_compare_path(
+        result_path: Optional[Path], expected_path: Optional[Path],
+        temp_folder: Optional[Union[Path, str]],
+        func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path,
+                                                                        str]]]
+    ) -> Optional[Path]:
+        compare_sh_path: Optional[Path] = None
+        if expected_path and result_path and temp_folder:
+            expected_file_name: str = os.path.basename(expected_path)
+            # create a temp file to launch the diff tool
+            # use .command: https://stackoverflow.com/questions/5125907/how-to-run-a-shell-script-in-os-x-by-double-clicking
+            compare_sh_path = Path(temp_folder).joinpath(
+                f"compare_schema_{expected_file_name}.command"
+            )
+            with open(compare_sh_path, "w") as compare_sh:
+                compare_sh.write(
+                    f"/usr/local/bin/charm diff "
+                    f"{func_path_modifier(result_path) if func_path_modifier else result_path} "
+                    f"{func_path_modifier(expected_path) if func_path_modifier else expected_path}"
+                )
+                os.fchmod(compare_sh.fileno(), 0o7777)
+        return compare_sh_path
 
     @staticmethod
     def process_input_file(
@@ -497,16 +540,24 @@ class SparkPipelineFrameworkTestRunner:
         return file_extension
 
     @staticmethod
-    def write_table_to_output(
-        spark_session: SparkSession, view_name: str, output_folder: Path
-    ) -> None:
-        df: DataFrame = spark_session.table(view_name)
+    def should_write_dataframe_as_json(df: DataFrame) -> bool:
         types: List[Tuple[str, Any]] = df.dtypes
         type_dict: Dict[str, Any] = {key: value for key, value in types}
         # these type strings can look like 'array<struct<Field:string>>', so we
         # have to check if "array" or "struct" appears in the type string, not
         # just for exact matches
-        if [t for t in type_dict.values() if "array" in t or "struct" in t]:
+        return any(
+            [t for t in type_dict.values() if "array" in t or "struct" in t]
+        )
+
+    @staticmethod
+    def write_table_to_output(
+        spark_session: SparkSession, view_name: str, output_folder: Path
+    ) -> None:
+        df: DataFrame = spark_session.table(view_name)
+        if SparkPipelineFrameworkTestRunner.should_write_dataframe_as_json(
+            df=df
+        ):
             # save as json
             output_folder_temp = output_folder.joinpath("temp")
             file_path: Path = output_folder_temp.joinpath(f"{view_name}.json")
@@ -571,14 +622,13 @@ class SparkPipelineFrameworkTestRunner:
     @staticmethod
     def write_schema_to_output(
         spark_session: SparkSession, view_name: str, schema_folder: Path
-    ) -> None:
+    ) -> Path:
         df: DataFrame = spark_session.table(view_name)
 
         # write out schema file if it does not exist
-        if not os.path.exists(schema_folder.joinpath(f"{view_name}.json")):
-            with open(
-                schema_folder.joinpath(f"{view_name}.json"), "w"
-            ) as file:
+        schema_file_path: Path = schema_folder.joinpath(f"{view_name}.json")
+        if not os.path.exists(schema_file_path):
+            with open(schema_file_path, "w") as file:
                 schema_as_dict: Dict[str, Any] = df.schema.jsonValue()
                 # schema_as_dict: Any = json.loads(s=schema_as_json)
                 # Adding $schema tag enables auto-complete and syntax checking in editors
@@ -587,6 +637,7 @@ class SparkPipelineFrameworkTestRunner:
                 ] = "https://raw.githubusercontent.com/imranq2/SparkPipelineFramework.Testing/main/spark_json_schema" \
                     ".json "
                 file.write(json.dumps(schema_as_dict, indent=4))
+        return schema_file_path
 
 
 def get_testable_folders(folder_path: Path) -> List[str]:
