@@ -399,14 +399,16 @@ class SparkPipelineFrameworkTestRunner:
                         result_schema_path = SparkPipelineFrameworkTestRunner.write_schema_to_output(
                             spark_session=spark_session,
                             view_name=view_name,
-                            schema_folder=Path(temp_folder
-                                               ).joinpath(view_name)
+                            schema_folder=Path(temp_folder).joinpath(
+                                "schemas"
+                            ).joinpath("result").joinpath(view_name)
                         )
                         e.compare_path = SparkPipelineFrameworkTestRunner.get_compare_path(
                             result_path=result_schema_path,
                             expected_path=Path(output_schema_file),
                             temp_folder=temp_folder,
-                            func_path_modifier=func_path_modifier
+                            func_path_modifier=func_path_modifier,
+                            type_="schema"
                         )
                         if func_path_modifier and e.compare_path:
                             e.compare_path = func_path_modifier(e.compare_path)
@@ -417,8 +419,8 @@ class SparkPipelineFrameworkTestRunner:
     def get_compare_path(
         result_path: Optional[Path], expected_path: Optional[Path],
         temp_folder: Optional[Union[Path, str]],
-        func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path,
-                                                                        str]]]
+        func_path_modifier: Optional[Callable[[Union[Path, str]],
+                                              Union[Path, str]]], type_: str
     ) -> Optional[Path]:
         compare_sh_path: Optional[Path] = None
         if expected_path and result_path and temp_folder:
@@ -426,7 +428,7 @@ class SparkPipelineFrameworkTestRunner:
             # create a temp file to launch the diff tool
             # use .command: https://stackoverflow.com/questions/5125907/how-to-run-a-shell-script-in-os-x-by-double-clicking
             compare_sh_path = Path(temp_folder).joinpath(
-                f"compare_schema_{expected_file_name}.command"
+                f"compare_{type_}_{expected_file_name}.command"
             )
             with open(compare_sh_path, "w") as compare_sh:
                 compare_sh.write(
@@ -615,6 +617,7 @@ class SparkPipelineFrameworkTestRunner:
                 lines = lines + file_source.readlines()
 
         # convert from json to json and write in pretty print
+        os.makedirs(os.path.dirname(destination_file), exist_ok=True)
         with open(destination_file, "w") as file_destination:
             json_array: List[Any] = [json.loads(line) for line in lines]
             file_destination.write(json.dumps(json_array, indent=2))
@@ -628,6 +631,7 @@ class SparkPipelineFrameworkTestRunner:
         # write out schema file if it does not exist
         schema_file_path: Path = schema_folder.joinpath(f"{view_name}.json")
         if not os.path.exists(schema_file_path):
+            os.makedirs(os.path.dirname(schema_file_path), exist_ok=True)
             with open(schema_file_path, "w") as file:
                 schema_as_dict: Dict[str, Any] = df.schema.jsonValue()
                 # schema_as_dict: Any = json.loads(s=schema_as_json)

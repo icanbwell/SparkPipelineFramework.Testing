@@ -15,18 +15,26 @@ def test_practitioner_fail_on_schema(spark_session: SparkSession) -> None:
             SparkPipelineFrameworkTestRunner.run_tests(
                 spark_session=spark_session,
                 folder_path=data_dir,
-                func_path_modifier=lambda x:
-                Path(str(x).replace(str(data_dir), "/foo/"))
+                # func_path_modifier=lambda x:
+                # Path(str(x).replace(str(data_dir), "/foo/"))
             )
         except SparkPipelineFrameworkTestingException as e:
             assert len(e.exceptions) == 1
-            assert e.exceptions[0].result_path == Path(
-                "/foo/output/temp/result/output.json"
+            # assert e.exceptions[0].result_path == Path(
+            #     "/foo/output/temp/result/output.json"
+            # )
+            # assert e.exceptions[0].expected_path == Path(
+            #     "/foo/output/output.json"
+            # )
+            # assert e.exceptions[0].compare_path == Path(
+            #     "/foo/output/temp/result/compare_schema_output.json.command"
+            # )
+            compare_file_full_path = data_dir.joinpath(
+                "output/temp/result/compare_schema_output.json.command"
             )
-            assert e.exceptions[0].expected_path == Path(
-                "/foo/output/output.json"
-            )
-            assert e.exceptions[0].compare_path == Path(
-                "/foo/output/temp/result/compare_schema_output.json.command"
-            )
+            with open(compare_file_full_path, "r") as file:
+                print(
+                    f"------- compare file: {compare_file_full_path} ---------"
+                )
+                print(file.read())
             raise
