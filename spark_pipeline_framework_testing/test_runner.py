@@ -30,7 +30,8 @@ class SparkPipelineFrameworkTestRunner:
         folder_path: Path,
         parameters: Optional[Dict[str, Any]] = None,
         func_path_modifier: Optional[Callable[[Union[Path, str]],
-                                              Union[Path, str]]] = None
+                                              Union[Path, str]]] = None,
+        temp_folder: Optional[Path] = None
     ) -> None:
         """
         Tests Spark Transformers without writing any code
@@ -50,6 +51,7 @@ class SparkPipelineFrameworkTestRunner:
         :param folder_path: where to look for test files
         :param parameters: (Optional) any parameters to pass to the transformer
         :param func_path_modifier: (Optional) A function that can transform the paths
+        :param temp_folder: folder to use for temporary files.  Any existing files in this folder will be deleted.
         :return: Throws SparkPipelineFrameworkTestingException if there are mismatches between
                     expected output files and actual output files.  The `exceptions` list in
                     SparkPipelineFrameworkTestingException holds all the mismatch exceptions
@@ -166,8 +168,11 @@ class SparkPipelineFrameworkTestRunner:
                 if isfile(join(output_folder, f))
             ]
             views_found: List[str] = []
-            if os.path.exists(output_folder.joinpath("temp/result")):
-                shutil.rmtree(output_folder.joinpath("temp/result"))
+            if not temp_folder:
+                temp_folder = output_folder.joinpath("temp")
+
+            if os.path.exists(temp_folder):
+                shutil.rmtree(temp_folder)
 
             data_frame_exceptions: List[SparkDataFrameComparerException] = []
             for output_file in output_files:
@@ -178,7 +183,7 @@ class SparkPipelineFrameworkTestRunner:
                     output_file=output_file,
                     output_folder=output_folder,
                     output_schema_folder=output_schema_folder,
-                    temp_folder=output_folder.joinpath("temp/result"),
+                    temp_folder=temp_folder.joinpath("result"),
                     func_path_modifier=func_path_modifier
                 )
                 if found_output_file:
@@ -190,9 +195,6 @@ class SparkPipelineFrameworkTestRunner:
                         data_frame_exceptions.append(data_frame_exception)
 
             # write out any missing output files
-            if os.path.exists(output_folder.joinpath("temp/output")):
-                shutil.rmtree(output_folder.joinpath("temp/output"))
-
             table_names_to_write_to_output: List[str] = [
                 t.name for t in output_tables
                 if t.name.lower() not in views_found and not t.name.
@@ -204,10 +206,9 @@ class SparkPipelineFrameworkTestRunner:
                 SparkPipelineFrameworkTestRunner.write_table_to_output(
                     spark_session=spark_session,
                     view_name=table_name,
-                    output_folder=output_folder
+                    output_folder=output_folder,
+                    temp_folder=temp_folder.joinpath("result")
                 )
-            if os.path.exists(output_folder.joinpath("temp/output")):
-                shutil.rmtree(output_folder.joinpath("temp/output"))
 
             clean_spark_session(session=spark_session)
 
@@ -554,15 +555,15 @@ class SparkPipelineFrameworkTestRunner:
 
     @staticmethod
     def write_table_to_output(
-        spark_session: SparkSession, view_name: str, output_folder: Path
+        spark_session: SparkSession, view_name: str, output_folder: Path,
+        temp_folder: Path
     ) -> None:
         df: DataFrame = spark_session.table(view_name)
         if SparkPipelineFrameworkTestRunner.should_write_dataframe_as_json(
             df=df
         ):
             # save as json
-            output_folder_temp = output_folder.joinpath("temp")
-            file_path: Path = output_folder_temp.joinpath(f"{view_name}.json")
+            file_path: Path = temp_folder.joinpath(f"{view_name}.json")
             print(f"Writing {file_path}")
             df.coalesce(1).write.mode("overwrite").json(path=str(file_path))
             SparkPipelineFrameworkTestRunner.combine_spark_json_files_to_one_file(
@@ -572,8 +573,7 @@ class SparkPipelineFrameworkTestRunner:
             )
         else:
             # save as csv
-            output_folder_temp = output_folder.joinpath("temp")
-            file_path = output_folder_temp.joinpath("temp", f"{view_name}.csv")
+            file_path = temp_folder.joinpath(f"{view_name}.csv")
             print(f"Writing {file_path}")
 
             df.coalesce(1).write.mode("overwrite"
@@ -600,6 +600,7 @@ class SparkPipelineFrameworkTestRunner:
 
         with open(destination_file, "w") as file_destination:
             file_destination.writelines(lines)
+            file_destination.write("\n")
 
     @staticmethod
     def combine_spark_json_files_to_one_file(
@@ -621,6 +622,7 @@ class SparkPipelineFrameworkTestRunner:
         with open(destination_file, "w") as file_destination:
             json_array: List[Any] = [json.loads(line) for line in lines]
             file_destination.write(json.dumps(json_array, indent=2))
+            file_destination.write("\n")
 
     @staticmethod
     def write_schema_to_output(
