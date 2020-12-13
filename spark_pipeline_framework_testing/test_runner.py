@@ -2,8 +2,6 @@ import glob
 import json
 import os
 import shutil
-from importlib import import_module
-from inspect import signature
 from os import listdir
 from os.path import isfile, join
 from pathlib import Path, PurePath
@@ -22,6 +20,7 @@ from spark_data_frame_comparer.spark_data_frame_comparer_exception import (
     ExceptionType,
 )
 from spark_pipeline_framework.progress_logger.progress_logger import ProgressLogger
+from spark_pipeline_framework.utilities.class_helpers import ClassHelpers
 from spark_pipeline_framework.utilities.json_to_jsonl_converter import (
     convert_json_to_jsonl,
 )
@@ -43,7 +42,7 @@ class SparkPipelineFrameworkTestRunner:
             Callable[[Union[Path, str]], Union[Path, str]]
         ] = None,
         temp_folder: Optional[Path] = None,
-        transformer: Optional[Transformer] = None,
+        transformer_type: Optional[Type[Transformer]] = None,
     ) -> None:
         """
         Tests Spark Transformers without writing any code
@@ -64,7 +63,7 @@ class SparkPipelineFrameworkTestRunner:
         :param parameters: (Optional) any parameters to pass to the transformer
         :param func_path_modifier: (Optional) A function that can transform the paths
         :param temp_folder: folder to use for temporary files.  Any existing files in this folder will be deleted.
-        :param transformer: (Optional) the transformer to run
+        :param transformer_type: (Optional) the transformer to run
         :return: Throws SparkPipelineFrameworkTestingException if there are mismatches between
                     expected output files and actual output files.  The `exceptions` list in
                     SparkPipelineFrameworkTestingException holds all the mismatch exceptions
@@ -139,7 +138,7 @@ class SparkPipelineFrameworkTestRunner:
                     parameters=parameters,
                     search_result=search_result,
                     testable_folder=testable_folder,
-                    transformer=transformer,
+                    transformer_type=transformer_type,
                 )
 
             # write out any missing schemas
@@ -237,11 +236,11 @@ class SparkPipelineFrameworkTestRunner:
         parameters: Optional[Dict[str, Any]],
         search_result: Match[str],
         testable_folder: str,
-        transformer: Optional[Type[Transformer]],
+        transformer_type: Optional[Type[Transformer]],
     ) -> None:
         my_class: Type[Transformer]
-        if transformer:
-            my_class = transformer
+        if transformer_type:
+            my_class = transformer_type
         else:
             # get name of transformer file
             search_result_end = search_result.end()
@@ -253,9 +252,7 @@ class SparkPipelineFrameworkTestRunner:
             lib_path: str = testable_folder[search_result_start_:].replace("/", ".")
             # load the transformer file (i.e., module)
             full_reference = lib_path + "." + transformer_file_name
-            my_class = SparkPipelineFrameworkTestRunner.get_first_class_in_file(
-                full_reference
-            )
+            my_class = ClassHelpers.get_first_class_in_file(full_reference)
 
         with ProgressLogger() as progress_logger:
             # now figure out the class_parameters to use when instantiating the class
@@ -263,10 +260,8 @@ class SparkPipelineFrameworkTestRunner:
                 "parameters": parameters or {},
                 "progress_logger": progress_logger,
             }
-            my_instance: Transformer = (
-                SparkPipelineFrameworkTestRunner.instantiate_class_with_parameters(
-                    class_parameters=class_parameters, my_class=my_class
-                )
+            my_instance: Transformer = ClassHelpers.instantiate_class_with_parameters(
+                class_parameters=class_parameters, my_class=my_class
             )
             # now call transform
             schema = StructType([])
@@ -275,39 +270,6 @@ class SparkPipelineFrameworkTestRunner:
                 spark_session.sparkContext.emptyRDD(), schema
             )
             my_instance.transform(df)
-
-    @staticmethod
-    def instantiate_class_with_parameters(
-        class_parameters: Dict[str, Any], my_class: Type[Any]
-    ) -> Any:
-        # find the signature of the __init__ method
-        my_class_signature = signature(my_class.__init__)
-        my_class_args = [
-            param.name
-            for param in my_class_signature.parameters.values()
-            if param.name != "self"
-        ]
-        # instantiate the class passing in the parameters + progress_logger
-        if len(my_class_args) > 0 and len(class_parameters) > 0:
-            # noinspection PyArgumentList
-            my_instance = my_class(
-                **{k: v for k, v in class_parameters.items() if k in my_class_args}
-            )
-        else:
-            my_instance = my_class()
-        return my_instance
-
-    @staticmethod
-    def get_first_class_in_file(full_reference: str) -> Type[Transformer]:
-        module = import_module(full_reference)
-        md = module.__dict__
-        # find the first class in that module (we assume the first class is the Transformer class)
-        my_class: Type[Transformer] = [
-            md[c]
-            for c in md
-            if (isinstance(md[c], type) and md[c].__module__ == module.__name__)
-        ][0]
-        return my_class
 
     @staticmethod
     def process_output_file(
