@@ -4,11 +4,13 @@ from shutil import rmtree
 
 from pyspark.sql import SparkSession
 
-from spark_pipeline_framework_testing.test_runner import SparkPipelineFrameworkTestRunner
+from spark_pipeline_framework_testing.test_runner import (
+    SparkPipelineFrameworkTestRunner,
+)
 
 
 def test_folder(spark_session: SparkSession) -> None:
-    data_dir: Path = Path(__file__).parent.joinpath('./')
+    data_dir: Path = Path(__file__).parent.joinpath("./")
 
     temp_folder = data_dir.joinpath("output/temp")
     if path.isdir(temp_folder):
