@@ -30,5 +30,5 @@ repos:
             - sparkautomapper
             - sparkautomapper.fhir
             - sparkpipelineframework>=0.1.59
-            - sparkdataframecomparer>=0.1.54
+            - sparkdataframecomparer>=0.1.55
             - pytest
