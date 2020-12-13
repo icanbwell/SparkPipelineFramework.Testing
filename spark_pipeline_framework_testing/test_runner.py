@@ -8,8 +8,9 @@ from os import listdir
 from os.path import isfile, join
 from pathlib import Path, PurePath
 from re import search
-from typing import List, Optional, Match, Dict, Any, Tuple, Union, Callable
+from typing import List, Optional, Match, Dict, Any, Tuple, Union, Callable, Type
 
+from pyspark.ml import Transformer
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
 from pyspark.sql.types import StructType
@@ -31,7 +32,8 @@ class SparkPipelineFrameworkTestRunner:
         parameters: Optional[Dict[str, Any]] = None,
         func_path_modifier: Optional[Callable[[Union[Path, str]],
                                               Union[Path, str]]] = None,
-        temp_folder: Optional[Path] = None
+        temp_folder: Optional[Path] = None,
+        transformer: Optional[Transformer] = None
     ) -> None:
         """
         Tests Spark Transformers without writing any code
@@ -52,6 +54,7 @@ class SparkPipelineFrameworkTestRunner:
         :param parameters: (Optional) any parameters to pass to the transformer
         :param func_path_modifier: (Optional) A function that can transform the paths
         :param temp_folder: folder to use for temporary files.  Any existing files in this folder will be deleted.
+        :param transformer: (Optional) the transformer to run
         :return: Throws SparkPipelineFrameworkTestingException if there are mismatches between
                     expected output files and actual output files.  The `exceptions` list in
                     SparkPipelineFrameworkTestingException holds all the mismatch exceptions
@@ -132,7 +135,8 @@ class SparkPipelineFrameworkTestRunner:
                     spark_session=spark_session,
                     parameters=parameters,
                     search_result=search_result,
-                    testable_folder=testable_folder
+                    testable_folder=testable_folder,
+                    transformer=transformer
                 )
 
             # write out any missing schemas
@@ -220,54 +224,75 @@ class SparkPipelineFrameworkTestRunner:
     @staticmethod
     def run_transformer(
         spark_session: SparkSession, parameters: Optional[Dict[str, Any]],
-        search_result: Match[str], testable_folder: str
+        search_result: Match[str], testable_folder: str,
+        transformer: Optional[Type[Transformer]]
     ) -> None:
-        # get name of transformer file
-        transformer_file_name = testable_folder[search_result.end():].replace(
-            '/', '_'
-        )
-        # find parent folder of transformer file
-        lib_path = testable_folder[search_result.start() +
-                                   1:].replace('/', '.')
-        # load the transformer file (i.e., module)
-        module = import_module(lib_path + "." + transformer_file_name)
-        md = module.__dict__
-        # find the first class in that module (we assume the first class is the Transformer class)
-        my_class = [
-            md[c] for c in md if
-            (isinstance(md[c], type) and md[c].__module__ == module.__name__)
-        ][0]
-        # find the signature of the __init__ method
-        my_class_signature = signature(my_class.__init__)
-        my_class_args = [
-            param.name for param in my_class_signature.parameters.values()
-            if param.name != 'self'
-        ]
+        my_class: Type[Transformer]
+        if transformer:
+            my_class = transformer
+        else:
+            # get name of transformer file
+            transformer_file_name: str = testable_folder[search_result.end(
+            ):].replace('/', '_')
+            # find parent folder of transformer file
+            lib_path: str = testable_folder[search_result.start() +
+                                            1:].replace('/', '.')
+            # load the transformer file (i.e., module)
+            full_reference = lib_path + "." + transformer_file_name
+            my_class = SparkPipelineFrameworkTestRunner.get_first_class_in_file(
+                full_reference
+            )
+
         with ProgressLogger() as progress_logger:
             # now figure out the class_parameters to use when instantiating the class
             class_parameters: Dict[str, Any] = {
                 "parameters": parameters or {},
                 'progress_logger': progress_logger
             }
-            # instantiate the class passing in the parameters + progress_logger
-            if len(my_class_args) > 0 and len(class_parameters) > 0:
-                my_instance = my_class(
-                    **{
-                        k: v
-                        for k, v in class_parameters.items()
-                        if k in my_class_args
-                    }
-                )
-            else:
-                my_instance = my_class()
+            my_instance: Transformer = SparkPipelineFrameworkTestRunner.instantiate_class_with_parameters(
+                class_parameters=class_parameters, my_class=my_class
+            )
             # now call transform
             schema = StructType([])
             # create an empty dataframe to pass into transform()
             df: DataFrame = spark_session.createDataFrame(
                 spark_session.sparkContext.emptyRDD(), schema
             )
-
             my_instance.transform(df)
+
+    @staticmethod
+    def instantiate_class_with_parameters(
+        class_parameters: Dict[str, Any], my_class: Type[Any]
+    ) -> Any:
+        # find the signature of the __init__ method
+        my_class_signature = signature(my_class.__init__)
+        my_class_args = [
+            param.name for param in my_class_signature.parameters.values()
+            if param.name != 'self'
+        ]
+        # instantiate the class passing in the parameters + progress_logger
+        if len(my_class_args) > 0 and len(class_parameters) > 0:
+            # noinspection PyArgumentList
+            my_instance = my_class(
+                **{
+                    k: v
+                    for k, v in class_parameters.items() if k in my_class_args
+                }
+            )
+        else:
+            my_instance = my_class()
+        return my_instance
+
+    @staticmethod
+    def get_first_class_in_file(full_reference: str) -> Type[Transformer]:
+        module = import_module(full_reference)
+        md = module.__dict__
+        # find the first class in that module (we assume the first class is the Transformer class)
+        my_class: Type[Transformer] = [
+            md[c] for c in md if
+            (isinstance(md[c], type) and md[c].__module__ == module.__name__)
+        ][0]
+        return my_class
 
     @staticmethod
     def process_output_file(
@@ -312,11 +337,17 @@ class SparkPipelineFrameworkTestRunner:
                     f"Reading file {output_file_path} using schema: {output_schema_file}"
                 )
                 spark_session.read.schema(schema).csv(
-                    path=output_file_path, header=True
+                    path=output_file_path,
+                    header=True,
+                    comment="#",
+                    emptyValue=None
                 ).createOrReplaceTempView(f"expected_{view_name}")
             else:  # if we don't have schema file then load without a schema
                 spark_session.read.csv(
-                    path=output_file_path, header=True, comment="#"
+                    path=output_file_path,
+                    header=True,
+                    comment="#",
+                    emptyValue=None
                 ).createOrReplaceTempView(f"expected_{view_name}")
 
             # write the result file to temp folder
