@@ -9,7 +9,7 @@ from spark_pipeline_framework_testing.test_runner import (
 )
 
 
-def test_folder(spark_session: SparkSession) -> None:
+def test_practitioner(spark_session: SparkSession) -> None:
     data_dir: Path = Path(__file__).parent.joinpath("./")
 
     temp_folder = data_dir.joinpath("output/temp")
@@ -18,5 +18,5 @@ def test_folder(spark_session: SparkSession) -> None:
     temp_folder.mkdir(parents=True, exist_ok=True)
 
     SparkPipelineFrameworkTestRunner.run_tests(
-        spark_session=spark_session, folder_path=data_dir
+        spark_session=spark_session, folder_path=data_dir, sort_output_by=["id"]
     )
