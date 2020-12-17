@@ -43,6 +43,7 @@ class SparkPipelineFrameworkTestRunner:
         ] = None,
         temp_folder: Optional[Path] = None,
         transformer_type: Optional[Type[Transformer]] = None,
+        sort_output_by: Optional[List[str]] = None,
     ) -> None:
         """
         Tests Spark Transformers without writing any code
@@ -64,6 +65,7 @@ class SparkPipelineFrameworkTestRunner:
         :param func_path_modifier: (Optional) A function that can transform the paths
         :param temp_folder: folder to use for temporary files.  Any existing files in this folder will be deleted.
         :param transformer_type: (Optional) the transformer to run
+        :param sort_output_by: (Optional) sort by these columns before comparing or writing output files
         :return: Throws SparkPipelineFrameworkTestingException if there are mismatches between
                     expected output files and actual output files.  The `exceptions` list in
                     SparkPipelineFrameworkTestingException holds all the mismatch exceptions
@@ -193,6 +195,7 @@ class SparkPipelineFrameworkTestRunner:
                     output_schema_folder=output_schema_folder,
                     temp_folder=temp_folder.joinpath("result"),
                     func_path_modifier=func_path_modifier,
+                    sort_output_by=sort_output_by,
                 )
                 if found_output_file:
                     views_found.append(
@@ -221,6 +224,7 @@ class SparkPipelineFrameworkTestRunner:
                     view_name=table_name,
                     output_folder=output_folder,
                     temp_folder=temp_folder.joinpath("result"),
+                    sort_output_by=sort_output_by,
                 )
 
             clean_spark_session(session=spark_session)
@@ -278,6 +282,7 @@ class SparkPipelineFrameworkTestRunner:
         output_folder: Path,
         output_schema_folder: Path,
         func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path, str]]],
+        sort_output_by: Optional[List[str]],
         temp_folder: Optional[Union[Path, str]] = None,
     ) -> Tuple[bool, Optional[SparkDataFrameComparerException]]:
         data_frame_exception: Optional[SparkDataFrameComparerException] = None
@@ -321,9 +326,14 @@ class SparkPipelineFrameworkTestRunner:
             # write the result file to temp folder
             if result_path and temp_folder:
                 result_path_for_view: Path = result_path.joinpath(f"{view_name}.csv")
-                result_df.coalesce(1).write.csv(
-                    path=str(result_path_for_view), header=True
-                )
+                if sort_output_by:
+                    result_df.coalesce(1).sort(*sort_output_by).write.csv(
+                        path=str(result_path_for_view), header=True
+                    )
+                else:
+                    result_df.coalesce(1).write.csv(
+                        path=str(result_path_for_view), header=True
+                    )
                 result_file = Path(temp_folder).joinpath(f"{view_name}.csv")
                 SparkPipelineFrameworkTestRunner.combine_spark_csv_files_to_one_file(
                     source_folder=result_path_for_view,
@@ -351,7 +361,12 @@ class SparkPipelineFrameworkTestRunner:
             # write result to temp folder for comparison
             if result_path and temp_folder:
                 result_path_for_view = result_path.joinpath(f"{view_name}.json")
-                result_df.coalesce(1).write.json(path=str(result_path_for_view))
+                if sort_output_by:
+                    result_df.coalesce(1).sort(*sort_output_by).write.json(
+                        path=str(result_path_for_view)
+                    )
+                else:
+                    result_df.coalesce(1).write.json(path=str(result_path_for_view))
                 result_file = Path(temp_folder).joinpath(f"{view_name}.json")
                 SparkPipelineFrameworkTestRunner.combine_spark_json_files_to_one_file(
                     source_folder=result_path_for_view,
@@ -378,6 +393,7 @@ class SparkPipelineFrameworkTestRunner:
                     expected_path=output_file_path,
                     temp_folder=temp_folder,
                     func_path_modifier=func_path_modifier,
+                    order_by=sort_output_by,
                 )
             except SparkDataFrameComparerException as e:
                 data_frame_exception = e
@@ -556,13 +572,19 @@ class SparkPipelineFrameworkTestRunner:
         view_name: str,
         output_folder: Path,
         temp_folder: Path,
+        sort_output_by: Optional[List[str]],
     ) -> None:
         df: DataFrame = spark_session.table(view_name)
         if SparkPipelineFrameworkTestRunner.should_write_dataframe_as_json(df=df):
             # save as json
             file_path: Path = temp_folder.joinpath(f"{view_name}.json")
             print(f"Writing {file_path}")
-            df.coalesce(1).write.mode("overwrite").json(path=str(file_path))
+            if sort_output_by:
+                df.coalesce(1).sort(*sort_output_by).write.mode("overwrite").json(
+                    path=str(file_path)
+                )
+            else:
+                df.coalesce(1).write.mode("overwrite").json(path=str(file_path))
             SparkPipelineFrameworkTestRunner.combine_spark_json_files_to_one_file(
                 source_folder=file_path,
                 destination_file=output_folder.joinpath(f"{view_name}.json"),
@@ -573,7 +595,14 @@ class SparkPipelineFrameworkTestRunner:
             file_path = temp_folder.joinpath(f"{view_name}.csv")
             print(f"Writing {file_path}")
 
-            df.coalesce(1).write.mode("overwrite").csv(path=str(file_path), header=True)
+            if sort_output_by:
+                df.coalesce(1).sort(*sort_output_by).write.mode("overwrite").csv(
+                    path=str(file_path), header=True
+                )
+            else:
+                df.coalesce(1).write.mode("overwrite").csv(
+                    path=str(file_path), header=True
+                )
             SparkPipelineFrameworkTestRunner.combine_spark_csv_files_to_one_file(
                 source_folder=file_path,
                 destination_file=output_folder.joinpath(f"{view_name}.csv"),
