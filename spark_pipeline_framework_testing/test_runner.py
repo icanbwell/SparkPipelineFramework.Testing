@@ -329,10 +329,12 @@ class SparkPipelineFrameworkTestRunner:
             # write the result file to temp folder
             if result_path and temp_folder:
                 result_path_for_view: Path = result_path.joinpath(f"{view_name}.csv")
-                if sort_output_by:
-                    sort_columns: List[str] = [
-                        col for col in sort_output_by if col in result_df.columns
-                    ]
+                sort_columns: List[str] = (
+                    [col for col in sort_output_by if col in result_df.columns]
+                    if sort_output_by
+                    else []
+                )
+                if len(sort_columns) > 0:
                     result_df.coalesce(1).sort(*sort_columns).write.csv(
                         path=str(result_path_for_view), header=True
                     )
@@ -367,10 +369,12 @@ class SparkPipelineFrameworkTestRunner:
             # write result to temp folder for comparison
             if result_path and temp_folder:
                 result_path_for_view = result_path.joinpath(f"{view_name}.json")
-                if sort_output_by:
-                    sort_columns = [
-                        col for col in sort_output_by if col in result_df.columns
-                    ]
+                sort_columns = (
+                    [col for col in sort_output_by if col in result_df.columns]
+                    if sort_output_by
+                    else []
+                )
+                if len(sort_columns) > 0:
                     result_df.coalesce(1).sort(*sort_columns).write.json(
                         path=str(result_path_for_view)
                     )
@@ -585,6 +589,11 @@ class SparkPipelineFrameworkTestRunner:
         output_as_json_only: bool,
     ) -> None:
         df: DataFrame = spark_session.table(view_name)
+        sort_columns: List[str] = (
+            [col for col in sort_output_by if col in df.columns]
+            if sort_output_by
+            else []
+        )
         if (
             output_as_json_only
             or SparkPipelineFrameworkTestRunner.should_write_dataframe_as_json(df=df)
@@ -592,10 +601,7 @@ class SparkPipelineFrameworkTestRunner:
             # save as json
             file_path: Path = temp_folder.joinpath(f"{view_name}.json")
             print(f"Writing {file_path}")
-            if sort_output_by:
-                sort_columns: List[str] = [
-                    col for col in sort_output_by if col in df.columns
-                ]
+            if len(sort_columns) > 0:
                 df.coalesce(1).sort(*sort_columns).write.mode("overwrite").json(
                     path=str(file_path)
                 )
@@ -611,8 +617,7 @@ class SparkPipelineFrameworkTestRunner:
             file_path = temp_folder.joinpath(f"{view_name}.csv")
             print(f"Writing {file_path}")
 
-            if sort_output_by:
-                sort_columns = [col for col in sort_output_by if col in df.columns]
+            if len(sort_columns) > 0:
                 df.coalesce(1).sort(*sort_columns).write.mode("overwrite").csv(
                     path=str(file_path), header=True
                 )
