@@ -330,7 +330,10 @@ class SparkPipelineFrameworkTestRunner:
             if result_path and temp_folder:
                 result_path_for_view: Path = result_path.joinpath(f"{view_name}.csv")
                 if sort_output_by:
-                    result_df.coalesce(1).sort(*sort_output_by).write.csv(
+                    sort_columns: List[str] = [
+                        col for col in sort_output_by if col in result_df.columns
+                    ]
+                    result_df.coalesce(1).sort(*sort_columns).write.csv(
                         path=str(result_path_for_view), header=True
                     )
                 else:
@@ -365,7 +368,10 @@ class SparkPipelineFrameworkTestRunner:
             if result_path and temp_folder:
                 result_path_for_view = result_path.joinpath(f"{view_name}.json")
                 if sort_output_by:
-                    result_df.coalesce(1).sort(*sort_output_by).write.json(
+                    sort_columns = [
+                        col for col in sort_output_by if col in result_df.columns
+                    ]
+                    result_df.coalesce(1).sort(*sort_columns).write.json(
                         path=str(result_path_for_view)
                     )
                 else:
@@ -587,7 +593,10 @@ class SparkPipelineFrameworkTestRunner:
             file_path: Path = temp_folder.joinpath(f"{view_name}.json")
             print(f"Writing {file_path}")
             if sort_output_by:
-                df.coalesce(1).sort(*sort_output_by).write.mode("overwrite").json(
+                sort_columns: List[str] = [
+                    col for col in sort_output_by if col in df.columns
+                ]
+                df.coalesce(1).sort(*sort_columns).write.mode("overwrite").json(
                     path=str(file_path)
                 )
             else:
@@ -603,7 +612,8 @@ class SparkPipelineFrameworkTestRunner:
             print(f"Writing {file_path}")
 
             if sort_output_by:
-                df.coalesce(1).sort(*sort_output_by).write.mode("overwrite").csv(
+                sort_columns = [col for col in sort_output_by if col in df.columns]
+                df.coalesce(1).sort(*sort_columns).write.mode("overwrite").csv(
                     path=str(file_path), header=True
                 )
             else:
