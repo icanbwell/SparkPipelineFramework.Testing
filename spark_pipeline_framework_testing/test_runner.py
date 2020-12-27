@@ -44,6 +44,7 @@ class SparkPipelineFrameworkTestRunner:
         temp_folder: Optional[Path] = None,
         transformer_type: Optional[Type[Transformer]] = None,
         sort_output_by: Optional[List[str]] = None,
+        output_as_json_only: bool = True,
     ) -> None:
         """
         Tests Spark Transformers without writing any code
@@ -66,6 +67,7 @@ class SparkPipelineFrameworkTestRunner:
         :param temp_folder: folder to use for temporary files.  Any existing files in this folder will be deleted.
         :param transformer_type: (Optional) the transformer to run
         :param sort_output_by: (Optional) sort by these columns before comparing or writing output files
+        :param output_as_json_only: (Optional) if set to True then do not output as csv
         :return: Throws SparkPipelineFrameworkTestingException if there are mismatches between
                     expected output files and actual output files.  The `exceptions` list in
                     SparkPipelineFrameworkTestingException holds all the mismatch exceptions
@@ -225,6 +227,7 @@ class SparkPipelineFrameworkTestRunner:
                     output_folder=output_folder,
                     temp_folder=temp_folder.joinpath("result"),
                     sort_output_by=sort_output_by,
+                    output_as_json_only=output_as_json_only,
                 )
 
             clean_spark_session(session=spark_session)
@@ -552,9 +555,9 @@ class SparkPipelineFrameworkTestRunner:
         return view_name
 
     @staticmethod
-    def get_file_extension_from_file_path(input_file: str) -> str:
+    def get_file_extension_from_file_path(file_name: str) -> str:
         file_extension: str
-        _, file_extension = os.path.splitext(input_file)
+        _, file_extension = os.path.splitext(file_name)
         return file_extension
 
     @staticmethod
@@ -573,9 +576,13 @@ class SparkPipelineFrameworkTestRunner:
         output_folder: Path,
         temp_folder: Path,
         sort_output_by: Optional[List[str]],
+        output_as_json_only: bool,
     ) -> None:
         df: DataFrame = spark_session.table(view_name)
-        if SparkPipelineFrameworkTestRunner.should_write_dataframe_as_json(df=df):
+        if (
+            output_as_json_only
+            or SparkPipelineFrameworkTestRunner.should_write_dataframe_as_json(df=df)
+        ):
             # save as json
             file_path: Path = temp_folder.joinpath(f"{view_name}.json")
             print(f"Writing {file_path}")
