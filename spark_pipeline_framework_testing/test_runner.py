@@ -300,6 +300,11 @@ class SparkPipelineFrameworkTestRunner:
         if file_extension.lower() not in [".csv", ".json", ".jsonl", ".parquet"]:
             return True, data_frame_exception
         result_df: DataFrame = spark_session.table(view_name)
+        sort_columns: List[str] = (
+            [col for col in sort_output_by if col in result_df.columns]
+            if sort_output_by
+            else []
+        )
 
         found_output_file: bool = False
         output_file_path = os.path.join(output_folder, output_file)
@@ -329,11 +334,6 @@ class SparkPipelineFrameworkTestRunner:
             # write the result file to temp folder
             if result_path and temp_folder:
                 result_path_for_view: Path = result_path.joinpath(f"{view_name}.csv")
-                sort_columns: List[str] = (
-                    [col for col in sort_output_by if col in result_df.columns]
-                    if sort_output_by
-                    else []
-                )
                 if len(sort_columns) > 0:
                     result_df.coalesce(1).sort(*sort_columns).write.csv(
                         path=str(result_path_for_view), header=True
@@ -369,11 +369,6 @@ class SparkPipelineFrameworkTestRunner:
             # write result to temp folder for comparison
             if result_path and temp_folder:
                 result_path_for_view = result_path.joinpath(f"{view_name}.json")
-                sort_columns = (
-                    [col for col in sort_output_by if col in result_df.columns]
-                    if sort_output_by
-                    else []
-                )
                 if len(sort_columns) > 0:
                     result_df.coalesce(1).sort(*sort_columns).write.json(
                         path=str(result_path_for_view)
@@ -406,7 +401,7 @@ class SparkPipelineFrameworkTestRunner:
                     expected_path=output_file_path,
                     temp_folder=temp_folder,
                     func_path_modifier=func_path_modifier,
-                    order_by=sort_output_by,
+                    order_by=sort_columns if len(sort_columns) > 0 else None,
                 )
             except SparkDataFrameComparerException as e:
                 data_frame_exception = e
