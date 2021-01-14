@@ -689,7 +689,7 @@ def get_testable_folders(folder_path: Path) -> List[str]:
     testable_folder_list: List[str] = [
         str(PurePath(folder_path).parent)
         for folder_path in folder_list
-        if PurePath(folder_path).name == "input"
+        if PurePath(folder_path).name in ["input", "source_api_calls"]
     ]
     return testable_folder_list
 
