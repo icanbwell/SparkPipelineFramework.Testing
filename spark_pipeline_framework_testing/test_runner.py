@@ -3,7 +3,7 @@ import json
 import os
 import shutil
 from os import listdir
-from os.path import isfile, join
+from os.path import isfile, join, isdir
 from pathlib import Path, PurePath
 from re import search
 from typing import List, Optional, Match, Dict, Any, Tuple, Union, Callable, Type
@@ -84,13 +84,15 @@ class SparkPipelineFrameworkTestRunner:
         # for each of them
         testable_folder: str
         for testable_folder in testable_folder_list:
-            input_folder: Path = Path(testable_folder).joinpath("input")
-            input_files: List[str] = [
-                f for f in listdir(input_folder) if isfile(join(input_folder, f))
-            ]
-            input_schema_folder = Path(testable_folder).joinpath("input_schema")
-
             print(f"Running test in folder: {testable_folder}...")
+
+            input_folder: Path = Path(testable_folder).joinpath("input")
+            input_files: List[str] = []
+            if isdir(input_folder):
+                input_files = [
+                    f for f in listdir(input_folder) if isfile(join(input_folder, f))
+                ]
+            input_schema_folder = Path(testable_folder).joinpath("input_schema")
 
             # for each file in input folder, load into a view in Spark
             #   (use name of file without extension as name of view)
