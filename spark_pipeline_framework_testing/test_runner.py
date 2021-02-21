@@ -45,6 +45,7 @@ class SparkPipelineFrameworkTestRunner:
         transformer_type: Optional[Type[Transformer]] = None,
         sort_output_by: Optional[List[str]] = None,
         output_as_json_only: bool = True,
+        apply_schema_to_output: bool = True,
     ) -> None:
         """
         Tests Spark Transformers without writing any code
@@ -68,6 +69,7 @@ class SparkPipelineFrameworkTestRunner:
         :param transformer_type: (Optional) the transformer to run
         :param sort_output_by: (Optional) sort by these columns before comparing or writing output files
         :param output_as_json_only: (Optional) if set to True then do not output as csv
+        :param apply_schema_to_output: If true applies schema to output file
         :return: Throws SparkPipelineFrameworkTestingException if there are mismatches between
                     expected output files and actual output files.  The `exceptions` list in
                     SparkPipelineFrameworkTestingException holds all the mismatch exceptions
@@ -200,6 +202,7 @@ class SparkPipelineFrameworkTestRunner:
                     temp_folder=temp_folder.joinpath("result"),
                     func_path_modifier=func_path_modifier,
                     sort_output_by=sort_output_by,
+                    apply_schema_to_output=apply_schema_to_output,
                 )
                 if found_output_file:
                     views_found.append(
@@ -288,6 +291,7 @@ class SparkPipelineFrameworkTestRunner:
         output_schema_folder: Path,
         func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path, str]]],
         sort_output_by: Optional[List[str]],
+        apply_schema_to_output: bool,
         temp_folder: Optional[Union[Path, str]] = None,
     ) -> Tuple[bool, Optional[SparkDataFrameComparerException]]:
         data_frame_exception: Optional[SparkDataFrameComparerException] = None
@@ -318,7 +322,7 @@ class SparkPipelineFrameworkTestRunner:
         if file_extension.lower() == ".csv":
             output_schema_file = os.path.join(output_schema_folder, f"{view_name}.json")
             # if we have an output schema file use it
-            if os.path.exists(output_schema_file):
+            if apply_schema_to_output and os.path.exists(output_schema_file):
                 with open(output_schema_file) as file:
                     schema_json = json.loads(file.read())
                 schema = StructType.fromJson(schema_json)
@@ -354,7 +358,7 @@ class SparkPipelineFrameworkTestRunner:
             found_output_file = True
         elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
             output_schema_file = os.path.join(output_schema_folder, output_file)
-            if os.path.exists(output_schema_file):
+            if apply_schema_to_output and os.path.exists(output_schema_file):
                 with open(output_schema_file) as file:
                     schema_json = json.loads(file.read())
                 schema = StructType.fromJson(schema_json)
