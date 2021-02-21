@@ -1,5 +1,5 @@
 numpy>=1.19.2
-pyspark>=2.4.0,!=3.0.2  # 3.0.2 throws "py4j.protocol.Py4JError: org.apache.spark.api.python.PythonUtils.getSparkBufferSize does not exist in the JVM"
+pyspark>=2.4.0
 logger
 sparkpipelineframework>=0.1.62
 sparkdataframecomparer>=0.1.56
