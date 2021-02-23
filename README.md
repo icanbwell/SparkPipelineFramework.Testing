@@ -1,3 +1,9 @@
+[![Build and Test](https://github.com/imranq2/SparkPipelineFramework.Testing/actions/workflows/build_and_Test.yml/badge.svg)](https://github.com/imranq2/SparkPipelineFramework.Testing/actions/workflows/build_and_Test.yml)
+
+[![Upload Python Package](https://github.com/imranq2/SparkPipelineFramework.Testing/actions/workflows/python-publish.yml/badge.svg)](https://github.com/imranq2/SparkPipelineFramework.Testing/actions/workflows/python-publish.yml)
+
+[![Known Vulnerabilities](https://snyk.io/test/github/imranq2/SparkPipelineFramework.Testing/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/imranq2/SparkPipelineFramework.Testing?targetFile=requirements.txt)
+
 # SparkPipelineFramework.Tests
 Testing framework that can tests SparkPipelineFramework library by just providing input files to setup before running the transformer and output files to use for verifying the output
 
