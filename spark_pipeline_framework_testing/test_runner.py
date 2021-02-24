@@ -46,6 +46,7 @@ class SparkPipelineFrameworkTestRunner:
         sort_output_by: Optional[List[str]] = None,
         output_as_json_only: bool = True,
         apply_schema_to_output: bool = True,
+        check_output: bool = True,
     ) -> None:
         """
         Tests Spark Transformers without writing any code
@@ -70,6 +71,7 @@ class SparkPipelineFrameworkTestRunner:
         :param sort_output_by: (Optional) sort by these columns before comparing or writing output files
         :param output_as_json_only: (Optional) if set to True then do not output as csv
         :param apply_schema_to_output: If true applies schema to output file
+        :param check_output: if set, check the output of the test.  Otherwise don't check the output.
         :return: Throws SparkPipelineFrameworkTestingException if there are mismatches between
                     expected output files and actual output files.  The `exceptions` list in
                     SparkPipelineFrameworkTestingException holds all the mismatch exceptions
@@ -138,7 +140,7 @@ class SparkPipelineFrameworkTestRunner:
                 destination_view_name: str = "output"
                 parameters["view"] = destination_view_name
 
-            # find name of transformer
+            # find name of transformer and run it
             search_result: Optional[Match[str]] = search(r"/library/", testable_folder)
             if search_result:
                 SparkPipelineFrameworkTestRunner.run_transformer(
@@ -149,98 +151,101 @@ class SparkPipelineFrameworkTestRunner:
                     transformer_type=transformer_type,
                 )
 
-            # write out any missing schemas
-            output_tables: List[Table] = spark_session.catalog.listTables("default")
+            if check_output:
+                # write out any missing schemas
+                output_tables: List[Table] = spark_session.catalog.listTables("default")
 
-            output_schema_folder: Path = Path(testable_folder).joinpath("output_schema")
-            tables_for_writing_schema: List[str] = [
-                t.name
-                for t in output_tables
-                if not t.name.startswith("expected_")
-                and t.name not in input_table_names
-            ]
-            if (
-                "output" in tables_for_writing_schema
-            ):  # if there is an output table then ignore other input_tables
-                tables_for_writing_schema = ["output"]
-            for table_name in tables_for_writing_schema:
-                if not os.path.exists(output_schema_folder):
-                    os.mkdir(output_schema_folder)
-
-                SparkPipelineFrameworkTestRunner.write_schema_to_output(
-                    spark_session=spark_session,
-                    view_name=table_name,
-                    schema_folder=output_schema_folder,
+                output_schema_folder: Path = Path(testable_folder).joinpath(
+                    "output_schema"
                 )
+                tables_for_writing_schema: List[str] = [
+                    t.name
+                    for t in output_tables
+                    if not t.name.startswith("expected_")
+                    and t.name not in input_table_names
+                ]
+                if (
+                    "output" in tables_for_writing_schema
+                ):  # if there is an output table then ignore other input_tables
+                    tables_for_writing_schema = ["output"]
+                for table_name in tables_for_writing_schema:
+                    if not os.path.exists(output_schema_folder):
+                        os.mkdir(output_schema_folder)
 
-            # for each file in output folder, loading into a view in Spark (prepend with "expected_")
-            output_folder = Path(testable_folder).joinpath("output")
-            if not os.path.exists(output_folder):
-                os.mkdir(output_folder)
-            output_files = [
-                f for f in listdir(output_folder) if isfile(join(output_folder, f))
-            ]
-            views_found: List[str] = []
-            if not temp_folder:
-                temp_folder = output_folder.joinpath("temp")
-
-            if os.path.exists(temp_folder):
-                shutil.rmtree(temp_folder)
-
-            data_frame_exceptions: List[SparkDataFrameComparerException] = []
-            for output_file in output_files:
-                found_output_file: bool
-                data_frame_exception: Optional[SparkDataFrameComparerException]
-                (
-                    found_output_file,
-                    data_frame_exception,
-                ) = SparkPipelineFrameworkTestRunner.process_output_file(
-                    spark_session=spark_session,
-                    output_file=output_file,
-                    output_folder=output_folder,
-                    output_schema_folder=output_schema_folder,
-                    temp_folder=temp_folder.joinpath("result"),
-                    func_path_modifier=func_path_modifier,
-                    sort_output_by=sort_output_by,
-                    apply_schema_to_output=apply_schema_to_output,
-                )
-                if found_output_file:
-                    views_found.append(
-                        SparkPipelineFrameworkTestRunner.get_view_name_from_file_path(
-                            output_file
-                        ).lower()
+                    SparkPipelineFrameworkTestRunner.write_schema_to_output(
+                        spark_session=spark_session,
+                        view_name=table_name,
+                        schema_folder=output_schema_folder,
                     )
-                    if data_frame_exception:
-                        data_frame_exceptions.append(data_frame_exception)
 
-            # write out any missing output files
-            table_names_to_write_to_output: List[str] = [
-                t.name
-                for t in output_tables
-                if t.name.lower() not in views_found
-                and not t.name.startswith("expected_")
-                and t.name not in input_table_names
-            ]
-            if (
-                "output" in table_names_to_write_to_output
-            ):  # if there is an output table then ignore other input_tables
-                table_names_to_write_to_output = ["output"]
-            for table_name in table_names_to_write_to_output:
-                SparkPipelineFrameworkTestRunner.write_table_to_output(
-                    spark_session=spark_session,
-                    view_name=table_name,
-                    output_folder=output_folder,
-                    temp_folder=temp_folder.joinpath("result"),
-                    sort_output_by=sort_output_by,
-                    output_as_json_only=output_as_json_only,
-                )
+                # for each file in output folder, loading into a view in Spark (prepend with "expected_")
+                output_folder = Path(testable_folder).joinpath("output")
+                if not os.path.exists(output_folder):
+                    os.mkdir(output_folder)
+                output_files = [
+                    f for f in listdir(output_folder) if isfile(join(output_folder, f))
+                ]
+                views_found: List[str] = []
+                if not temp_folder:
+                    temp_folder = output_folder.joinpath("temp")
 
-            clean_spark_session(session=spark_session)
+                if os.path.exists(temp_folder):
+                    shutil.rmtree(temp_folder)
 
-            if len(data_frame_exceptions) > 0:
-                raise SparkPipelineFrameworkTestingException(
-                    exceptions=data_frame_exceptions
-                )
+                data_frame_exceptions: List[SparkDataFrameComparerException] = []
+                for output_file in output_files:
+                    found_output_file: bool
+                    data_frame_exception: Optional[SparkDataFrameComparerException]
+                    (
+                        found_output_file,
+                        data_frame_exception,
+                    ) = SparkPipelineFrameworkTestRunner.process_output_file(
+                        spark_session=spark_session,
+                        output_file=output_file,
+                        output_folder=output_folder,
+                        output_schema_folder=output_schema_folder,
+                        temp_folder=temp_folder.joinpath("result"),
+                        func_path_modifier=func_path_modifier,
+                        sort_output_by=sort_output_by,
+                        apply_schema_to_output=apply_schema_to_output,
+                    )
+                    if found_output_file:
+                        views_found.append(
+                            SparkPipelineFrameworkTestRunner.get_view_name_from_file_path(
+                                output_file
+                            ).lower()
+                        )
+                        if data_frame_exception:
+                            data_frame_exceptions.append(data_frame_exception)
+
+                # write out any missing output files
+                table_names_to_write_to_output: List[str] = [
+                    t.name
+                    for t in output_tables
+                    if t.name.lower() not in views_found
+                    and not t.name.startswith("expected_")
+                    and t.name not in input_table_names
+                ]
+                if (
+                    "output" in table_names_to_write_to_output
+                ):  # if there is an output table then ignore other input_tables
+                    table_names_to_write_to_output = ["output"]
+                for table_name in table_names_to_write_to_output:
+                    SparkPipelineFrameworkTestRunner.write_table_to_output(
+                        spark_session=spark_session,
+                        view_name=table_name,
+                        output_folder=output_folder,
+                        temp_folder=temp_folder.joinpath("result"),
+                        sort_output_by=sort_output_by,
+                        output_as_json_only=output_as_json_only,
+                    )
+
+                clean_spark_session(session=spark_session)
+
+                if len(data_frame_exceptions) > 0:
+                    raise SparkPipelineFrameworkTestingException(
+                        exceptions=data_frame_exceptions
+                    )
 
     @staticmethod
     def run_transformer(
