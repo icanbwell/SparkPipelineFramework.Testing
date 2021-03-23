@@ -1,4 +1,5 @@
 import glob
+import re
 import json
 import os
 import shutil
@@ -568,7 +569,8 @@ class SparkPipelineFrameworkTestRunner:
     def get_view_name_from_file_path(input_file: str) -> str:
         view_name: str
         view_name, _ = os.path.splitext(PurePath(input_file).name)
-        return view_name
+        cleaned_view_name = re.sub(r"-", "_", view_name)
+        return cleaned_view_name
 
     @staticmethod
     def get_file_extension_from_file_path(file_name: str) -> str:
