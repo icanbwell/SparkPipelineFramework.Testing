@@ -156,12 +156,14 @@ class SparkPipelineFrameworkTestRunner:
 
             if check_output:
                 # write out any missing schemas
-                output_tables: List[Table] = [
-                    table
-                    for table in spark_session.catalog.listTables("default")
-                    if ignore_views_for_output
-                    and table.name not in ignore_views_for_output
-                ]
+                output_tables: List[Table] = spark_session.catalog.listTables("default")
+
+                if ignore_views_for_output is not None:
+                    output_tables = [
+                        table
+                        for table in output_tables
+                        if table.name not in ignore_views_for_output
+                    ]
 
                 output_schema_folder: Path = Path(testable_folder).joinpath(
                     "output_schema"
