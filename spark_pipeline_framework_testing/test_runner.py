@@ -48,7 +48,7 @@ class SparkPipelineFrameworkTestRunner:
         output_as_json_only: bool = True,
         apply_schema_to_output: bool = True,
         check_output: bool = True,
-        ignore_views_for_output: Optional[List[str]] = None
+        ignore_views_for_output: Optional[List[str]] = None,
     ) -> None:
         """
         Tests Spark Transformers without writing any code
@@ -156,8 +156,12 @@ class SparkPipelineFrameworkTestRunner:
 
             if check_output:
                 # write out any missing schemas
-                output_tables: List[Table] = [table for table in spark_session.catalog.listTables("default")
-                                              if ignore_views_for_output and table.name not in ignore_views_for_output]
+                output_tables: List[Table] = [
+                    table
+                    for table in spark_session.catalog.listTables("default")
+                    if ignore_views_for_output
+                    and table.name not in ignore_views_for_output
+                ]
 
                 output_schema_folder: Path = Path(testable_folder).joinpath(
                     "output_schema"
