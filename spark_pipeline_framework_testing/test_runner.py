@@ -48,6 +48,7 @@ class SparkPipelineFrameworkTestRunner:
         output_as_json_only: bool = True,
         apply_schema_to_output: bool = True,
         check_output: bool = True,
+        ignore_views_for_output: Optional[List[str]] = None,
     ) -> None:
         """
         Tests Spark Transformers without writing any code
@@ -73,6 +74,7 @@ class SparkPipelineFrameworkTestRunner:
         :param output_as_json_only: (Optional) if set to True then do not output as csv
         :param apply_schema_to_output: If true applies schema to output file
         :param check_output: if set, check the output of the test.  Otherwise don't check the output.
+        :param ignore_views_for_output: list of view names to ignore when writing output schema and output json
         :return: Throws SparkPipelineFrameworkTestingException if there are mismatches between
                     expected output files and actual output files.  The `exceptions` list in
                     SparkPipelineFrameworkTestingException holds all the mismatch exceptions
@@ -155,6 +157,13 @@ class SparkPipelineFrameworkTestRunner:
             if check_output:
                 # write out any missing schemas
                 output_tables: List[Table] = spark_session.catalog.listTables("default")
+
+                if ignore_views_for_output is not None:
+                    output_tables = [
+                        table
+                        for table in output_tables
+                        if table.name not in ignore_views_for_output
+                    ]
 
                 output_schema_folder: Path = Path(testable_folder).joinpath(
                     "output_schema"
