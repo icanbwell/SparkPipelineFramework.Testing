@@ -36,7 +36,7 @@ checks:venv
 .PHONY:update
 update:
 	. $(VENV_NAME)/bin/activate && \
-	pip install -v --upgrade -r requirements.txt && \
+	pip install --upgrade -r requirements.txt && \
 	pip install --upgrade -r requirements-test.txt
 
 .PHONY:build
