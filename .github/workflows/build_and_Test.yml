@@ -30,7 +30,9 @@ jobs:
           pip install wheel
 
       # setup and install everything and run tests
-      - name: install_spark
-        run: make download_spark
+      - uses: vemonet/setup-spark@v1
+        with:
+          spark-version: '3.1.1'
+          hadoop-version: '3.2'
       - name: continuous_integration
         run: make continuous_integration
