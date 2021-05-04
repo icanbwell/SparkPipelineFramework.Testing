@@ -6,7 +6,7 @@ BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 VERSION=$(shell cat VERSION)
 VENV_NAME=venv
 GIT_HASH=${CIRCLE_SHA1}
-SPARK_VER=3.0.1
+SPARK_VER=3.1.1
 HADOOP_VER=3.2
 PACKAGES_FOLDER=venv/lib/python3.6/site-packages
 SPF_BASE=${PACKAGES_FOLDER}
@@ -36,7 +36,7 @@ checks:venv
 .PHONY:update
 update:
 	. $(VENV_NAME)/bin/activate && \
-	pip install --upgrade -r requirements.txt && \
+	pip install -v --upgrade -r requirements.txt && \
 	pip install --upgrade -r requirements-test.txt
 
 .PHONY:build
