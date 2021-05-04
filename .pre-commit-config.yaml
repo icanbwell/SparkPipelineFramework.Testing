@@ -25,10 +25,10 @@ repos:
         args: [--strict, --python-version=3.6, --show-error-codes, --allow-untyped-decorators]
         additional_dependencies:
             - numpy>=1.19.2
-            - pyspark>=2.4.0,<=3.0.1
+            - pyspark>=2.4.0,<=3.1.1
             - logger
             - sparkautomapper
             - sparkautomapper.fhir
-            - sparkpipelineframework>=0.1.62
-            - sparkdataframecomparer>=0.1.56
+            - sparkpipelineframework>=0.1.86
+            - sparkdataframecomparer>=0.1.63
             - pytest

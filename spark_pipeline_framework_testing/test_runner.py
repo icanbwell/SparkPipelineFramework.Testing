@@ -499,7 +499,7 @@ class SparkPipelineFrameworkTestRunner:
             input_schema_file = os.path.join(input_schema_folder, f"{view_name}.json")
             if os.path.exists(input_schema_file):
                 with open(input_schema_file) as file:
-                    schema_json: str = json.loads(file.read())
+                    schema_json: Dict[str, Any] = json.loads(file.read())
                 schema = StructType.fromJson(schema_json)
                 print(f"Reading file {input_file} using schema: {input_schema_file}")
                 spark_session.read.schema(schema).csv(
