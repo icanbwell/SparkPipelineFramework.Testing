@@ -6,7 +6,7 @@ import shutil
 from typing import Any
 
 import pytest
-from pyspark.sql import SparkSession
+from pyspark.sql.session import SparkSession
 
 # make sure env variables are set correctly
 if "SPARK_HOME" not in os.environ:
