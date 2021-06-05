@@ -381,6 +381,11 @@ class SparkPipelineFrameworkTestRunner:
                     result_df.coalesce(1).write.csv(
                         path=str(result_path_for_view), header=True
                     )
+                if output_schema:
+                    # read result_df with output schema so it has all the columns
+                    result_df = result_df.sql_ctx.read.schema(output_schema).csv(
+                        str(result_path_for_view), header=True
+                    )
                 result_file = Path(temp_folder).joinpath(f"{view_name}.csv")
                 SparkPipelineFrameworkTestRunner.combine_spark_csv_files_to_one_file(
                     source_folder=result_path_for_view,
@@ -423,6 +428,11 @@ class SparkPipelineFrameworkTestRunner:
                     )
                 else:
                     result_df.coalesce(1).write.json(path=str(result_path_for_view))
+                if output_schema:
+                    # read result_df with output schema so it has all the columns
+                    result_df = result_df.sql_ctx.read.schema(output_schema).json(
+                        str(result_path_for_view)
+                    )
                 result_file = Path(temp_folder).joinpath(f"{view_name}.json")
                 SparkPipelineFrameworkTestRunner.combine_spark_json_files_to_one_file(
                     source_folder=result_path_for_view,
