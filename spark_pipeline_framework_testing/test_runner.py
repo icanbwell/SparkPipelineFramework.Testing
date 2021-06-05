@@ -49,6 +49,7 @@ class SparkPipelineFrameworkTestRunner:
         apply_schema_to_output: bool = True,
         check_output: bool = True,
         ignore_views_for_output: Optional[List[str]] = None,
+        input_schema: Optional[StructType] = None,
     ) -> None:
         """
         Tests Spark Transformers without writing any code
@@ -75,6 +76,7 @@ class SparkPipelineFrameworkTestRunner:
         :param apply_schema_to_output: If true applies schema to output file
         :param check_output: if set, check the output of the test.  Otherwise don't check the output.
         :param ignore_views_for_output: list of view names to ignore when writing output schema and output json
+        :param input_schema: Optional input_schema to apply to the input data
         :return: Throws SparkPipelineFrameworkTestingException if there are mismatches between
                     expected output files and actual output files.  The `exceptions` list in
                     SparkPipelineFrameworkTestingException holds all the mismatch exceptions
@@ -109,6 +111,7 @@ class SparkPipelineFrameworkTestRunner:
                     input_file=input_file,
                     input_folder=input_folder,
                     input_schema_folder=input_schema_folder,
+                    input_schema=input_schema,
                 )
 
             # write out any input schemas
@@ -117,16 +120,17 @@ class SparkPipelineFrameworkTestRunner:
             input_table_names: List[str] = [
                 t.name for t in input_tables if not t.name.startswith("expected_")
             ]
-            table_name: str
-            for table_name in input_table_names:
-                if not os.path.exists(input_schema_folder):
-                    os.mkdir(input_schema_folder)
+            if not input_schema:
+                table_name: str
+                for table_name in input_table_names:
+                    if not os.path.exists(input_schema_folder):
+                        os.mkdir(input_schema_folder)
 
-                SparkPipelineFrameworkTestRunner.write_schema_to_output(
-                    spark_session=spark_session,
-                    view_name=table_name,
-                    schema_folder=input_schema_folder,
-                )
+                    SparkPipelineFrameworkTestRunner.write_schema_to_output(
+                        spark_session=spark_session,
+                        view_name=table_name,
+                        schema_folder=input_schema_folder,
+                    )
 
             # read parameters.json if it exists
             parameters_json_file: Path = Path(testable_folder).joinpath(
@@ -178,15 +182,17 @@ class SparkPipelineFrameworkTestRunner:
                     "output" in tables_for_writing_schema
                 ):  # if there is an output table then ignore other input_tables
                     tables_for_writing_schema = ["output"]
-                for table_name in tables_for_writing_schema:
-                    if not os.path.exists(output_schema_folder):
-                        os.mkdir(output_schema_folder)
 
-                    SparkPipelineFrameworkTestRunner.write_schema_to_output(
-                        spark_session=spark_session,
-                        view_name=table_name,
-                        schema_folder=output_schema_folder,
-                    )
+                if not input_schema:
+                    for table_name in tables_for_writing_schema:
+                        if not os.path.exists(output_schema_folder):
+                            os.mkdir(output_schema_folder)
+
+                        SparkPipelineFrameworkTestRunner.write_schema_to_output(
+                            spark_session=spark_session,
+                            view_name=table_name,
+                            schema_folder=output_schema_folder,
+                        )
 
                 # for each file in output folder, loading into a view in Spark (prepend with "expected_")
                 output_folder = Path(testable_folder).joinpath("output")
@@ -485,6 +491,7 @@ class SparkPipelineFrameworkTestRunner:
         input_file: str,
         input_folder: Path,
         input_schema_folder: Path,
+        input_schema: Optional[StructType],
     ) -> None:
         file_extension: str = (
             SparkPipelineFrameworkTestRunner.get_file_extension_from_file_path(
@@ -543,12 +550,24 @@ class SparkPipelineFrameworkTestRunner:
             # find schema file
             input_schema_file = os.path.join(input_schema_folder, input_file)
             # if schema exists then use it when loading the file
-            if os.path.exists(input_schema_file):
+            if not input_schema and os.path.exists(input_schema_file):
                 with open(input_schema_file) as file:
                     schema_json = json.loads(file.read())
                 schema = StructType.fromJson(schema_json)
                 print(f"Reading file {input_file} using schema: {input_schema_file}")
                 spark_session.read.schema(schema).json(
+                    path=jsonl_input_file_path
+                ).limit(
+                    SparkPipelineFrameworkTestRunner.row_limit
+                ).createOrReplaceTempView(
+                    view_name
+                )
+                assert (
+                    "_corrupt_record" not in spark_session.table(view_name).columns
+                ), input_file_path
+            elif input_schema:
+                print(f"Reading file {input_file} using passed in schema")
+                spark_session.read.schema(input_schema).json(
                     path=jsonl_input_file_path
                 ).limit(
                     SparkPipelineFrameworkTestRunner.row_limit
