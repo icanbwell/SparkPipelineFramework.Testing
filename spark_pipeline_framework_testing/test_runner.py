@@ -391,7 +391,11 @@ class SparkPipelineFrameworkTestRunner:
             found_output_file = True
         elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
             output_schema_file = os.path.join(output_schema_folder, output_file)
-            if apply_schema_to_output and os.path.exists(output_schema_file):
+            if (
+                apply_schema_to_output
+                and not output_schema
+                and os.path.exists(output_schema_file)
+            ):
                 with open(output_schema_file) as file:
                     schema_json = json.loads(file.read())
                 schema = StructType.fromJson(schema_json)
@@ -399,6 +403,11 @@ class SparkPipelineFrameworkTestRunner:
                     f"Reading file {output_file_path} using schema: {output_schema_file}"
                 )
                 spark_session.read.schema(schema).option("multiLine", True).json(
+                    path=output_file_path
+                ).createOrReplaceTempView(f"expected_{view_name}")
+            elif apply_schema_to_output and output_schema:
+                print(f"Reading file {output_file_path} using passed in schema")
+                spark_session.read.schema(output_schema).option("multiLine", True).json(
                     path=output_file_path
                 ).createOrReplaceTempView(f"expected_{view_name}")
             else:
