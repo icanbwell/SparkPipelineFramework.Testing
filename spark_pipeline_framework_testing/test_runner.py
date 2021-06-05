@@ -50,6 +50,7 @@ class SparkPipelineFrameworkTestRunner:
         check_output: bool = True,
         ignore_views_for_output: Optional[List[str]] = None,
         input_schema: Optional[StructType] = None,
+        output_schema: Optional[StructType] = None,
     ) -> None:
         """
         Tests Spark Transformers without writing any code
@@ -224,6 +225,7 @@ class SparkPipelineFrameworkTestRunner:
                         func_path_modifier=func_path_modifier,
                         sort_output_by=sort_output_by,
                         apply_schema_to_output=apply_schema_to_output,
+                        output_schema=output_schema,
                     )
                     if found_output_file:
                         views_found.append(
@@ -313,6 +315,7 @@ class SparkPipelineFrameworkTestRunner:
         func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path, str]]],
         sort_output_by: Optional[List[str]],
         apply_schema_to_output: bool,
+        output_schema: Optional[StructType],
         temp_folder: Optional[Union[Path, str]] = None,
     ) -> Tuple[bool, Optional[SparkDataFrameComparerException]]:
         data_frame_exception: Optional[SparkDataFrameComparerException] = None
@@ -343,7 +346,11 @@ class SparkPipelineFrameworkTestRunner:
         if file_extension.lower() == ".csv":
             output_schema_file = os.path.join(output_schema_folder, f"{view_name}.json")
             # if we have an output schema file use it
-            if apply_schema_to_output and os.path.exists(output_schema_file):
+            if (
+                apply_schema_to_output
+                and not output_schema
+                and os.path.exists(output_schema_file)
+            ):
                 with open(output_schema_file) as file:
                     schema_json = json.loads(file.read())
                 schema = StructType.fromJson(schema_json)
@@ -351,6 +358,11 @@ class SparkPipelineFrameworkTestRunner:
                     f"Reading file {output_file_path} using schema: {output_schema_file}"
                 )
                 spark_session.read.schema(schema).csv(
+                    path=output_file_path, header=True, comment="#", emptyValue=None
+                ).createOrReplaceTempView(f"expected_{view_name}")
+            elif apply_schema_to_output and output_schema:
+                print(f"Reading file {output_file_path} using passed in schema")
+                spark_session.read.schema(output_schema).csv(
                     path=output_file_path, header=True, comment="#", emptyValue=None
                 ).createOrReplaceTempView(f"expected_{view_name}")
             else:  # if we don't have schema file then load without a schema
