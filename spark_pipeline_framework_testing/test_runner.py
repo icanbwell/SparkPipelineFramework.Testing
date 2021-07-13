@@ -49,8 +49,8 @@ class SparkPipelineFrameworkTestRunner:
         apply_schema_to_output: bool = True,
         check_output: bool = True,
         ignore_views_for_output: Optional[List[str]] = None,
-        input_schema: Optional[StructType] = None,
-        output_schema: Optional[StructType] = None,
+        input_schema: Optional[Union[StructType, Dict[str, StructType]]] = None,
+        output_schema: Optional[Union[StructType, Dict[str, StructType]]] = None,
     ) -> None:
         """
         Tests Spark Transformers without writing any code
@@ -77,7 +77,10 @@ class SparkPipelineFrameworkTestRunner:
         :param apply_schema_to_output: If true applies schema to output file
         :param check_output: if set, check the output of the test.  Otherwise don't check the output.
         :param ignore_views_for_output: list of view names to ignore when writing output schema and output json
-        :param input_schema: Optional input_schema to apply to the input data
+        :param input_schema: Optional input_schema to apply to the input data. Can be a schema or a dictionary
+                                of schemas where the key is name of the view
+        :param output_schema: Optional output_schema to apply to the input data. Can be a schema or a dictionary
+                                of schemas where the key is name of the view
         :return: Throws SparkPipelineFrameworkTestingException if there are mismatches between
                     expected output files and actual output files.  The `exceptions` list in
                     SparkPipelineFrameworkTestingException holds all the mismatch exceptions
@@ -184,7 +187,7 @@ class SparkPipelineFrameworkTestRunner:
                 ):  # if there is an output table then ignore other input_tables
                     tables_for_writing_schema = ["output"]
 
-                if not input_schema:
+                if not output_schema:
                     for table_name in tables_for_writing_schema:
                         if not os.path.exists(output_schema_folder):
                             os.mkdir(output_schema_folder)
@@ -315,7 +318,7 @@ class SparkPipelineFrameworkTestRunner:
         func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path, str]]],
         sort_output_by: Optional[List[str]],
         apply_schema_to_output: bool,
-        output_schema: Optional[StructType],
+        output_schema: Optional[Union[StructType, Dict[str, StructType]]],
         temp_folder: Optional[Union[Path, str]] = None,
     ) -> Tuple[bool, Optional[SparkDataFrameComparerException]]:
         data_frame_exception: Optional[SparkDataFrameComparerException] = None
@@ -341,153 +344,135 @@ class SparkPipelineFrameworkTestRunner:
         result_path: Optional[Path] = (
             Path(temp_folder).joinpath(f"{view_name}") if temp_folder else None
         )
-        result_file: Optional[Path] = None
-        output_schema_file: Optional[str] = None
-        if file_extension.lower() == ".csv":
-            output_schema_file = os.path.join(output_schema_folder, f"{view_name}.json")
-            # if we have an output schema file use it
-            if (
-                apply_schema_to_output
-                and not output_schema
-                and os.path.exists(output_schema_file)
-            ):
-                with open(output_schema_file) as file:
-                    schema_json = json.loads(file.read())
-                schema = StructType.fromJson(schema_json)
-                print(
-                    f"Reading file {output_file_path} using schema: {output_schema_file}"
-                )
-                spark_session.read.schema(schema).csv(
-                    path=output_file_path, header=True, comment="#", emptyValue=None
-                ).createOrReplaceTempView(f"expected_{view_name}")
-            elif apply_schema_to_output and output_schema:
-                print(f"Reading file {output_file_path} using passed in schema")
-                spark_session.read.schema(output_schema).csv(
-                    path=output_file_path, header=True, comment="#", emptyValue=None
-                ).createOrReplaceTempView(f"expected_{view_name}")
-            else:  # if we don't have schema file then load without a schema
-                spark_session.read.csv(
-                    path=output_file_path, header=True, comment="#", emptyValue=None
-                ).createOrReplaceTempView(f"expected_{view_name}")
 
-            # write the result file to temp folder
-            if result_path and temp_folder:
-                result_path_for_view: Path = result_path.joinpath(f"{view_name}.csv")
-                if len(sort_columns) > 0:
-                    result_df.coalesce(1).sort(*sort_columns).write.csv(
-                        path=str(result_path_for_view), header=True
-                    )
-                else:
-                    result_df.coalesce(1).write.csv(
-                        path=str(result_path_for_view), header=True
-                    )
-                if output_schema:
-                    # read result_df with output schema so it has all the columns
-                    result_df = result_df.sql_ctx.read.schema(output_schema).csv(
-                        str(result_path_for_view), header=True
-                    )
-                result_file = Path(temp_folder).joinpath(f"{view_name}.csv")
+        # get schema
+        output_schema_for_view: Optional[StructType] = None
+        output_schema_file: str = os.path.join(
+            output_schema_folder, f"{view_name}.json"
+        )
+        # if there is a schema file and no schema was passed in then use that
+        if (
+            apply_schema_to_output
+            and not output_schema
+            and os.path.exists(output_schema_file)
+        ):
+            with open(output_schema_file) as file:
+                schema_json = json.loads(file.read())
+            output_schema_for_view = StructType.fromJson(schema_json)
+            print(f"Reading file {output_file_path} using schema: {output_schema_file}")
+        elif apply_schema_to_output and output_schema:
+            print(
+                f"Reading file {output_file_path} using passed in schema for view {view_name}"
+            )
+            # the schema is passed either as a single schema or a dict of schemas
+            output_schema_for_view = (
+                output_schema[view_name]  # type: ignore
+                if output_schema
+                and isinstance(output_schema, dict)
+                and view_name in output_schema
+                else output_schema
+            )
+
+        # create a reader to read the file (using schema if specified)
+        reader = (
+            spark_session.read.schema(output_schema_for_view)
+            if output_schema_for_view
+            else spark_session.read
+        )
+
+        # now read the file using the reader for the file extension
+        output_df: DataFrame
+        if file_extension.lower() == ".csv":
+            output_df = reader.csv(
+                path=output_file_path, header=True, comment="#", emptyValue=None
+            )
+            found_output_file = True
+        elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
+            output_df = reader.option("multiLine", True).json(path=output_file_path)
+            found_output_file = True
+        elif file_extension.lower() == ".parquet":
+            output_df = reader.parquet(path=output_file_path)
+            found_output_file = True
+        else:
+            assert False, f"Unsupported file extension: {file_extension}"
+
+        # create expected view
+        output_df.createOrReplaceTempView(f"expected_{view_name}")
+
+        # write result to temp folder for comparison
+        if result_path and temp_folder:
+            result_path_for_view = result_path.joinpath(f"{view_name}.json")
+            result_df = (
+                result_df.coalesce(1).sort(*sort_columns)
+                if len(sort_columns) > 0
+                else result_df.coalesce(1)
+            )
+            result_df.write.json(path=str(result_path_for_view))
+            if output_schema_for_view:
+                result_df = result_df.sql_ctx.read.schema(output_schema_for_view).json(
+                    str(result_path_for_view)
+                )
+            result_file: Path = Path(temp_folder).joinpath(f"{view_name}.json")
+            if file_extension.lower() == ".csv":
                 SparkPipelineFrameworkTestRunner.combine_spark_csv_files_to_one_file(
                     source_folder=result_path_for_view,
                     destination_file=result_file,
                     file_extension="csv",
                 )
-
-            found_output_file = True
-        elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
-            output_schema_file = os.path.join(output_schema_folder, output_file)
-            if (
-                apply_schema_to_output
-                and not output_schema
-                and os.path.exists(output_schema_file)
+            elif (
+                file_extension.lower() == ".jsonl" or file_extension.lower() == ".json"
             ):
-                with open(output_schema_file) as file:
-                    schema_json = json.loads(file.read())
-                schema = StructType.fromJson(schema_json)
-                print(
-                    f"Reading file {output_file_path} using schema: {output_schema_file}"
-                )
-                spark_session.read.schema(schema).option("multiLine", True).json(
-                    path=output_file_path
-                ).createOrReplaceTempView(f"expected_{view_name}")
-            elif apply_schema_to_output and output_schema:
-                print(f"Reading file {output_file_path} using passed in schema")
-                spark_session.read.schema(output_schema).option("multiLine", True).json(
-                    path=output_file_path
-                ).createOrReplaceTempView(f"expected_{view_name}")
-            else:
-                spark_session.read.option("multiLine", True).json(
-                    path=output_file_path
-                ).createOrReplaceTempView(f"expected_{view_name}")
-            # write result to temp folder for comparison
-            if result_path and temp_folder:
-                result_path_for_view = result_path.joinpath(f"{view_name}.json")
-                if len(sort_columns) > 0:
-                    result_df.coalesce(1).sort(*sort_columns).write.json(
-                        path=str(result_path_for_view)
-                    )
-                else:
-                    result_df.coalesce(1).write.json(path=str(result_path_for_view))
-                if output_schema:
-                    # read result_df with output schema so it has all the columns
-                    result_df = result_df.sql_ctx.read.schema(output_schema).json(
-                        str(result_path_for_view)
-                    )
-                result_file = Path(temp_folder).joinpath(f"{view_name}.json")
                 SparkPipelineFrameworkTestRunner.combine_spark_json_files_to_one_file(
                     source_folder=result_path_for_view,
                     destination_file=result_file,
                     file_extension="json",
                 )
-            found_output_file = True
-        elif file_extension.lower() == ".parquet":
-            spark_session.read.parquet(path=output_file_path).createOrReplaceTempView(
-                f"expected_{view_name}"
-            )
-            found_output_file = True
-        if found_output_file:
-            # Do a data frame compare on each view
-            print(f"Comparing with view:[view_name= with view:[expected_{view_name}]")
-            try:
-                # drop any corrupted column
-                assert_compare_data_frames(
-                    expected_df=spark_session.table(f"expected_{view_name}").drop(
-                        "_corrupt_record"
-                    ),
-                    result_df=result_df,
-                    result_path=result_file,
-                    expected_path=output_file_path,
-                    temp_folder=temp_folder,
-                    func_path_modifier=func_path_modifier,
-                    order_by=sort_columns if len(sort_columns) > 0 else None,
+
+            if found_output_file:
+                # Do a data frame compare on each view
+                print(
+                    f"Comparing with view:[view_name= with view:[expected_{view_name}]"
                 )
-            except SparkDataFrameComparerException as e:
-                data_frame_exception = e
-                # for schema errors, show a compare path for schema
-                if e.exception_type == ExceptionType.SchemaMismatch:
-                    if temp_folder and output_schema_file:
-                        # write the new schema to temp folder
-                        result_schema_path = (
-                            SparkPipelineFrameworkTestRunner.write_schema_to_output(
-                                spark_session=spark_session,
-                                view_name=view_name,
-                                schema_folder=Path(temp_folder)
-                                .joinpath("schemas")
-                                .joinpath("result")
-                                .joinpath(view_name),
+                try:
+                    # drop any corrupted column
+                    assert_compare_data_frames(
+                        expected_df=spark_session.table(f"expected_{view_name}").drop(
+                            "_corrupt_record"
+                        ),
+                        result_df=result_df,
+                        result_path=result_file,
+                        expected_path=output_file_path,
+                        temp_folder=temp_folder,
+                        func_path_modifier=func_path_modifier,
+                        order_by=sort_columns if len(sort_columns) > 0 else None,
+                    )
+                except SparkDataFrameComparerException as e:
+                    data_frame_exception = e
+                    # for schema errors, show a compare path for schema
+                    if e.exception_type == ExceptionType.SchemaMismatch:
+                        if temp_folder and output_schema_file:
+                            # write the new schema to temp folder
+                            result_schema_path = (
+                                SparkPipelineFrameworkTestRunner.write_schema_to_output(
+                                    spark_session=spark_session,
+                                    view_name=view_name,
+                                    schema_folder=Path(temp_folder)
+                                    .joinpath("schemas")
+                                    .joinpath("result")
+                                    .joinpath(view_name),
+                                )
                             )
-                        )
-                        e.compare_path = (
-                            SparkPipelineFrameworkTestRunner.get_compare_path(
-                                result_path=result_schema_path,
-                                expected_path=Path(output_schema_file),
-                                temp_folder=temp_folder,
-                                func_path_modifier=func_path_modifier,
-                                type_="schema",
+                            e.compare_path = (
+                                SparkPipelineFrameworkTestRunner.get_compare_path(
+                                    result_path=result_schema_path,
+                                    expected_path=Path(output_schema_file),
+                                    temp_folder=temp_folder,
+                                    func_path_modifier=func_path_modifier,
+                                    type_="schema",
+                                )
                             )
-                        )
-                        if func_path_modifier and e.compare_path:
-                            e.compare_path = func_path_modifier(e.compare_path)
+                            if func_path_modifier and e.compare_path:
+                                e.compare_path = func_path_modifier(e.compare_path)
 
         return found_output_file, data_frame_exception
 
@@ -503,7 +488,8 @@ class SparkPipelineFrameworkTestRunner:
         if expected_path and result_path and temp_folder:
             expected_file_name: str = os.path.basename(expected_path)
             # create a temp file to launch the diff tool
-            # use .command: https://stackoverflow.com/questions/5125907/how-to-run-a-shell-script-in-os-x-by-double-clicking
+            # use .command:
+            # https://stackoverflow.com/questions/5125907/how-to-run-a-shell-script-in-os-x-by-double-clicking
             compare_sh_path = Path(temp_folder).joinpath(
                 f"compare_{type_}_{expected_file_name}.command"
             )
@@ -522,7 +508,7 @@ class SparkPipelineFrameworkTestRunner:
         input_file: str,
         input_folder: Path,
         input_schema_folder: Path,
-        input_schema: Optional[StructType],
+        input_schema: Optional[Union[StructType, Dict[str, StructType]]],
     ) -> None:
         file_extension: str = (
             SparkPipelineFrameworkTestRunner.get_file_extension_from_file_path(
@@ -597,8 +583,15 @@ class SparkPipelineFrameworkTestRunner:
                     "_corrupt_record" not in spark_session.table(view_name).columns
                 ), input_file_path
             elif input_schema:
-                print(f"Reading file {input_file} using passed in schema")
-                spark_session.read.schema(input_schema).json(
+                print(
+                    f"Reading file {input_file} using passed in schema for view {view_name}"
+                )
+                input_schema_for_view: StructType = (
+                    input_schema[view_name]  # type: ignore
+                    if isinstance(input_schema, dict) and view_name in input_schema
+                    else input_schema
+                )
+                spark_session.read.schema(input_schema_for_view).json(
                     path=jsonl_input_file_path
                 ).limit(
                     SparkPipelineFrameworkTestRunner.row_limit

@@ -20,7 +20,7 @@ def cleanup_files(data_dir: Path) -> None:
         os.remove(data_dir.joinpath("output", "complex.json"))
 
 
-def test_folder(spark_session: SparkSession) -> None:
+def test_complex_feature(spark_session: SparkSession) -> None:
     data_dir: Path = Path(__file__).parent.joinpath("./")
 
     SparkPipelineFrameworkTestRunner.run_tests(
