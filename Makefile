@@ -88,7 +88,8 @@ proxies:
 	python3 ${PACKAGES_FOLDER}/spark_pipeline_framework/proxy_generator/generate_proxies.py
 
 .PHONY:continuous_integration
-continuous_integration:
+continuous_integration: venv
+	. $(VENV_NAME)/bin/activate && \
 	pip install --upgrade pip && \
     pip install --upgrade -r requirements.txt && \
     pip install --upgrade -r requirements-test.txt && \
