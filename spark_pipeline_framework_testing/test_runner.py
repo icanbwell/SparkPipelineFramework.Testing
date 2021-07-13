@@ -408,7 +408,7 @@ class SparkPipelineFrameworkTestRunner:
                 else result_df.coalesce(1)
             )
             result_df.write.json(path=str(result_path_for_view))
-            if output_schema_for_view:
+            if output_schema and output_schema_for_view:
                 result_df = result_df.sql_ctx.read.schema(output_schema_for_view).json(
                     str(result_path_for_view)
                 )
