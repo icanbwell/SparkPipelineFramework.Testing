@@ -11,76 +11,44 @@ HADOOP_VER=3.2
 PACKAGES_FOLDER=venv/lib/python3.6/site-packages
 SPF_BASE=${PACKAGES_FOLDER}
 
-include spark_pipeline_framework_testing/Makefile.spark
-include spark_pipeline_framework_testing/Makefile.docker
-include spark_pipeline_framework_testing/Makefile.python
+Pipfile.lock: Pipfile
+	docker-compose run --rm --name spftest_pip dev pipenv lock --dev
 
-.PHONY:devsetup
-devsetup:venv
-	. $(VENV_NAME)/bin/activate && \
-    pip install --upgrade pip && \
-    pip install --upgrade -r requirements.txt && \
-    pip install --upgrade -r requirements-test.txt && \
-    pre-commit install && \
-    python setup.py install
+.PHONY:devdocker
+devdocker: ## Builds the docker for dev
+	docker-compose build
 
-.PHONY:checks
-checks:venv
-	. $(VENV_NAME)/bin/activate && \
-    pip install --upgrade -r requirements.txt && \
-    flake8 spark_pipeline_framework_testing && \
-    mypy spark_pipeline_framework_testing --strict && \
-    flake8 tests && \
-    mypy tests --strict
+.PHONY:init
+init: devdocker up setup-pre-commit  ## Initializes the local developer environment
+
+.PHONY: up
+up: Pipfile.lock
+	docker-compose up --build -d --remove-orphans
+
+.PHONY: down
+down:
+	docker-compose down
+
+.PHONY:clean-pre-commit
+clean-pre-commit: ## removes pre-commit hook
+	rm -f .git/hooks/pre-commit
+
+.PHONY:setup-pre-commit
+setup-pre-commit: Pipfile.lock
+	cp ./pre-commit-hook ./.git/hooks/pre-commit
+
+.PHONY:run-pre-commit
+run-pre-commit: setup-pre-commit
+	./.git/hooks/pre-commit
 
 .PHONY:update
-update:
-	. $(VENV_NAME)/bin/activate && \
-	pip install --upgrade -r requirements.txt && \
-	pip install --upgrade -r requirements-test.txt
-
-.PHONY:build
-build:venv
-	. $(VENV_NAME)/bin/activate && \
-    pip install --upgrade pip && \
-    pip install --upgrade -r requirements.txt && \
-    python setup.py install && \
-    rm -r dist/ && \
-    python3 setup.py sdist bdist_wheel
-
-.PHONY:testpackage
-testpackage:venv build
-	. $(VENV_NAME)/bin/activate && \
-	python3 -m twine upload -u __token__ --repository testpypi dist/*
-# password can be set in TWINE_PASSWORD. https://twine.readthedocs.io/en/latest/
-
-.PHONY:package
-package:venv build
-	. $(VENV_NAME)/bin/activate && \
-	python3 -m twine upload -u __token__ --repository pypi dist/*
-# password can be set in TWINE_PASSWORD. https://twine.readthedocs.io/en/latest/
+update: down Pipfile.lock setup-pre-commit  ## Updates all the packages using Pipfile
+	docker-compose run --rm --name spftest_pipenv dev pipenv sync --dev && \
+	make devdocker
 
 .PHONY:tests
 tests:
-	. $(VENV_NAME)/bin/activate && \
-    pip install --upgrade -r requirements.txt && \
-	pip install --upgrade -r requirements-test.txt && \
-	pytest tests
-
-.PHONY:clean-pre-commit
-clean-pre-commit:
-	pre-commit clean
-
-.PHONY:setup-pre-commit
-setup-pre-commit:
-	pre-commit install
-
-.PHONY:run-pre-commit
-run-pre-commit:
-	pre-commit run --all-files
-
-.PHONY:init
-init: installspark up devsetup proxies tests
+	docker-compose run --rm --name spftest_tests dev pytest tests
 
 .PHONY:proxies
 proxies:
