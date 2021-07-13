@@ -339,7 +339,7 @@ class SparkPipelineFrameworkTestRunner:
             else []
         )
 
-        found_output_file: bool = False
+        found_output_file: bool
         output_file_path = os.path.join(output_folder, output_file)
         result_path: Optional[Path] = (
             Path(temp_folder).joinpath(f"{view_name}") if temp_folder else None
@@ -515,46 +515,53 @@ class SparkPipelineFrameworkTestRunner:
                 input_file
             )
         )
+        if file_extension.lower() not in [".csv", ".json", ".jsonl", ".parquet"]:
+            return
+
         view_name: str = SparkPipelineFrameworkTestRunner.get_view_name_from_file_path(
             input_file
         )
+
+        input_file_path = os.path.join(input_folder, input_file)
+
+        # get schema
+        input_schema_for_view: Optional[StructType] = None
+        input_schema_file: str = os.path.join(input_schema_folder, f"{view_name}.json")
+        # if there is a schema file and no schema was passed in then use that
+        if not input_schema and os.path.exists(input_schema_file):
+            with open(input_schema_file, "r") as file:
+                schema_json = json.loads(file.read())
+            input_schema_for_view = StructType.fromJson(schema_json)
+            print(f"Reading file {input_file_path} using schema: {input_schema_file}")
+        elif input_schema:
+            print(
+                f"Reading file {input_file_path} using passed in schema for view {view_name}"
+            )
+            # the schema is passed either as a single schema or a dict of schemas
+            input_schema_for_view = (
+                input_schema[view_name]  # type: ignore
+                if input_schema
+                and isinstance(input_schema, dict)
+                and view_name in input_schema
+                else input_schema
+            )
+
+        # create a reader to read the file (using schema if specified)
+        reader = (
+            spark_session.read.schema(input_schema_for_view)
+            if input_schema_for_view
+            else spark_session.read
+        )
+
+        input_df: DataFrame
         if file_extension.lower() == ".csv":
-            input_file_path = os.path.join(input_folder, input_file)
-            input_schema_file = os.path.join(input_schema_folder, f"{view_name}.json")
-            if os.path.exists(input_schema_file):
-                with open(input_schema_file) as file:
-                    schema_json: Dict[str, Any] = json.loads(file.read())
-                schema = StructType.fromJson(schema_json)
-                print(f"Reading file {input_file} using schema: {input_schema_file}")
-                spark_session.read.schema(schema).csv(
-                    path=input_file_path,
-                    header=True,
-                    comment="#",
-                    emptyValue=None,
-                ).limit(
-                    SparkPipelineFrameworkTestRunner.row_limit
-                ).createOrReplaceTempView(
-                    view_name
-                )
-                assert (
-                    "_corrupt_record" not in spark_session.table(view_name).columns
-                ), input_file_path
-            else:
-                spark_session.read.csv(
-                    path=input_file_path,
-                    header=True,
-                    comment="#",
-                    emptyValue=None,
-                ).limit(
-                    SparkPipelineFrameworkTestRunner.row_limit
-                ).createOrReplaceTempView(
-                    view_name
-                )
-                assert (
-                    "_corrupt_record" not in spark_session.table(view_name).columns
-                ), input_file_path
+            input_df = reader.csv(
+                path=input_file_path,
+                header=True,
+                comment="#",
+                emptyValue=None,
+            ).limit(SparkPipelineFrameworkTestRunner.row_limit)
         elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
-            input_file_path = os.path.join(input_folder, input_file)
             # create json_input_folder if it does not exist
             json_input_folder = os.path.join(input_folder, "..", "input_jsonl")
             if not os.path.exists(json_input_folder):
@@ -564,58 +571,21 @@ class SparkPipelineFrameworkTestRunner:
             convert_json_to_jsonl(
                 src_file=Path(input_file_path), dst_file=Path(jsonl_input_file_path)
             )
-            # find schema file
-            input_schema_file = os.path.join(input_schema_folder, input_file)
-            # if schema exists then use it when loading the file
-            if not input_schema and os.path.exists(input_schema_file):
-                with open(input_schema_file) as file:
-                    schema_json = json.loads(file.read())
-                schema = StructType.fromJson(schema_json)
-                print(f"Reading file {input_file} using schema: {input_schema_file}")
-                spark_session.read.schema(schema).json(
-                    path=jsonl_input_file_path
-                ).limit(
-                    SparkPipelineFrameworkTestRunner.row_limit
-                ).createOrReplaceTempView(
-                    view_name
-                )
-                assert (
-                    "_corrupt_record" not in spark_session.table(view_name).columns
-                ), input_file_path
-            elif input_schema:
-                print(
-                    f"Reading file {input_file} using passed in schema for view {view_name}"
-                )
-                input_schema_for_view: StructType = (
-                    input_schema[view_name]  # type: ignore
-                    if isinstance(input_schema, dict) and view_name in input_schema
-                    else input_schema
-                )
-                spark_session.read.schema(input_schema_for_view).json(
-                    path=jsonl_input_file_path
-                ).limit(
-                    SparkPipelineFrameworkTestRunner.row_limit
-                ).createOrReplaceTempView(
-                    view_name
-                )
-                assert (
-                    "_corrupt_record" not in spark_session.table(view_name).columns
-                ), input_file_path
-            else:  # if no schema found just load the file
-                spark_session.read.json(path=jsonl_input_file_path).limit(
-                    SparkPipelineFrameworkTestRunner.row_limit
-                ).createOrReplaceTempView(view_name)
-                assert (
-                    "_corrupt_record" not in spark_session.table(view_name).columns
-                ), input_file_path
-        elif file_extension.lower() == ".parquet":
-            input_file_path = os.path.join(input_folder, input_file)
-            spark_session.read.parquet(path=input_file_path).limit(
+            input_df = reader.json(path=jsonl_input_file_path).limit(
                 SparkPipelineFrameworkTestRunner.row_limit
-            ).createOrReplaceTempView(view_name)
-            assert (
-                "_corrupt_record" not in spark_session.table(view_name).columns
-            ), input_file_path
+            )
+        elif file_extension.lower() == ".parquet":
+            input_df = reader.parquet(path=input_file_path).limit(
+                SparkPipelineFrameworkTestRunner.row_limit
+            )
+        else:
+            assert False, f"Unsupported file extension: {file_extension}"
+
+        # create expected view
+        input_df.createOrReplaceTempView(view_name)
+        assert (
+            "_corrupt_record" not in spark_session.table(view_name).columns
+        ), input_file_path
 
     @staticmethod
     def get_view_name_from_file_path(input_file: str) -> str:
