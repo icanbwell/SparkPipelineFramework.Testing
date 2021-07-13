@@ -1,0 +1,11 @@
+version: '3.5'
+services:
+  dev:
+    user: root
+    build:
+      dockerfile: spark.Dockerfile
+      context: .
+    volumes:
+      - ./:/spftest/
+    container_name: spftest_dev
+    working_dir: /spftest
