@@ -1,0 +1,4 @@
+diagnosis_id,member_id,icd_code
+100,1,E08.43
+101,1,I50.20
+102,2,J44.9

@@ -1,7 +1,7 @@
 import glob
-import re
 import json
 import os
+import re
 import shutil
 from os import listdir
 from os.path import isfile, join, isdir

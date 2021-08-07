@@ -10,6 +10,7 @@ logger = ">=1.4"
 sparkpipelineframework = ">=0.1.99"
 sparkdataframecomparer = ">=0.1.68"
 Deprecated = "==1.2.12"
+requests = ">=2.25.1"
 
 [dev-packages]
 setuptools = "*"
