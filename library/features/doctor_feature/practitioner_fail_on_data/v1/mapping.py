@@ -3,19 +3,26 @@ from typing import Any, Dict
 from spark_auto_mapper.automappers.automapper import AutoMapper
 from spark_auto_mapper.helpers.automapper_helpers import AutoMapperHelpers as A
 from spark_auto_mapper_fhir.complex_types.address import Address
-from spark_auto_mapper_fhir.complex_types.codeableConcept import CodeableConcept
+from spark_auto_mapper_fhir.complex_types.codeable_concept import CodeableConcept
 from spark_auto_mapper_fhir.complex_types.coding import Coding
 from spark_auto_mapper_fhir.complex_types.human_name import HumanName
 from spark_auto_mapper_fhir.complex_types.identifier import Identifier
 from spark_auto_mapper_fhir.fhir_types.id import FhirId
 from spark_auto_mapper_fhir.fhir_types.list import FhirList
 from spark_auto_mapper_fhir.resources.practitioner import Practitioner
-from spark_auto_mapper_fhir.valuesets.administrative_gender import (
+from spark_auto_mapper_fhir.value_sets.address_type import AddressTypeCode
+from spark_auto_mapper_fhir.value_sets.address_use import AddressUseCodeValues
+from spark_auto_mapper_fhir.value_sets.administrative_gender import (
     AdministrativeGenderCode,
 )
-from spark_auto_mapper_fhir.valuesets.identifier_type import IdentifierTypeCode
-from spark_auto_mapper_fhir.valuesets.identifier_use import IdentifierUseCode
-from spark_auto_mapper_fhir.valuesets.name_use import NameUseCode
+from spark_auto_mapper_fhir.value_sets.identifier_type_codes import (
+    IdentifierTypeCodesCodeValues,
+)
+from spark_auto_mapper_fhir.value_sets.identifier_use import (
+    IdentifierUseCode,
+    IdentifierUseCodeValues,
+)
+from spark_auto_mapper_fhir.value_sets.name_use import NameUseCodeValues
 
 
 def mapping(parameters: Dict[str, Any]) -> AutoMapper:
@@ -29,14 +36,14 @@ def mapping(parameters: Dict[str, Any]) -> AutoMapper:
             identifier=FhirList(
                 [
                     Identifier(
-                        use=IdentifierUseCode.Usual,
+                        use=IdentifierUseCodeValues.Usual,
                         value=A.column("b.gecb_provider_number"),
                         type_=CodeableConcept(
                             coding=FhirList(
                                 [
                                     Coding(
-                                        system=IdentifierTypeCode.codeset,
-                                        code=IdentifierTypeCode.ProviderNumber,
+                                        system=IdentifierUseCode.codeset,
+                                        code=IdentifierTypeCodesCodeValues.ProviderNumber,
                                     )
                                 ]
                             )
@@ -44,14 +51,14 @@ def mapping(parameters: Dict[str, Any]) -> AutoMapper:
                         system="medstarhealth.org",
                     ),
                     Identifier(
-                        use=IdentifierUseCode.Official,
+                        use=IdentifierUseCodeValues.Official,
                         value=A.column("provider_npi"),
                         type_=CodeableConcept(
                             coding=FhirList(
                                 [
                                     Coding(
-                                        system=IdentifierTypeCode.codeset,
-                                        code=IdentifierTypeCode.NationalProviderIdentifier,
+                                        system=IdentifierUseCode.codeset,
+                                        code=IdentifierTypeCodesCodeValues.NationalProviderIdentifier,
                                     )
                                 ]
                             )
@@ -72,7 +79,7 @@ def mapping(parameters: Dict[str, Any]) -> AutoMapper:
                         ),
                         family=A.column("provider_last_name"),
                         suffix=FhirList([A.column("provider_title")]),
-                        use=NameUseCode.usual,
+                        use=NameUseCodeValues.Usual,
                         text=A.text(""),
                     )
                 ]
@@ -95,8 +102,10 @@ def mapping(parameters: Dict[str, Any]) -> AutoMapper:
             address=FhirList(
                 [
                     Address(
-                        use=A.text("Work"),  # AddressUseCode.Work,
-                        type_=A.text("Physical"),  # AddressTypeCode.Physical,
+                        use=AddressUseCodeValues.Work,  # AddressUseCode.Work,
+                        type_=AddressTypeCode(
+                            A.text("Physical")
+                        ),  # AddressTypeCode.Physical,
                         text=A.column("practice_name"),
                         line=FhirList(
                             [
