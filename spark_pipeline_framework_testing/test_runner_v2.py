@@ -19,7 +19,9 @@ from spark_pipeline_framework.utilities.FriendlySparkException import (
 )
 from spark_pipeline_framework.utilities.class_helpers import ClassHelpers
 
-from spark_pipeline_framework_testing.mockserver_client.mockserver_client import MockServerFriendlyClient
+from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
+    MockServerFriendlyClient,
+)
 
 if TYPE_CHECKING:
     from spark_pipeline_framework_testing.test_classes.input_types import TestInputType
@@ -136,7 +138,6 @@ class SparkPipelineFrameworkTestRunnerV2:
                         self.logger,
                         self.mock_client,
                         self.spark_session,
-
                     )
             if not self.auto_find_helix_transformer:
                 if self.helix_transformers:
@@ -166,7 +167,7 @@ class SparkPipelineFrameworkTestRunnerV2:
                         spark_session=self.spark_session,
                         temp_folder_path=self.temp_folder_path,
                         mock_client=self.mock_client,
-                        logger=self.logger
+                        logger=self.logger,
                     )
 
         except SparkPipelineFrameworkTestingException as e:
@@ -235,7 +236,7 @@ class SparkPipelineFrameworkTestRunnerV2:
                 "progress_logger": progress_logger,
             }
             my_instance: Transformer = ClassHelpers.instantiate_class_with_parameters(
-                class_parameters=class_parameters, my_class=transformer_class
+                class_parameters=class_parameters, my_class=transformer_class  # type: ignore
             )
             # now call transform
             schema = StructType([])
@@ -251,7 +252,10 @@ class SparkPipelineFrameworkTestRunnerV2:
     ) -> Type[Transformer]:
         # get name of transformer file
         search_result: Optional[Match[str]] = search(r"/library/", testable_folder)
-
+        if not search_result:
+            raise ModuleNotFoundError(
+                f"re.search(r`/library/`, {testable_folder}) returns empty!"
+            )
         search_result_end = search_result.end()
         transformer_file_name: str = testable_folder[search_result_end:].replace(
             "/", "_"

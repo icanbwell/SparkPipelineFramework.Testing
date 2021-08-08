@@ -26,6 +26,4 @@ class FhirCalls(FrameworkPipeline):
                 response: Response = requests.post(f"{url}", json=resource)
                 print(">>>", response.text)
 
-        self.steps = [
-        ]
-
+        self.steps = []

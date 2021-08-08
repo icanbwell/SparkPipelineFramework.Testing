@@ -78,6 +78,7 @@ class MockCallValidator(Validator):
     """
     validates Mock calls
     """
+
     def __init__(
         self,
         related_inputs: Optional[Union[List["FhirCalls"], "FhirCalls"]],
@@ -225,7 +226,7 @@ class MockCallValidator(Validator):
         related_input: "FhirCalls"
         for related_input in self.related_inputs:
             if related_input:
-                all_files.extend(related_input.mocked_files) # type: ignore
+                all_files.extend(related_input.mocked_files)  # type: ignore
         return all_files
 
 
@@ -233,6 +234,7 @@ class OutputFileValidator(Validator):
     """
     compare files
     """
+
     def __init__(
         self,
         func_path_modifier: Optional[
@@ -256,7 +258,9 @@ class OutputFileValidator(Validator):
         self.output_schema_folder = output_schema_folder
         self.output_folder = output_folder
         self.related_inputs = (
-            related_inputs if not related_inputs or isinstance(related_inputs, list) else [related_inputs]
+            related_inputs
+            if not related_inputs or isinstance(related_inputs, list)
+            else [related_inputs]
         )
         # init in validate
         self.spark_session: SparkSession
@@ -273,14 +277,13 @@ class OutputFileValidator(Validator):
         temp_folder_path: Path,
         logger: Logger,
         mock_client: Optional[MockServerFriendlyClient] = None,
-
     ) -> None:
         assert spark_session
         assert self.related_inputs
-        assert self.related_inputs[0].input_table_names # type: ignore
+        assert self.related_inputs[0].input_table_names  # type: ignore
         self.logger = logger
 
-        self.input_table_names = self.related_inputs[0].input_table_names# type: ignore
+        self.input_table_names = self.related_inputs[0].input_table_names  # type: ignore
         self.spark_session = spark_session
         self.test_path = test_path
         self.output_folder_path = test_path.joinpath(self.output_folder)
@@ -445,7 +448,9 @@ class OutputFileValidator(Validator):
             )
             found_output_file = True
         elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
-            output_df = reader.option("multiLine", True).json(path=str(output_file_path))
+            output_df = reader.option("multiLine", True).json(
+                path=str(output_file_path)
+            )
             found_output_file = True
         elif file_extension.lower() == ".parquet":
             output_df = reader.parquet(path=str(output_file_path))

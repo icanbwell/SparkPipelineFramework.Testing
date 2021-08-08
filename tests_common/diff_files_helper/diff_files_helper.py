@@ -3,7 +3,9 @@ import os
 from pathlib import Path
 from typing import Any
 
-from utilities.path_converter import convert_path_from_docker
+from spark_pipeline_framework_testing.utils.path_converter import (
+    convert_path_from_docker,
+)
 
 
 class DiffFilesHelper:

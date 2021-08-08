@@ -28,7 +28,9 @@ from tests_common.common_functions import (
     get_file_extension_from_file_path,
     get_view_name_from_file_path,
 )
-from spark_pipeline_framework_testing.mockserver_client.mockserver_client import MockServerFriendlyClient
+from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
+    MockServerFriendlyClient,
+)
 
 
 class TestInputType(ABC):
@@ -59,6 +61,7 @@ class FhirCalls(TestInputType):
     This class mocks and/or validates calls to a Fhir Server
     https://www.hl7.org/fhir/summary.html#:~:text=FHIR%C2%AE%20%E2%80%93%20Fast%20Healthcare%20Interoperability,a%20tight%20focus%20on%20implementability.
     """
+
     def __init__(
         self,
         fhir_validation_url: str = "http://fhir:3000/4_0_0",
@@ -111,6 +114,7 @@ class FileInput(TestInputType):
     """
     This class loads standard files to a Spark view
     """
+
     def __init__(
         self,
         test_input_folder: str = "input",
@@ -266,6 +270,7 @@ class FileInput(TestInputType):
             "_corrupt_record" not in self.spark_session.table(view_name).columns
         ), input_file_path
 
+
 class SourceApiCall(TestInputType):
     """
     This class help mock a http call using this format:
@@ -281,6 +286,7 @@ class SourceApiCall(TestInputType):
       }
     }
     """
+
     def __init__(
         self,
         response_data_folder: str = "source_api_calls",
@@ -418,5 +424,3 @@ class ApiJsonResponse(TestInputType):
                 )
                 print(f"Mocking {mock_client.base_url}{path}: {request_parameters}")
         return files
-
-

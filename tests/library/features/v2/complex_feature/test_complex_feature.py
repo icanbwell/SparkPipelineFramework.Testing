@@ -31,11 +31,11 @@ def cleanup_files(data_dir: Path) -> None:
 def test_complex_feature(spark_session: SparkSession) -> None:
     test_path: Path = Path(__file__).parent.joinpath("./")
 
-
     test_name = "test_complex_feature"
     input_file = FileInput()
     logger = get_logger(__name__)
-    SparkPipelineFrameworkTestRunnerV2(logger = logger,
+    SparkPipelineFrameworkTestRunnerV2(
+        logger=logger,
         spark_session=spark_session,
         test_path=test_path,
         test_name=test_name,

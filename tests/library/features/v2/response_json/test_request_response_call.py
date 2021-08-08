@@ -14,7 +14,7 @@ from spark_pipeline_framework_testing.mockserver_client.mockserver_client import
 )
 from spark_pipeline_framework_testing.test_classes.input_types import (
     FileInput,
-    ApiJsonResponse, SourceApiCall,
+    SourceApiCall,
 )
 from spark_pipeline_framework_testing.test_runner_v2 import (
     SparkPipelineFrameworkTestRunnerV2,
@@ -31,7 +31,8 @@ def test_request_response_call(spark_session: SparkSession) -> None:
     input_file = FileInput()
     request = SourceApiCall(response_data_folder="request_response_call")
     logger = get_logger(__name__)
-    SparkPipelineFrameworkTestRunnerV2(logger = logger,
+    SparkPipelineFrameworkTestRunnerV2(
+        logger=logger,
         spark_session=spark_session,
         test_path=test_path,
         test_name=test_name,

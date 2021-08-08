@@ -13,6 +13,7 @@ def camel_case_to_snake_case(text: str) -> str:
     str1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", text)
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", str1).lower()
 
+
 def get_folders_containing_testcases(
     folder_path: Path, test_input_directories: List[str] = ["input"]
 ) -> List[str]:
