@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List, Dict, Any, Union
 
-from tests_common.mockserver_client.exceptions.mock_server_exception import (
+from spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_exception import (
     MockServerException,
 )
 

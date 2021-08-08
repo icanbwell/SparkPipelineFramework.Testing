@@ -28,18 +28,19 @@ from tests_common.common_functions import (
     get_file_extension_from_file_path,
     get_view_name_from_file_path,
 )
-from tests_common.mockserver_client.mockserver_client import MockServerFriendlyClient
+from spark_pipeline_framework_testing.mockserver_client.mockserver_client import MockServerFriendlyClient
 
 
 class TestInputType(ABC):
-    def __init__(self, logger: Logger) -> None:
-        self.logger = logger
+    def __init__(self) -> None:
+        pass
 
     @abstractmethod
     def initialize(
         self,
         test_name: str,
         test_path: Path,
+        logger: Logger,
         mock_client: Optional[MockServerFriendlyClient] = None,
         spark_session: Optional[SparkSession] = None,
     ) -> None:
@@ -54,13 +55,16 @@ class TestInputType(ABC):
 
 
 class FhirCalls(TestInputType):
+    """
+    This class mocks and/or validates calls to a Fhir Server
+    https://www.hl7.org/fhir/summary.html#:~:text=FHIR%C2%AE%20%E2%80%93%20Fast%20Healthcare%20Interoperability,a%20tight%20focus%20on%20implementability.
+    """
     def __init__(
         self,
-        logger: Logger,
         fhir_validation_url: str = "http://fhir:3000/4_0_0",
         fhir_calls_folder: str = "fhir_calls",
     ) -> None:
-        super().__init__(logger)
+        super().__init__()
         self.fhir_calls_folder = fhir_calls_folder
         self.fhir_validation_url = fhir_validation_url
 
@@ -77,6 +81,7 @@ class FhirCalls(TestInputType):
         self,
         test_name: str,
         test_path: Path,
+        logger: Logger,
         mock_client: Optional[MockServerFriendlyClient] = None,
         spark_session: Optional[SparkSession] = None,
     ) -> None:
@@ -84,6 +89,7 @@ class FhirCalls(TestInputType):
         assert spark_session
         self.test_name = test_name
         self.test_path = test_path
+        self.logger = logger
         self.mock_client = mock_client
         self.spark_session = spark_session
         self.temp_folder_path = test_path.joinpath(self.test_path)
@@ -102,20 +108,21 @@ class FhirCalls(TestInputType):
 
 
 class FileInput(TestInputType):
+    """
+    This class loads standard files to a Spark view
+    """
     def __init__(
         self,
-        logger: Logger,
         test_input_folder: str = "input",
         input_schema_folder: str = "input_schema",
         input_schema: Optional[Union[StructType, Dict[str, StructType]]] = None,
         row_limit: int = 100,
     ) -> None:
-        super().__init__(logger=logger)
+        super().__init__()
         self.test_input_folder = test_input_folder
         self.input_schema = input_schema
         self.input_schema_folder = input_schema_folder
         self.test_path: Path
-        self.logger = logger
         self.row_limit = row_limit
         self.input_table_names: List[str]
         self.spark_session: SparkSession
@@ -124,16 +131,20 @@ class FileInput(TestInputType):
         self,
         test_name: str,
         test_path: Path,
+        logger: Logger,
         mock_client: Optional[MockServerFriendlyClient] = None,
         spark_session: Optional[SparkSession] = None,
     ) -> None:
         assert spark_session
         self.spark_session = spark_session
         self.test_path = test_path
+        self.logger = logger
         input_table_names = self.ingest_input_files(self.input_schema)
         self.input_table_names = input_table_names
 
-    def ingest_input_files(self, input_schema: Optional[Union[StructType, Dict[str, StructType]]]) -> List[str]:
+    def ingest_input_files(
+        self, input_schema: Optional[Union[StructType, Dict[str, StructType]]]
+    ) -> List[str]:
         print(f"Running test in folder: {self.test_path}...")
 
         input_folder: Path = Path(self.test_path).joinpath(self.test_input_folder)
@@ -255,20 +266,94 @@ class FileInput(TestInputType):
             "_corrupt_record" not in self.spark_session.table(view_name).columns
         ), input_file_path
 
+class SourceApiCall(TestInputType):
+    """
+    This class help mock a http call using this format:
+    {
+      "request_parameters": {
+        "method": "<method name>",
+        "querystring": {
+        ...
+        }
+      },
+      "request_result": {
+      ....
+      }
+    }
+    """
+    def __init__(
+        self,
+        response_data_folder: str = "source_api_calls",
+    ) -> None:
+        super().__init__()
+        self.response_data_folder = response_data_folder
+        self.test_path: Path
+
+    def initialize(
+        self,
+        test_name: str,
+        test_path: Path,
+        logger: Logger,
+        mock_client: Optional[MockServerFriendlyClient] = None,
+        spark_session: Optional[SparkSession] = None,
+    ) -> None:
+        assert mock_client
+        self.test_path = test_path
+        self.logger = logger
+        response_data_path = self.test_path.joinpath(self.response_data_folder)
+        self.raise_if_not_exist(response_data_path)
+        self.load_mock_source_api_responses_from_folder(
+            folder=response_data_path,
+            mock_client=mock_client,
+            url_prefix=test_name,
+        )
+
+    @staticmethod
+    def load_mock_source_api_responses_from_folder(
+        folder: Path, mock_client: MockServerFriendlyClient, url_prefix: Optional[str]
+    ) -> List[str]:
+        """
+        Mock responses for all files from the folder and its sub-folders
+
+        from https://pypi.org/project/mockserver-friendly-client/
+
+        :param folder: where to look for files (recursively)
+        :param mock_client:
+        :param url_prefix:
+        """
+        file_path: str
+        files: List[str] = sorted(
+            glob.glob(str(folder.joinpath("**/*")), recursive=True)
+        )
+        for file_path in files:
+            with open(file_path, "r") as file:
+                content = file.read()
+                path = f"{('/' + url_prefix) if url_prefix else ''}/{os.path.basename(file_path)}"
+                mock_client.expect(
+                    request(
+                        method="GET",
+                        path=path,
+                    ),
+                    response(body=content),
+                    timing=times(1),
+                )
+                print(f"Mocking: GET {mock_client.base_url}{path}")
+        return files
+
 
 class ApiJsonResponse(TestInputType):
     def __init__(
         self,
-        logger: Logger,
         response_data_folder: str = "api_json_response",
     ) -> None:
-        super().__init__(logger=logger)
+        super().__init__()
         self.input_folder_name = response_data_folder
 
     def initialize(
         self,
         test_name: str,
         test_path: Path,
+        logger: Logger,
         mock_client: Optional[MockServerFriendlyClient] = None,
         spark_session: Optional[SparkSession] = None,
     ) -> None:
@@ -335,61 +420,3 @@ class ApiJsonResponse(TestInputType):
         return files
 
 
-class SourceApiCall(TestInputType):
-    def __init__(
-        self,
-        logger: Logger,
-        response_data_folder: str = "source_api_calls",
-    ) -> None:
-        super().__init__(logger=logger)
-        self.response_data_folder = response_data_folder
-        self.test_path: Path
-
-    def initialize(
-        self,
-        test_name: str,
-        test_path: Path,
-        mock_client: Optional[MockServerFriendlyClient] = None,
-        spark_session: Optional[SparkSession] = None,
-    ) -> None:
-        assert mock_client
-        self.test_path = test_path
-        response_data_path = self.test_path.joinpath(self.response_data_folder)
-        self.raise_if_not_exist(response_data_path)
-        self.load_mock_source_api_responses_from_folder(
-            folder=response_data_path,
-            mock_client=mock_client,
-            url_prefix=test_name,
-        )
-
-    @staticmethod
-    def load_mock_source_api_responses_from_folder(
-        folder: Path, mock_client: MockServerFriendlyClient, url_prefix: Optional[str]
-    ) -> List[str]:
-        """
-        Mock responses for all files from the folder and its sub-folders
-
-        from https://pypi.org/project/mockserver-friendly-client/
-
-        :param folder: where to look for files (recursively)
-        :param mock_client:
-        :param url_prefix:
-        """
-        file_path: str
-        files: List[str] = sorted(
-            glob.glob(str(folder.joinpath("**/*")), recursive=True)
-        )
-        for file_path in files:
-            with open(file_path, "r") as file:
-                content = file.read()
-                path = f"{('/' + url_prefix) if url_prefix else ''}/{os.path.basename(file_path)}"
-                mock_client.expect(
-                    request(
-                        method="GET",
-                        path=path,
-                    ),
-                    response(body=content),
-                    timing=times(1),
-                )
-                print(f"Mocking: GET {mock_client.base_url}{path}")
-        return files

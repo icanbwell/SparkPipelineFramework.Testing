@@ -20,10 +20,10 @@ def test_fhir_mock(spark_session: SparkSession) -> None:
     mock_server_url = "http://mock-server:1080"
     mock_client = MockServerFriendlyClient(mock_server_url)
     mock_client.clear(f"/{test_name}/")
-    logger = get_logger(__name__)
 
-    fhir_calls = FhirCalls(logger)
-    test_validators = MockCallValidator(related_inputs=fhir_calls, logger=logger)
+
+    fhir_calls = FhirCalls()
+    test_validators = MockCallValidator(related_inputs=fhir_calls)
     params = {
         "test_name": test_name,
         "mock_server_url": mock_server_url,
@@ -35,8 +35,9 @@ def test_fhir_mock(spark_session: SparkSession) -> None:
 
         ]
     }
-    SparkPipelineFrameworkTestRunnerV2(spark_session=spark_session, test_path=test_path, test_name=test_name,
-                                       helix_transformers=[PipelineFhirCallsFhirMockV1],
-                                       test_validators=[test_validators], mock_client=mock_client,
+    logger = get_logger(__name__)
+    SparkPipelineFrameworkTestRunnerV2(logger = logger,spark_session=spark_session, test_path=test_path, test_name=test_name,
+                                       test_validators=[test_validators], auto_find_helix_transformer=False,
+                                       helix_transformers=[PipelineFhirCallsFhirMockV1], mock_client=mock_client,
                                        helix_pipeline_parameters=params, test_inputs=[fhir_calls],
                                        temp_folder="temp").run_test2()

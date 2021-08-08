@@ -1,6 +1,68 @@
 [
   {
     "resourceType": "Practitioner",
+    "id": "4610",
+    "identifier": [
+      {
+        "use": "usual",
+        "type": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/identifier-use",
+              "code": "PRN"
+            }
+          ]
+        },
+        "system": "medstarhealth.org",
+        "value": "4610"
+      },
+      {
+        "use": "official",
+        "type": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/identifier-use",
+              "code": "NPI"
+            }
+          ]
+        },
+        "system": "http://hl7.org/fhir/sid/us-npi",
+        "value": "1598000000"
+      }
+    ],
+    "active": true,
+    "name": [
+      {
+        "use": "usual",
+        "text": "",
+        "family": "DOCTOR4",
+        "given": [
+          "FIRST4"
+        ],
+        "suffix": []
+      }
+    ],
+    "telecom": [],
+    "address": [
+      {
+        "use": "work",
+        "type": "Physical",
+        "text": "Good Medical Center",
+        "line": [
+          "Good Building",
+          "123 Main Street"
+        ],
+        "city": "HAWAII",
+        "district": "",
+        "state": "HI",
+        "postalCode": "20000",
+        "country": "USA"
+      }
+    ],
+    "gender": "unknown"
+  },
+  {
+    "resourceType": "Practitioner",
     "id": "4657",
     "identifier": [
       {
@@ -8,7 +70,7 @@
         "type": {
           "coding": [
             {
-              "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+              "system": "http://hl7.org/fhir/identifier-use",
               "code": "PRN"
             }
           ]
@@ -21,7 +83,7 @@
         "type": {
           "coding": [
             {
-              "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+              "system": "http://hl7.org/fhir/identifier-use",
               "code": "NPI"
             }
           ]
@@ -34,6 +96,7 @@
     "name": [
       {
         "use": "usual",
+        "text": "",
         "family": "DOCTOR1",
         "given": [
           "FIRST1"
@@ -44,7 +107,7 @@
     "telecom": [],
     "address": [
       {
-        "use": "Work",
+        "use": "work",
         "type": "Physical",
         "text": "Good Medical Center",
         "line": [
@@ -52,65 +115,7 @@
           "123 Main Street"
         ],
         "city": "HAWAII",
-        "state": "HI",
-        "postalCode": "20000",
-        "country": "USA"
-      }
-    ],
-    "gender": "unknown"
-  },
-  {
-    "resourceType": "Practitioner",
-    "id": "4940",
-    "identifier": [
-      {
-        "use": "usual",
-        "type": {
-          "coding": [
-            {
-              "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-              "code": "PRN"
-            }
-          ]
-        },
-        "system": "medstarhealth.org",
-        "value": "4940"
-      },
-      {
-        "use": "official",
-        "type": {
-          "coding": [
-            {
-              "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-              "code": "NPI"
-            }
-          ]
-        },
-        "system": "http://hl7.org/fhir/sid/us-npi"
-      }
-    ],
-    "active": true,
-    "name": [
-      {
-        "use": "usual",
-        "family": "DOCTOR2",
-        "given": [
-          "FIRST2"
-        ],
-        "suffix": []
-      }
-    ],
-    "telecom": [],
-    "address": [
-      {
-        "use": "Work",
-        "type": "Physical",
-        "text": "Good Medical Center",
-        "line": [
-          "Good Building",
-          "123 Main Street"
-        ],
-        "city": "HAWAII",
+        "district": "",
         "state": "HI",
         "postalCode": "20000",
         "country": "USA"
@@ -127,7 +132,7 @@
         "type": {
           "coding": [
             {
-              "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+              "system": "http://hl7.org/fhir/identifier-use",
               "code": "PRN"
             }
           ]
@@ -140,7 +145,7 @@
         "type": {
           "coding": [
             {
-              "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+              "system": "http://hl7.org/fhir/identifier-use",
               "code": "NPI"
             }
           ]
@@ -153,6 +158,7 @@
     "name": [
       {
         "use": "usual",
+        "text": "",
         "family": "DOCTOR3",
         "given": [
           "FIRST3"
@@ -163,7 +169,7 @@
     "telecom": [],
     "address": [
       {
-        "use": "Work",
+        "use": "work",
         "type": "Physical",
         "text": "Good Medical Center",
         "line": [
@@ -171,6 +177,7 @@
           "123 Main Street"
         ],
         "city": "HAWAII",
+        "district": "",
         "state": "HI",
         "postalCode": "20000",
         "country": "USA"
@@ -180,42 +187,42 @@
   },
   {
     "resourceType": "Practitioner",
-    "id": "4610",
+    "id": "4940",
     "identifier": [
       {
         "use": "usual",
         "type": {
           "coding": [
             {
-              "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+              "system": "http://hl7.org/fhir/identifier-use",
               "code": "PRN"
             }
           ]
         },
         "system": "medstarhealth.org",
-        "value": "4610"
+        "value": "4940"
       },
       {
         "use": "official",
         "type": {
           "coding": [
             {
-              "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+              "system": "http://hl7.org/fhir/identifier-use",
               "code": "NPI"
             }
           ]
         },
-        "system": "http://hl7.org/fhir/sid/us-npi",
-        "value": "1598000000"
+        "system": "http://hl7.org/fhir/sid/us-npi"
       }
     ],
     "active": true,
     "name": [
       {
         "use": "usual",
-        "family": "DOCTOR4",
+        "text": "",
+        "family": "DOCTOR2",
         "given": [
-          "FIRST4"
+          "FIRST2"
         ],
         "suffix": []
       }
@@ -223,7 +230,7 @@
     "telecom": [],
     "address": [
       {
-        "use": "Work",
+        "use": "work",
         "type": "Physical",
         "text": "Good Medical Center",
         "line": [
@@ -231,6 +238,7 @@
           "123 Main Street"
         ],
         "city": "HAWAII",
+        "district": "",
         "state": "HI",
         "postalCode": "20000",
         "country": "USA"

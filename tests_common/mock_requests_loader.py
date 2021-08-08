@@ -4,7 +4,7 @@ from glob import glob
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
-from tests_common.mockserver_client.mockserver_client import (
+from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
     request,
     response,

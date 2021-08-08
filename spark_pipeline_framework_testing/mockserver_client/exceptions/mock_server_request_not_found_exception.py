@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional, List, Union
 
-from tests_common.mockserver_client.exceptions.mock_server_exception import (
+from spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_exception import (
     MockServerException,
 )
 

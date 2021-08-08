@@ -35,7 +35,7 @@ from spark_pipeline_framework_testing.mockserver_client.mockserver_client import
 from spark_pipeline_framework_testing.utils.path_converter import (
     convert_path_from_docker,
 )
-from tests_common.mockserver_client.mockserver_verify_exception import (
+from spark_pipeline_framework_testing.mockserver_client.mockserver_verify_exception import (
     MockServerVerifyException,
 )
 
@@ -68,22 +68,24 @@ class Validator(ABC):
         test_path: Path,
         spark_session: SparkSession,
         temp_folder_path: Path,
+        logger: Logger,
         mock_client: Optional[MockServerFriendlyClient] = None,
     ) -> None:
         pass
 
 
 class MockCallValidator(Validator):
+    """
+    validates Mock calls
+    """
     def __init__(
         self,
         related_inputs: Optional[Union[List["FhirCalls"], "FhirCalls"]],
-        logger: Logger,
     ) -> None:
         if related_inputs:
             self.related_inputs = (
                 related_inputs if isinstance(related_inputs, list) else [related_inputs]
             )
-        self.logger = logger
 
     def validate(
         self,
@@ -91,10 +93,12 @@ class MockCallValidator(Validator):
         test_path: Path,
         spark_session: SparkSession,
         temp_folder_path: Path,
+        logger: Logger,
         mock_client: Optional[MockServerFriendlyClient] = None,
     ) -> None:
         assert MockServerFriendlyClient
         assert mock_client
+        self.logger = logger
         data_folder_path: Path = test_path.joinpath(
             self.related_inputs[0].fhir_calls_folder
         )
@@ -113,15 +117,15 @@ class MockCallValidator(Validator):
                         # use .command:
                         # https://stackoverflow.com/questions/5125907/how-to-run-a-shell-script-in-os-x-by-double-clicking
                         compare_sh_path = temp_folder_path.joinpath(
-                            f"compare_fhir_{expected_file_name}.command"
+                            f"compare_http_{expected_file_name}.command"
                         )
                         # write actual to result_path
                         os.makedirs(
-                            temp_folder_path.joinpath("actual_fhir_calls"),
+                            temp_folder_path.joinpath("actual_http_calls"),
                             exist_ok=True,
                         )
                         result_path: Path = temp_folder_path.joinpath(
-                            "actual_fhir_calls"
+                            "actual_http_calls"
                         ).joinpath(expected_file_name)
                         with open(result_path, "w") as file_result:
                             file_result.write(json.dumps(exception.actual, indent=2))
@@ -162,7 +166,7 @@ class MockCallValidator(Validator):
                         with open(resource_file_path, "w") as file:
                             file.write(json.dumps(resource_obj, indent=2))
                         self.logger.info(
-                            f"Writing fhir calls file to : {resource_file_path}"
+                            f"Writing http calls file to : {resource_file_path}"
                         )
                 elif isinstance(exception, MockServerExpectationNotFoundException):
                     # add to error
@@ -226,9 +230,11 @@ class MockCallValidator(Validator):
 
 
 class OutputFileValidator(Validator):
+    """
+    compare files
+    """
     def __init__(
         self,
-        logger: Logger,
         func_path_modifier: Optional[
             Callable[[Union[Path, str]], Union[Path, str]]
         ] = None,
@@ -252,7 +258,6 @@ class OutputFileValidator(Validator):
         self.related_inputs = (
             related_inputs if not related_inputs or isinstance(related_inputs, list) else [related_inputs]
         )
-        self.logger = logger
         # init in validate
         self.spark_session: SparkSession
         self.test_path: Optional[Path] = None
@@ -266,11 +271,14 @@ class OutputFileValidator(Validator):
         test_path: Path,
         spark_session: SparkSession,
         temp_folder_path: Path,
+        logger: Logger,
         mock_client: Optional[MockServerFriendlyClient] = None,
+
     ) -> None:
         assert spark_session
         assert self.related_inputs
         assert self.related_inputs[0].input_table_names # type: ignore
+        self.logger = logger
 
         self.input_table_names = self.related_inputs[0].input_table_names# type: ignore
         self.spark_session = spark_session

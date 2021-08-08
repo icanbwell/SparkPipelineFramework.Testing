@@ -8,7 +8,7 @@ from spark_pipeline_framework.utilities.FriendlySparkException import (
     FriendlySparkException,
 )
 
-from tests_common.mockserver_client.exceptions.mock_server_json_content_mismatch_exception import (
+from spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_json_content_mismatch_exception import (
     MockServerJsonContentMismatchException,
 )
 

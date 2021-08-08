@@ -19,7 +19,7 @@ from spark_pipeline_framework.utilities.FriendlySparkException import (
 )
 from spark_pipeline_framework.utilities.class_helpers import ClassHelpers
 
-from tests_common.mockserver_client.mockserver_client import MockServerFriendlyClient
+from spark_pipeline_framework_testing.mockserver_client.mockserver_client import MockServerFriendlyClient
 
 if TYPE_CHECKING:
     from spark_pipeline_framework_testing.test_classes.input_types import TestInputType
@@ -45,8 +45,10 @@ class SparkPipelineFrameworkTestRunnerV2:
         spark_session: SparkSession,
         test_path: Path,
         test_name: str,
-        helix_transformers: List[Type[ProxyBase]],
         test_validators: Optional[List[Validator]],
+        logger: Logger,
+        auto_find_helix_transformer: bool = True,
+        helix_transformers: Optional[List[Type[ProxyBase]]] = None,
         mock_client: Optional[MockServerFriendlyClient] = None,
         fhir_server_url: Optional[str] = None,
         fhir_validation_url: Optional[str] = None,
@@ -58,6 +60,7 @@ class SparkPipelineFrameworkTestRunnerV2:
         parameters_filename: str = "parameters.json",
     ) -> None:
         """
+        :param auto_find_helix_transformer:
         :param test_name:
         :param helix_transformers:
         :param test_validators:
@@ -82,9 +85,11 @@ class SparkPipelineFrameworkTestRunnerV2:
         self.test_inputs = test_inputs
         self.helix_transformers = helix_transformers
         self.mock_client = mock_client
+        self.auto_find_helix_transformer = auto_find_helix_transformer
         self.fhir_server_url = fhir_server_url
         self.fhir_validation_url = fhir_validation_url
         self.capture_exceptions = capture_exceptions
+        self.logger = logger
         self.temp_folder_path = test_path.joinpath(temp_folder) if temp_folder else None
         if not self.temp_folder_path:
             self.temp_folder_path = self.test_path.joinpath("temp")
@@ -128,17 +133,20 @@ class SparkPipelineFrameworkTestRunnerV2:
                     test_input.initialize(
                         self.test_name,
                         self.test_path,
+                        self.logger,
                         self.mock_client,
                         self.spark_session,
+
                     )
-            if self.helix_transformers:
-                for transformer in self.helix_transformers:
-                    self.run_helix_transformers(
-                        parameters=self.helix_pipeline_parameters
-                        if self.helix_pipeline_parameters
-                        else {},
-                        transformer_class=transformer,
-                    )  # todo: find trans if run_helix_transformers is empty
+            if not self.auto_find_helix_transformer:
+                if self.helix_transformers:
+                    for transformer in self.helix_transformers:
+                        self.run_helix_transformers(
+                            parameters=self.helix_pipeline_parameters
+                            if self.helix_pipeline_parameters
+                            else {},
+                            transformer_class=transformer,
+                        )
             else:
                 transformer_class = self.find_transformer(str(self.test_path))
                 if transformer_class:
@@ -158,6 +166,7 @@ class SparkPipelineFrameworkTestRunnerV2:
                         spark_session=self.spark_session,
                         temp_folder_path=self.temp_folder_path,
                         mock_client=self.mock_client,
+                        logger=self.logger
                     )
 
         except SparkPipelineFrameworkTestingException as e:
@@ -192,8 +201,10 @@ class SparkPipelineFrameworkTestRunnerV2:
                 )
             else:
                 raise
-        except ModuleNotFoundError as e:
-            raise Exception(f"Please make sure the transformer for {convert_path_from_docker(self.test_path)} exists!")
+        except ModuleNotFoundError:
+            raise Exception(
+                f"Please make sure the transformer for {convert_path_from_docker(self.test_path)} exists!"
+            )
         finally:
             if "CATALOG_LOCATION" in os.environ:
                 del os.environ["CATALOG_LOCATION"]
@@ -206,7 +217,7 @@ class SparkPipelineFrameworkTestRunnerV2:
             parameters = {}
         parameters_json_file: Path = Path(self.test_path).joinpath(
             self.parameters_filename
-        )  # todo: as test param not hard coded
+        )
         if os.path.exists(parameters_json_file):
             with open(parameters_json_file, "r") as file:
                 parameters = json.loads(file.read())
@@ -252,4 +263,3 @@ class SparkPipelineFrameworkTestRunnerV2:
         full_reference = lib_path + "." + transformer_file_name
         my_class = ClassHelpers.get_first_class_in_file(full_reference)
         return my_class
-

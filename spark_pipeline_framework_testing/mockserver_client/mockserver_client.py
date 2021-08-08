@@ -7,23 +7,16 @@ import dictdiffer
 from requests import put, Response
 from spark_pipeline_framework.logger.yarn_logger import get_logger
 
-from tests_common.mockserver_client._time import _Time
-from tests_common.mockserver_client._timing import _Timing
-from tests_common.mockserver_client.exceptions.mock_server_exception import (
-    MockServerException,
-)
-from tests_common.mockserver_client.exceptions.mock_server_expectation_not_found_exception import (
-    MockServerExpectationNotFoundException,
-)
-from tests_common.mockserver_client.exceptions.mock_server_json_content_mismatch_exception import (
-    MockServerJsonContentMismatchException,
-)
-from tests_common.mockserver_client.exceptions.mock_server_request_not_found_exception import (
-    MockServerRequestNotFoundException,
-)
-from tests_common.mockserver_client.mockserver_verify_exception import (
-    MockServerVerifyException,
-)
+from spark_pipeline_framework_testing.mockserver_client._time import _Time
+from spark_pipeline_framework_testing.mockserver_client._timing import _Timing
+from spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_exception import MockServerException
+from spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_expectation_not_found_exception import \
+    MockServerExpectationNotFoundException
+from spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_json_content_mismatch_exception import \
+    MockServerJsonContentMismatchException
+from spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_request_not_found_exception import \
+    MockServerRequestNotFoundException
+from spark_pipeline_framework_testing.mockserver_client.mockserver_verify_exception import MockServerVerifyException
 
 
 class MockServerFriendlyClient(object):
