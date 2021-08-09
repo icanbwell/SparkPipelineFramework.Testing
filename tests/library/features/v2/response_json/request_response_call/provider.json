@@ -1,0 +1,91 @@
+{
+  "request_parameters": {
+    "method": "GET",
+    "querystring": {
+      "page": "1"
+    }
+  },
+  "request_result": {
+    "alerts": null,
+    "availability_format": 0,
+    "facets": [
+      {
+        "field": "none",
+        "missing": 5483,
+        "other": 0,
+        "terms": [],
+        "total": 0
+      }
+    ],
+    "geocoded_location": {},
+    "interpretation": {},
+    "providers": [
+      {
+        "id": 261481,
+        "name": {
+          "first_name": "Samer",
+          "full_name": "Samer Samir Najjar",
+          "last_name": "Najjar",
+          "middle_name": "Samir",
+          "suffix": null
+        },
+        "npi": "1841347192",
+        "specialties": [
+          {
+            "aliases": [
+              {
+                "aui": null,
+                "name": "Heart Failure and Transplantation Cardiology"
+              },
+              {
+                "aui": "A0002321",
+                "name": "Advanced Heart Failure and Transplant Cardiology"
+              },
+              {
+                "aui": "A0002322",
+                "name": "another alias"
+              }
+
+            ],
+            "eui": "E0000018",
+            "is_certified": false,
+            "piped_name": "Heart Failure and Transplantation Cardiology",
+            "practice_focus": null,
+            "specialty": "Heart Failure and Transplantation Cardiology",
+            "subspecialty": "subspecialty test"
+          }
+        ]
+      },
+      {
+        "id": 1877338,
+        "name": {
+          "first_name": "Diane",
+          "full_name": "Diane Kaliris",
+          "last_name": "Kaliris",
+          "middle_name": null,
+          "suffix": null
+        },
+        "npi": "1720474125",
+        "specialties": [
+          {
+            "aliases": [
+              {
+                "aui": null,
+                "name": "Physical Therapy"
+              }
+            ],
+            "eui": "E0000310",
+            "is_certified": false,
+            "piped_name": "Physical Therapy",
+            "practice_focus": null,
+            "specialty": "Physical Therapy",
+            "subspecialty": null
+          }
+        ]
+      }
+    ],
+    "suggestions": {},
+    "total_providers": 3,
+    "warnings": []
+  }
+}

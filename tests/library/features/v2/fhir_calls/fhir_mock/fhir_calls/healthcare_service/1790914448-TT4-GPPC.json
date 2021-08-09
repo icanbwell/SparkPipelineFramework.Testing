@@ -1,0 +1,47 @@
+[
+  {
+    "resourceType": "HealthcareService",
+    "id": "1790914448-TT4-GPPC",
+    "meta": {
+      "source": "http://medstarhealth.org/provider_appointment_type",
+      "security": [
+        {
+          "system": "https://www.icanbwell.com/access",
+          "code": "medstar"
+        },
+        {
+          "system": "https://www.icanbwell.com/owner",
+          "code": "medstar"
+        }
+      ]
+    },
+    "identifier": [
+      {
+        "use": "usual",
+        "system": "http://medstarhealth.org",
+        "value": "1790914448-TT4-GPPC"
+      }
+    ],
+    "type": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-category",
+            "display": "PrimaryCare"
+          },
+          {
+            "system": "http://medstarhealth.org/protocol",
+            "code": "PrimaryCare",
+            "display": "PrimaryCare"
+          }
+        ]
+      }
+    ],
+    "location": [
+      {
+        "reference": "Location/Medstar-Alias-TT4-GPPC"
+      }
+    ],
+    "name": "PrimaryCare"
+  }
+]
