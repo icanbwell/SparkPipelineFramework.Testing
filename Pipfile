@@ -10,8 +10,6 @@ logger = ">=1.4"
 sparkpipelineframework = ">=0.1.99"
 sparkdataframecomparer = ">=0.1.68"
 Deprecated = "==1.2.12"
-requests = ">=2.25.1"
-dictdiffer = ">=0.8.1"
 
 [dev-packages]
 setuptools = "*"
@@ -31,6 +29,8 @@ types-Deprecated=">=0.1.2"
 sparkautomapper=">=0.2.42"
 "sparkautomapper.fhir"=">=0.2.21"
 sparkfhirschemas=">=0.1.31"
+requests = ">=2.25.1"
+dictdiffer = ">=0.8.1"
 
 [requires]
 python_version = "3.7"
