@@ -47,7 +47,7 @@ if TYPE_CHECKING:
 from spark_pipeline_framework_testing.testing_exception import (
     SparkPipelineFrameworkTestingException,
 )
-from tests_common.common_functions import (
+from spark_pipeline_framework_testing.tests_common.common_functions import (
     write_schema_to_output,
     get_view_name_from_file_path,
     clean_spark_session,
