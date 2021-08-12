@@ -20,13 +20,13 @@ from spark_pipeline_framework_testing.mockserver_client.mockserver_client import
     response,
     times,
 )
+from spark_pipeline_framework_testing.tests_common.common_functions import (
+    get_view_name_from_file_path,
+    get_file_extension_from_file_path,
+    write_schema_to_output,
+)
 from spark_pipeline_framework_testing.utils.mock_requests_loader import (
     load_mock_fhir_requests_from_folder,
-)
-from tests_common.common_functions import (
-    write_schema_to_output,
-    get_file_extension_from_file_path,
-    get_view_name_from_file_path,
 )
 from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
