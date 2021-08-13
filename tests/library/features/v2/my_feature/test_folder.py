@@ -19,7 +19,14 @@ def test_folder(spark_session: SparkSession) -> None:
     test_name = "test_folder"
     input_file = FileInput()
     logger = get_logger(__name__)
-    SparkPipelineFrameworkTestRunnerV2(spark_session=spark_session, test_path=test_path, test_name=test_name,
-                                       test_validators=[OutputFileValidator(related_inputs=input_file)], logger=logger,
-                                       auto_find_helix_transformer=False, helix_transformers=[FeaturesMyFeature],
-                                       test_inputs=[input_file], temp_folder="output/temp").run_test2()
+    SparkPipelineFrameworkTestRunnerV2(
+        spark_session=spark_session,
+        test_path=test_path,
+        test_name=test_name,
+        test_validators=[OutputFileValidator(related_inputs=input_file)],
+        logger=logger,
+        auto_find_helix_transformer=False,
+        helix_transformers=[FeaturesMyFeature],
+        test_inputs=[input_file],
+        temp_folder="output/temp",
+    ).run_test2()

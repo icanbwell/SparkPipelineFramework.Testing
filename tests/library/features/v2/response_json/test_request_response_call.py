@@ -31,10 +31,18 @@ def test_request_response_call(spark_session: SparkSession) -> None:
     input_file = FileInput()
     request = HttpJsonRequest(response_data_folder="request_response_call")
     logger = get_logger(__name__)
-    SparkPipelineFrameworkTestRunnerV2(spark_session=spark_session, test_path=test_path, test_name=test_name,
-                                       test_validators=None, logger=logger, auto_find_helix_transformer=False,
-                                       helix_transformers=[FeaturesComplexFeature], mock_client=mock_client,
-                                       test_inputs=[input_file, request], temp_folder="output/temp").run_test2()
+    SparkPipelineFrameworkTestRunnerV2(
+        spark_session=spark_session,
+        test_path=test_path,
+        test_name=test_name,
+        test_validators=None,
+        logger=logger,
+        auto_find_helix_transformer=False,
+        helix_transformers=[FeaturesComplexFeature],
+        mock_client=mock_client,
+        test_inputs=[input_file, request],
+        temp_folder="output/temp",
+    ).run_test2()
 
     with open(test_path.joinpath("request_response_call/provider.json")) as f:
         content = json.load(f)

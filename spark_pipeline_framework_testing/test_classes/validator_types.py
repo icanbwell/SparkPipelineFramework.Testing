@@ -248,7 +248,6 @@ class OutputFileValidator(Validator):
         output_folder: str = "output",
         output_schema_folder: str = "output_schema",
         output_schema: Optional[Union[StructType, Dict[str, StructType]]] = None,
-
     ):
         """
 

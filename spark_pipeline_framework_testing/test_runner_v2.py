@@ -42,14 +42,25 @@ from spark_pipeline_framework_testing.tests_common.path_converter import (
 class SparkPipelineFrameworkTestRunnerV2:
     row_limit: int = 100
 
-    def __init__(self, spark_session: SparkSession, test_path: Path, test_name: str,
-                 test_validators: Optional[List[Validator]], logger: Logger, auto_find_helix_transformer: bool = True,
-                 helix_transformers: Optional[List[Type[ProxyBase]]] = None,
-                 mock_client: Optional[MockServerFriendlyClient] = None, fhir_server_url: Optional[str] = None,
-                 fhir_validation_url: Optional[str] = None, test_inputs: Optional[List["TestInputType"]] = None,
-                 temp_folder: Optional[str] = "temp", extra_params: Optional[Dict[str, Any]] = None,
-                 capture_exceptions: bool = True, helix_pipeline_parameters: Optional[Dict[str, Any]] = None,
-                 parameters_filename: str = "parameters.json") -> None:
+    def __init__(
+        self,
+        spark_session: SparkSession,
+        test_path: Path,
+        test_name: str,
+        test_validators: Optional[List[Validator]],
+        logger: Logger,
+        auto_find_helix_transformer: bool = True,
+        helix_transformers: Optional[List[Type[ProxyBase]]] = None,
+        mock_client: Optional[MockServerFriendlyClient] = None,
+        fhir_server_url: Optional[str] = None,
+        fhir_validation_url: Optional[str] = None,
+        test_inputs: Optional[List["TestInputType"]] = None,
+        temp_folder: Optional[str] = "temp",
+        extra_params: Optional[Dict[str, Any]] = None,
+        capture_exceptions: bool = True,
+        helix_pipeline_parameters: Optional[Dict[str, Any]] = None,
+        parameters_filename: str = "parameters.json",
+    ) -> None:
         """
         :param auto_find_helix_transformer: find transformer based on the test location (overwrites helix_transformers)
         :param test_name: unique name for the test

@@ -66,10 +66,12 @@ class FhirCalls(TestInputType):
         self,
         fhir_validation_url: str = "http://fhir:3000/4_0_0",
         fhir_calls_folder: str = "fhir_calls",
+        mock_url_prefix: Optional[str] = None
     ) -> None:
         super().__init__()
         self.fhir_calls_folder = fhir_calls_folder
         self.fhir_validation_url = fhir_validation_url
+        self.url_prefix = mock_url_prefix
 
         self.test_name: str
         self.test_path: Path
@@ -96,6 +98,8 @@ class FhirCalls(TestInputType):
         self.mock_client = mock_client
         self.spark_session = spark_session
         self.temp_folder_path = test_path.joinpath(self.test_path)
+        if self.url_prefix is None:
+            self.url_prefix = test_name
         fhir_calls_path: Path = self.test_path.joinpath(self.fhir_calls_folder)
         self.raise_if_not_exist(fhir_calls_path)
         self._run_mocked_fhir_test()
@@ -104,7 +108,7 @@ class FhirCalls(TestInputType):
         self.mocked_files = load_mock_fhir_requests_from_folder(
             folder=self.test_path.joinpath(self.fhir_calls_folder),
             mock_client=self.mock_client,
-            url_prefix=self.test_name,
+            url_prefix=self.url_prefix,
         )
 
         self.mock_client.expect_default()
@@ -296,11 +300,13 @@ class HttpJsonRequest(TestInputType):
     def __init__(
         self,
         response_data_folder: str = "source_api_calls",
+        mock_url_prefix: Optional[str] = None
+
     ) -> None:
         super().__init__()
         self.response_data_folder = response_data_folder
-        self.test_path: Path # todo: add custom url prefix option
-
+        self.test_path: Path
+        self.url_prefix = mock_url_prefix
     def initialize(
         self,
         test_name: str,
@@ -312,12 +318,14 @@ class HttpJsonRequest(TestInputType):
         assert mock_client
         self.test_path = test_path
         self.logger = logger
+        if self.url_prefix is None:
+            self.url_prefix = test_name
         response_data_path = self.test_path.joinpath(self.response_data_folder)
         self.raise_if_not_exist(response_data_path)
         self.load_mock_source_api_responses_from_folder(
             folder=response_data_path,
             mock_client=mock_client,
-            url_prefix=test_name,
+            url_prefix=self.url_prefix,
         )
 
     @staticmethod
@@ -361,9 +369,12 @@ class ApiJsonResponse(TestInputType):
     def __init__(
         self,
         response_data_folder: str = "api_json_response",
+        mock_url_prefix: Optional[str] = None
+
     ) -> None:
         super().__init__()
         self.input_folder_name = response_data_folder
+        self.url_prefix = mock_url_prefix
 
     def initialize(
         self,
@@ -374,12 +385,14 @@ class ApiJsonResponse(TestInputType):
         spark_session: Optional[SparkSession] = None,
     ) -> None:
         assert mock_client
+        if self.url_prefix is None:
+            self.url_prefix = test_name
         expected_input_path = test_path.joinpath(self.input_folder_name)
         self.raise_if_not_exist(expected_input_path)
         self.load_mock_source_api_json_responses(
             folder=expected_input_path,
             mock_client=mock_client,
-            url_prefix=test_name,
+            url_prefix=self.url_prefix,
             add_file_name=True,
         )
 
