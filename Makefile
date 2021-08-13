@@ -64,3 +64,12 @@ continuous_integration: venv
     python setup.py install && \
     pre-commit run --all-files && \
     pytest tests
+
+.PHONY: sphinx-html
+sphinx-html:
+	docker-compose run --rm --name sam_fhir dev make -C docsrc html
+	@echo "copy html to docs... why? https://github.com/sphinx-doc/sphinx/issues/3382#issuecomment-470772316"
+	@rm -rf docs
+	@mkdir docs
+	@touch docs/.nojekyll
+	cp -a docsrc/_build/html/. docs

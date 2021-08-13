@@ -1,0 +1,25 @@
+:mod:`spark_pipeline_framework_testing.tests_common.diff_files_helper.diff_files_helper`
+========================================================================================
+
+.. py:module:: spark_pipeline_framework_testing.tests_common.diff_files_helper.diff_files_helper
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   spark_pipeline_framework_testing.tests_common.diff_files_helper.diff_files_helper.DiffFilesHelper
+
+
+
+.. class:: DiffFilesHelper
+
+   .. method:: create_diff_command(expected_path: pathlib.Path, temp_folder: pathlib.Path, actual: Any) -> pathlib.Path
+      :staticmethod:
+
+
+

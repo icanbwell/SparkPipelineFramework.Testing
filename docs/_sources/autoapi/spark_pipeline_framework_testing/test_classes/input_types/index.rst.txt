@@ -1,0 +1,127 @@
+:mod:`spark_pipeline_framework_testing.test_classes.input_types`
+================================================================
+
+.. py:module:: spark_pipeline_framework_testing.test_classes.input_types
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   spark_pipeline_framework_testing.test_classes.input_types.TestInputType
+   spark_pipeline_framework_testing.test_classes.input_types.FhirCalls
+   spark_pipeline_framework_testing.test_classes.input_types.FileInput
+   spark_pipeline_framework_testing.test_classes.input_types.HttpJsonRequest
+   spark_pipeline_framework_testing.test_classes.input_types.ApiJsonResponse
+
+
+
+.. class:: TestInputType
+
+
+   Bases: :class:`abc.ABC`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. method:: initialize(self, test_name: str, test_path: pathlib.Path, logger: spark_pipeline_framework.logger.yarn_logger.Logger, mock_client: Optional[spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient] = None, spark_session: Optional[pyspark.sql.SparkSession] = None) -> None
+      :abstractmethod:
+
+
+   .. method:: raise_if_not_exist(path: pathlib.Path) -> None
+      :staticmethod:
+
+
+
+.. class:: FhirCalls(fhir_validation_url: str = 'http://fhir:3000/4_0_0', fhir_calls_folder: str = 'fhir_calls')
+
+
+   Bases: :class:`spark_pipeline_framework_testing.test_classes.input_types.TestInputType`
+
+   This class mocks and/or validates calls to a Fhir Server
+   https://www.hl7.org/fhir/summary.html#:~:text=FHIR%C2%AE%20%E2%80%93%20Fast%20Healthcare%20Interoperability,a%20tight%20focus%20on%20implementability.
+
+   .. method:: initialize(self, test_name: str, test_path: pathlib.Path, logger: spark_pipeline_framework.logger.yarn_logger.Logger, mock_client: Optional[spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient] = None, spark_session: Optional[pyspark.sql.SparkSession] = None) -> None
+
+
+   .. method:: _run_mocked_fhir_test(self) -> None
+
+
+
+.. class:: FileInput(test_input_folder: str = 'input', input_schema_folder: str = 'input_schema', input_schema: Optional[Union[(pyspark.sql.types.StructType, Dict[(str, pyspark.sql.types.StructType)])]] = None, row_limit: int = 100)
+
+
+   Bases: :class:`spark_pipeline_framework_testing.test_classes.input_types.TestInputType`
+
+   This class loads standard files to a Spark view
+
+   .. method:: initialize(self, test_name: str, test_path: pathlib.Path, logger: spark_pipeline_framework.logger.yarn_logger.Logger, mock_client: Optional[spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient] = None, spark_session: Optional[pyspark.sql.SparkSession] = None) -> None
+
+
+   .. method:: ingest_input_files(self, input_schema: Optional[Union[(pyspark.sql.types.StructType, Dict[(str, pyspark.sql.types.StructType)])]]) -> List[str]
+
+
+   .. method:: read_input_file(self, input_file: str, input_folder: pathlib.Path, input_schema_folder: pathlib.Path, input_schema: Optional[Union[(pyspark.sql.types.StructType, Dict[(str, pyspark.sql.types.StructType)])]]) -> None
+
+
+
+.. class:: HttpJsonRequest(response_data_folder: str = 'source_api_calls')
+
+
+   Bases: :class:`spark_pipeline_framework_testing.test_classes.input_types.TestInputType`
+
+   This class help mock a http call using this format:
+   {
+     "request_parameters": {
+       "method": "<method name>",
+       "querystring": {
+       ...
+       }
+     },
+     "request_result": {
+     ....
+     }
+   }
+
+   .. method:: initialize(self, test_name: str, test_path: pathlib.Path, logger: spark_pipeline_framework.logger.yarn_logger.Logger, mock_client: Optional[spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient] = None, spark_session: Optional[pyspark.sql.SparkSession] = None) -> None
+
+
+   .. method:: load_mock_source_api_responses_from_folder(folder: pathlib.Path, mock_client: spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient, url_prefix: Optional[str]) -> List[str]
+      :staticmethod:
+
+      Mock responses for all files from the folder and its sub-folders
+
+      from https://pypi.org/project/mockserver-friendly-client/
+
+      :param folder: where to look for files (recursively)
+      :param mock_client:
+      :param url_prefix:
+
+
+
+.. class:: ApiJsonResponse(response_data_folder: str = 'api_json_response')
+
+
+   Bases: :class:`spark_pipeline_framework_testing.test_classes.input_types.TestInputType`
+
+   Mock responses for all files from the folder and its sub-folders
+
+   .. method:: initialize(self, test_name: str, test_path: pathlib.Path, logger: spark_pipeline_framework.logger.yarn_logger.Logger, mock_client: Optional[spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient] = None, spark_session: Optional[pyspark.sql.SparkSession] = None) -> None
+
+
+   .. method:: load_mock_source_api_json_responses(folder: pathlib.Path, mock_client: spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient, url_prefix: Optional[str], add_file_name: bool = False) -> List[str]
+      :staticmethod:
+
+      Mock responses for all files from the folder and its sub-folders
+
+      :param folder: where to look for files (recursively)
+      :param mock_client:
+      :param url_prefix: http://{mock_server_url}/{url_prefix}...
+      :param add_file_name: http://{mock_server_url}/{url_prefix}/{add_file_name}...
+
+
+

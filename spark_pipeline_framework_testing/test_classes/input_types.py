@@ -25,7 +25,7 @@ from spark_pipeline_framework_testing.tests_common.common_functions import (
     get_file_extension_from_file_path,
     write_schema_to_output,
 )
-from spark_pipeline_framework_testing.utils.mock_requests_loader import (
+from spark_pipeline_framework_testing.tests_common.mock_requests_loader import (
     load_mock_fhir_requests_from_folder,
 )
 from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
@@ -122,6 +122,12 @@ class FileInput(TestInputType):
         input_schema: Optional[Union[StructType, Dict[str, StructType]]] = None,
         row_limit: int = 100,
     ) -> None:
+        """
+        :param test_input_folder: name of the folder in the test directory
+        :param input_schema_folder: name of the folder containing the schema of the input
+        :param input_schema: schema of the input file (overwrites input_schema_folder)
+        :param row_limit: row limit for input file
+        """
         super().__init__()
         self.test_input_folder = test_input_folder
         self.input_schema = input_schema
@@ -271,7 +277,7 @@ class FileInput(TestInputType):
         ), input_file_path
 
 
-class SourceApiCall(TestInputType):
+class HttpJsonRequest(TestInputType):
     """
     This class help mock a http call using this format:
     {
@@ -293,7 +299,7 @@ class SourceApiCall(TestInputType):
     ) -> None:
         super().__init__()
         self.response_data_folder = response_data_folder
-        self.test_path: Path
+        self.test_path: Path # todo: add custom url prefix option
 
     def initialize(
         self,
@@ -348,6 +354,10 @@ class SourceApiCall(TestInputType):
 
 
 class ApiJsonResponse(TestInputType):
+    """
+    Mock responses for all files from the folder and its sub-folders
+    """
+
     def __init__(
         self,
         response_data_folder: str = "api_json_response",

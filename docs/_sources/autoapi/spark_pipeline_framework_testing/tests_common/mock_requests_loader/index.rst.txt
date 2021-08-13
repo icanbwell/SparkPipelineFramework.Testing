@@ -1,0 +1,99 @@
+:mod:`spark_pipeline_framework_testing.tests_common.mock_requests_loader`
+=========================================================================
+
+.. py:module:: spark_pipeline_framework_testing.tests_common.mock_requests_loader
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   spark_pipeline_framework_testing.tests_common.mock_requests_loader.load_mock_fhir_requests_from_folder
+   spark_pipeline_framework_testing.tests_common.mock_requests_loader.mock_single_request
+   spark_pipeline_framework_testing.tests_common.mock_requests_loader.load_mock_fhir_everything_requests_from_folder
+   spark_pipeline_framework_testing.tests_common.mock_requests_loader.load_mock_fhir_everything_batch_requests_from_folder
+   spark_pipeline_framework_testing.tests_common.mock_requests_loader.load_mock_elasticsearch_requests_from_folder
+   spark_pipeline_framework_testing.tests_common.mock_requests_loader.load_mock_source_api_responses_from_folder
+   spark_pipeline_framework_testing.tests_common.mock_requests_loader.load_mock_source_api_json_responses
+
+
+.. function:: load_mock_fhir_requests_from_folder(folder: pathlib.Path, mock_client: spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient, method: str = 'POST', relative_path: Optional[str] = None, query_string: Optional[Dict[(str, str)]] = None, url_prefix: Optional[str] = None, response_body: Optional[str] = None) -> List[str]
+
+   Loads all .json files from the folder and its sub-folders
+
+   from https://pypi.org/project/mockserver-friendly-client/
+
+   :param folder: where to look for .json files (recursively)
+   :param mock_client: client to mock server
+   :param method:
+   :param relative_path:
+   :param query_string:
+   :param url_prefix:
+   :param response_body:
+
+
+.. function:: mock_single_request(fhir_request: Dict[(str, Any)], method: str, mock_client: spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient, relative_path: Optional[str], query_string: Optional[Dict[(str, str)]], url_prefix: Optional[str], response_body: Optional[str]) -> None
+
+
+.. function:: load_mock_fhir_everything_requests_from_folder(folder: pathlib.Path, mock_client: spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient, resourceType: str, url_prefix: Optional[str] = None) -> List[str]
+
+   Loads all .json files from the folder and its sub-folders
+
+   from https://pypi.org/project/mockserver-friendly-client/
+
+   :param folder: where to look for .json files (recursively)
+   :param mock_client:
+   :param resourceType:
+   :param url_prefix:
+
+
+.. function:: load_mock_fhir_everything_batch_requests_from_folder(folder: pathlib.Path, mock_client: spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient, resourceType: str, ids: List[str], url_prefix: Optional[str] = None) -> List[str]
+
+   Loads all .json files from the folder and its sub-folders
+
+   from https://pypi.org/project/mockserver-friendly-client/
+
+   :param folder: where to look for .json files (recursively)
+   :param mock_client:
+   :param resourceType:
+   :param url_prefix:
+   :param ids: id of resources for this batch to load
+
+
+.. function:: load_mock_elasticsearch_requests_from_folder(folder: pathlib.Path, mock_client: spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient, index: str) -> List[str]
+
+   Loads all .json files from the folder and its sub-folders
+
+   from https://pypi.org/project/mockserver-friendly-client/
+
+   :param folder: where to look for .json files (recursively)
+   :param mock_client:
+   :param index:
+
+
+.. function:: load_mock_source_api_responses_from_folder(folder: pathlib.Path, mock_client: spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient, url_prefix: Optional[str]) -> List[str]
+
+   Mock responses for all files from the folder and its sub-folders
+
+   from https://pypi.org/project/mockserver-friendly-client/
+
+   :param folder: where to look for files (recursively)
+   :param mock_client:
+   :param url_prefix:
+
+
+.. function:: load_mock_source_api_json_responses(folder: pathlib.Path, mock_client: spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient, url_prefix: Optional[str], add_file_name: bool = False) -> List[str]
+
+   Mock responses for all files from the folder and its sub-folders
+
+   :param folder: where to look for files (recursively)
+   :param mock_client:
+   :param url_prefix: http://{mock_server_url}/{url_prefix}...
+   :param add_file_name: http://{mock_server_url}/{url_prefix}/{add_file_name}...
+
+

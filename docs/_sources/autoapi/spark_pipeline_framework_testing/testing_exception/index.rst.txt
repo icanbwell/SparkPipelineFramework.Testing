@@ -1,0 +1,17 @@
+:mod:`spark_pipeline_framework_testing.testing_exception`
+=========================================================
+
+.. py:module:: spark_pipeline_framework_testing.testing_exception
+
+
+Module Contents
+---------------
+
+.. exception:: SparkPipelineFrameworkTestingException(exceptions: List[spark_data_frame_comparer.spark_data_frame_comparer_exception.SparkDataFrameComparerException])
+
+
+   Bases: :class:`Exception`
+
+   Common base class for all non-exit exceptions.
+
+

@@ -31,10 +31,10 @@ from spark_pipeline_framework_testing.test_classes.validator_types import (
 from spark_pipeline_framework_testing.testing_exception import (
     SparkPipelineFrameworkTestingException,
 )
-from spark_pipeline_framework_testing.utils.fhir_sender_testing_exception_handler import (
+from spark_pipeline_framework_testing.tests_common.fhir_sender_testing_exception_handler import (
     handle_fhir_sender_exception,
 )
-from spark_pipeline_framework_testing.utils.path_converter import (
+from spark_pipeline_framework_testing.tests_common.path_converter import (
     convert_path_from_docker,
 )
 
@@ -42,38 +42,27 @@ from spark_pipeline_framework_testing.utils.path_converter import (
 class SparkPipelineFrameworkTestRunnerV2:
     row_limit: int = 100
 
-    def __init__(
-        self,
-        spark_session: SparkSession,
-        test_path: Path,
-        test_name: str,
-        test_validators: Optional[List[Validator]],
-        logger: Logger,
-        auto_find_helix_transformer: bool = True,
-        helix_transformers: Optional[List[Type[ProxyBase]]] = None,
-        mock_client: Optional[MockServerFriendlyClient] = None,
-        fhir_server_url: Optional[str] = None,
-        fhir_validation_url: Optional[str] = None,
-        helix_pipeline_parameters: Optional[Dict[str, Any]] = None,
-        test_inputs: Optional[List["TestInputType"]] = None,
-        temp_folder: Optional[str] = "temp",
-        extra_params: Optional[Dict[str, Any]] = None,
-        capture_exceptions: bool = True,
-        parameters_filename: str = "parameters.json",
-    ) -> None:
+    def __init__(self, spark_session: SparkSession, test_path: Path, test_name: str,
+                 test_validators: Optional[List[Validator]], logger: Logger, auto_find_helix_transformer: bool = True,
+                 helix_transformers: Optional[List[Type[ProxyBase]]] = None,
+                 mock_client: Optional[MockServerFriendlyClient] = None, fhir_server_url: Optional[str] = None,
+                 fhir_validation_url: Optional[str] = None, test_inputs: Optional[List["TestInputType"]] = None,
+                 temp_folder: Optional[str] = "temp", extra_params: Optional[Dict[str, Any]] = None,
+                 capture_exceptions: bool = True, helix_pipeline_parameters: Optional[Dict[str, Any]] = None,
+                 parameters_filename: str = "parameters.json") -> None:
         """
-        :param auto_find_helix_transformer:
-        :param test_name:
-        :param helix_transformers:
-        :param test_validators:
-        :param mock_client:
-        :param fhir_server_url:
-        :param fhir_validation_url:
-        :param helix_pipeline_parameters:
-        :param test_inputs:
+        :param auto_find_helix_transformer: find transformer based on the test location (overwrites helix_transformers)
+        :param test_name: unique name for the test
+        :param helix_transformers: list of the transformers to process the input
+        :param test_validators: check if the output is what it's supposed to be
+        :param mock_client: mocker server object
+        :param fhir_server_url: to be sent to the transformer as param
+        :param fhir_validation_url: to validate the fhir schema
+        :param helix_pipeline_parameters: parameters necessary to run the pipeline
+        :param test_inputs: inputs to the test e.g. file
         :param extra_params: in case extra information needs to be passed to the transformer
         :param capture_exceptions: for test purposes, set false if you want to capture exceptions on test side
-        :param parameters_filename:
+        :param parameters_filename: name of the file containing the parameters (overwrites helix_pipeline_parameters)
         :param spark_session: Spark Session
         :param test_path: where to look for test files
         :param temp_folder: folder to use for temporary files.  Any existing files in this folder will be deleted.
