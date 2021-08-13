@@ -29,3 +29,5 @@ jobs:
         run: make up
       - name: tests
         run: make tests
+      - name: update docs
+        run: make sphinx-html

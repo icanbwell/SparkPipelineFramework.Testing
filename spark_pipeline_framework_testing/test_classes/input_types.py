@@ -66,7 +66,7 @@ class FhirCalls(TestInputType):
         self,
         fhir_validation_url: str = "http://fhir:3000/4_0_0",
         fhir_calls_folder: str = "fhir_calls",
-        mock_url_prefix: Optional[str] = None
+        mock_url_prefix: Optional[str] = None,
     ) -> None:
         super().__init__()
         self.fhir_calls_folder = fhir_calls_folder
@@ -300,13 +300,13 @@ class HttpJsonRequest(TestInputType):
     def __init__(
         self,
         response_data_folder: str = "source_api_calls",
-        mock_url_prefix: Optional[str] = None
-
+        mock_url_prefix: Optional[str] = None,
     ) -> None:
         super().__init__()
         self.response_data_folder = response_data_folder
         self.test_path: Path
         self.url_prefix = mock_url_prefix
+
     def initialize(
         self,
         test_name: str,
@@ -369,8 +369,7 @@ class ApiJsonResponse(TestInputType):
     def __init__(
         self,
         response_data_folder: str = "api_json_response",
-        mock_url_prefix: Optional[str] = None
-
+        mock_url_prefix: Optional[str] = None,
     ) -> None:
         super().__init__()
         self.input_folder_name = response_data_folder
