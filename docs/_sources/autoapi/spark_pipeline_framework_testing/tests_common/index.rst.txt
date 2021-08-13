@@ -20,6 +20,8 @@ Submodules
    :maxdepth: 1
 
    common_functions/index.rst
+   fhir_sender_testing_exception_handler/index.rst
    mock_requests_loader/index.rst
+   path_converter/index.rst
 
 

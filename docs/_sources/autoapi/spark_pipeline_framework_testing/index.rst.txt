@@ -13,7 +13,6 @@ Subpackages
    mockserver_client/index.rst
    test_classes/index.rst
    tests_common/index.rst
-   utils/index.rst
 
 
 Submodules

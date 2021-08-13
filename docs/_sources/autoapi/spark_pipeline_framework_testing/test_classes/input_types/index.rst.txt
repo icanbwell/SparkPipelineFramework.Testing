@@ -37,7 +37,7 @@ Classes
 
 
 
-.. class:: FhirCalls(fhir_validation_url: str = 'http://fhir:3000/4_0_0', fhir_calls_folder: str = 'fhir_calls')
+.. class:: FhirCalls(fhir_validation_url: str = 'http://fhir:3000/4_0_0', fhir_calls_folder: str = 'fhir_calls', mock_url_prefix: Optional[str] = None)
 
 
    Bases: :class:`spark_pipeline_framework_testing.test_classes.input_types.TestInputType`
@@ -69,7 +69,7 @@ Classes
 
 
 
-.. class:: HttpJsonRequest(response_data_folder: str = 'source_api_calls')
+.. class:: HttpJsonRequest(response_data_folder: str = 'source_api_calls', mock_url_prefix: Optional[str] = None)
 
 
    Bases: :class:`spark_pipeline_framework_testing.test_classes.input_types.TestInputType`
@@ -103,7 +103,7 @@ Classes
 
 
 
-.. class:: ApiJsonResponse(response_data_folder: str = 'api_json_response')
+.. class:: ApiJsonResponse(response_data_folder: str = 'api_json_response', mock_url_prefix: Optional[str] = None)
 
 
    Bases: :class:`spark_pipeline_framework_testing.test_classes.input_types.TestInputType`
