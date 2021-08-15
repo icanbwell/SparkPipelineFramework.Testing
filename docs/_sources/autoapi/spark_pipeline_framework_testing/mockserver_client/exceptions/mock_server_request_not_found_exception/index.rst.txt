@@ -1,0 +1,17 @@
+:mod:`spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_request_not_found_exception`
+============================================================================================================
+
+.. py:module:: spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_request_not_found_exception
+
+
+Module Contents
+---------------
+
+.. exception:: MockServerRequestNotFoundException(method: str, url: str, json_dict: Optional[Union[(Dict[(str, Any)], List[Dict[(str, Any)]])]])
+
+
+   Bases: :class:`spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_exception.MockServerException`
+
+   Common base class for all non-exit exceptions.
+
+

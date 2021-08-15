@@ -1,0 +1,171 @@
+:mod:`spark_pipeline_framework_testing.mockserver_client.mockserver_client`
+===========================================================================
+
+.. py:module:: spark_pipeline_framework_testing.mockserver_client.mockserver_client
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client._Option
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.request
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.response
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.times
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.times_once
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.times_any
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.form
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.json_equals
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.text_equals
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.json_contains
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.json_response
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.seconds
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.milliseconds
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.microseconds
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.nanoseconds
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.minutes
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.hours
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client.days
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client._non_null_options_to_dict
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client._to_named_values_list
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client._to_time
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client._to_delay
+   spark_pipeline_framework_testing.mockserver_client.mockserver_client._to_time_to_live
+
+
+.. class:: MockServerFriendlyClient(base_url: str)
+
+
+   Bases: :class:`object`
+
+   from https://pypi.org/project/mockserver-friendly-client/
+
+   .. method:: _call(self, command: str, data: Any = None) -> requests.Response
+
+
+   .. method:: clear(self, path: str) -> None
+
+
+   .. method:: reset(self) -> None
+
+
+   .. method:: stub(self, request1: Any, response1: Any, timing: Any = None, time_to_live: Any = None) -> None
+
+
+   .. method:: expect(self, request1: Dict[(str, Any)], response1: Dict[(str, Any)], timing: spark_pipeline_framework_testing.mockserver_client._timing._Timing, time_to_live: Any = None) -> None
+
+
+   .. method:: expect_default(self) -> None
+
+
+   .. method:: match_to_recorded_requests(self, recorded_requests: List[Dict[(str, Any)]]) -> List[spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_exception.MockServerException]
+
+
+   .. method:: does_request_match(request1: Dict[(str, Any)], request2: Dict[(str, Any)]) -> bool
+      :staticmethod:
+
+
+   .. method:: does_id_in_request_match(request1: Dict[(str, Any)], request2: Dict[(str, Any)]) -> bool
+      :staticmethod:
+
+
+   .. method:: compare_request_bodies(actual_body: Union[(str, bytes)], expected_body: Union[(str, bytes)]) -> None
+      :staticmethod:
+
+
+   .. method:: verify_expectations(self, test_name: Optional[str] = None, files: Optional[List[str]] = None) -> None
+
+
+   .. method:: retrieve(self) -> List[Dict[(str, Any)]]
+
+
+
+.. function:: request(method: Optional[str] = None, path: Optional[str] = None, querystring: Optional[Dict[(str, Any)]] = None, body: Optional[Dict[(str, Any)]] = None, headers: Optional[Dict[(str, Any)]] = None, cookies: Optional[str] = None) -> Dict[(str, Any)]
+
+
+.. function:: response(code: Optional[str] = None, body: Optional[str] = None, headers: Optional[Dict[(str, Any)]] = None, cookies: Optional[str] = None, delay: Optional[str] = None, reason: Optional[str] = None) -> Dict[(str, Any)]
+
+
+.. function:: times(count: int) -> spark_pipeline_framework_testing.mockserver_client._timing._Timing
+
+
+.. function:: times_once() -> spark_pipeline_framework_testing.mockserver_client._timing._Timing
+
+
+.. function:: times_any() -> spark_pipeline_framework_testing.mockserver_client._timing._Timing
+
+
+.. function:: form(form1: Any) -> Dict[(str, Any)]
+
+
+.. function:: json_equals(payload: Union[(Dict[(str, Any)], List[Dict[(str, Any)]])]) -> Dict[(str, Any)]
+
+   Expects that the request payload is equal to the given payload.
+
+
+.. function:: text_equals(payload: str) -> Dict[(str, Any)]
+
+   Expects that the request payload is equal to the given payload.
+
+
+.. function:: json_contains(payload: Dict[(str, Any)]) -> Dict[(str, Any)]
+
+   Expects the request payload to match all given fields. The request may has more fields.
+
+
+.. function:: json_response(body: Any = None, headers: Any = None, **kwargs: Any) -> Dict[(str, Any)]
+
+
+.. class:: _Option(field: Any, value: Any, formatter: Any = None)
+
+
+
+.. function:: seconds(value: int) -> spark_pipeline_framework_testing.mockserver_client._time._Time
+
+
+.. function:: milliseconds(value: int) -> spark_pipeline_framework_testing.mockserver_client._time._Time
+
+
+.. function:: microseconds(value: int) -> spark_pipeline_framework_testing.mockserver_client._time._Time
+
+
+.. function:: nanoseconds(value: int) -> spark_pipeline_framework_testing.mockserver_client._time._Time
+
+
+.. function:: minutes(value: int) -> spark_pipeline_framework_testing.mockserver_client._time._Time
+
+
+.. function:: hours(value: int) -> spark_pipeline_framework_testing.mockserver_client._time._Time
+
+
+.. function:: days(value: int) -> spark_pipeline_framework_testing.mockserver_client._time._Time
+
+
+.. function:: _non_null_options_to_dict(*options: Any) -> Dict[(str, Any)]
+
+
+.. function:: _to_named_values_list(dictionary: Dict[(str, Any)]) -> List[Dict[(str, Any)]]
+
+
+.. function:: _to_time(value: Union[(spark_pipeline_framework_testing.mockserver_client._time._Time, int)]) -> spark_pipeline_framework_testing.mockserver_client._time._Time
+
+
+.. function:: _to_delay(delay: spark_pipeline_framework_testing.mockserver_client._time._Time) -> Dict[(str, Any)]
+
+
+.. function:: _to_time_to_live(time: Union[(spark_pipeline_framework_testing.mockserver_client._time._Time, int)]) -> Dict[(str, Any)]
+
+

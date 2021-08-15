@@ -14,7 +14,7 @@ from spark_pipeline_framework_testing.mockserver_client.mockserver_client import
 )
 from spark_pipeline_framework_testing.test_classes.input_types import (
     FileInput,
-    SourceApiCall,
+    HttpJsonRequest,
 )
 from spark_pipeline_framework_testing.test_runner_v2 import (
     SparkPipelineFrameworkTestRunnerV2,
@@ -30,14 +30,14 @@ def test_source_api_call(spark_session: SparkSession) -> None:
     mock_client.clear(test_name)
 
     input_file = FileInput()
-    request = SourceApiCall()
+    request = HttpJsonRequest()
     logger = get_logger(__name__)
     SparkPipelineFrameworkTestRunnerV2(
-        logger=logger,
         spark_session=spark_session,
         test_path=test_path,
         test_name=test_name,
         test_validators=None,
+        logger=logger,
         auto_find_helix_transformer=False,
         helix_transformers=[FeaturesComplexFeature],
         mock_client=mock_client,

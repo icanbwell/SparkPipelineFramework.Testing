@@ -32,7 +32,7 @@ from spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_r
 from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
 )
-from spark_pipeline_framework_testing.utils.path_converter import (
+from spark_pipeline_framework_testing.tests_common.path_converter import (
     convert_path_from_docker,
 )
 from spark_pipeline_framework_testing.mockserver_client.mockserver_verify_exception import (
@@ -232,11 +232,12 @@ class MockCallValidator(Validator):
 
 class OutputFileValidator(Validator):
     """
-    compare files
+    compare input and output files
     """
 
     def __init__(
         self,
+        related_inputs: Union[List["FileInput"], "FileInput"],
         func_path_modifier: Optional[
             Callable[[Union[Path, str]], Union[Path, str]]
         ] = None,
@@ -247,8 +248,19 @@ class OutputFileValidator(Validator):
         output_folder: str = "output",
         output_schema_folder: str = "output_schema",
         output_schema: Optional[Union[StructType, Dict[str, StructType]]] = None,
-        related_inputs: Optional[Union[List["FileInput"], "FileInput"]] = None,
     ):
+        """
+
+        :param related_inputs: the corresponding input for this validator
+        :param func_path_modifier: in case you want to change paths e.g. docker to local
+        :param sort_output_by: order of column names [col1, col2,...]
+        :param output_as_json_only: save output as json
+        :param apply_schema_to_output:
+        :param ignore_views_for_output: don't save these views
+        :param output_folder: name of the output folder
+        :param output_schema_folder: name of the folder containing output schema
+        :param output_schema: the schema of the output (overwrites output_schema_folder)
+        """
         self.func_path_modifier = func_path_modifier
         self.sort_output_by = sort_output_by
         self.output_as_json_only = output_as_json_only

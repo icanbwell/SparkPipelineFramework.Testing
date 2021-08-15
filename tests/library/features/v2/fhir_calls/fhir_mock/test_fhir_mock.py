@@ -44,15 +44,15 @@ def test_fhir_mock(spark_session: SparkSession) -> None:
     }
     logger = get_logger(__name__)
     SparkPipelineFrameworkTestRunnerV2(
-        logger=logger,
         spark_session=spark_session,
         test_path=test_path,
         test_name=test_name,
         test_validators=[test_validators],
+        logger=logger,
         auto_find_helix_transformer=False,
         helix_transformers=[PipelineFhirCallsFhirMockV1],
         mock_client=mock_client,
-        helix_pipeline_parameters=params,
         test_inputs=[fhir_calls],
         temp_folder="temp",
+        helix_pipeline_parameters=params,
     ).run_test2()

@@ -1,0 +1,52 @@
+:mod:`spark_pipeline_framework_testing.tests_common.common_functions`
+=====================================================================
+
+.. py:module:: spark_pipeline_framework_testing.tests_common.common_functions
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   spark_pipeline_framework_testing.tests_common.common_functions.camel_case_to_snake_case
+   spark_pipeline_framework_testing.tests_common.common_functions.get_folders_containing_testcases
+   spark_pipeline_framework_testing.tests_common.common_functions.list_files
+   spark_pipeline_framework_testing.tests_common.common_functions.list_folders
+   spark_pipeline_framework_testing.tests_common.common_functions.clean_spark_session
+   spark_pipeline_framework_testing.tests_common.common_functions.write_schema_to_output
+   spark_pipeline_framework_testing.tests_common.common_functions.get_file_extension_from_file_path
+   spark_pipeline_framework_testing.tests_common.common_functions.get_view_name_from_file_path
+
+
+.. function:: camel_case_to_snake_case(text: str) -> str
+
+
+.. function:: get_folders_containing_testcases(folder_path: pathlib.Path, test_input_directories: List[str] = ['input']) -> List[str]
+
+
+.. function:: list_files(folder_path: pathlib.Path) -> List[str]
+
+
+.. function:: list_folders(folder_path: pathlib.Path) -> List[str]
+
+
+.. function:: clean_spark_session(session: pyspark.sql.SparkSession) -> None
+
+   :param session:
+   :return:
+
+
+.. function:: write_schema_to_output(spark_session: pyspark.sql.SparkSession, view_name: str, schema_folder: pathlib.Path) -> pathlib.Path
+
+
+.. function:: get_file_extension_from_file_path(file_name: str) -> str
+
+
+.. function:: get_view_name_from_file_path(input_file: str) -> str
+
+

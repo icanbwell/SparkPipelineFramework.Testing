@@ -1,0 +1,28 @@
+:mod:`spark_pipeline_framework_testing.mockserver_client._timing`
+=================================================================
+
+.. py:module:: spark_pipeline_framework_testing.mockserver_client._timing
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   spark_pipeline_framework_testing.mockserver_client._timing._Timing
+
+
+
+.. class:: _Timing(count: Optional[int] = None)
+
+
+   .. method:: for_expectation(self) -> Dict[(str, Any)]
+
+
+   .. method:: for_verification(self) -> Dict[(str, Any)]
+
+
+

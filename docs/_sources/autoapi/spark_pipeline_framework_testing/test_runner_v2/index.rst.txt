@@ -1,0 +1,37 @@
+:mod:`spark_pipeline_framework_testing.test_runner_v2`
+======================================================
+
+.. py:module:: spark_pipeline_framework_testing.test_runner_v2
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   spark_pipeline_framework_testing.test_runner_v2.SparkPipelineFrameworkTestRunnerV2
+
+
+
+.. class:: SparkPipelineFrameworkTestRunnerV2(spark_session: pyspark.sql.SparkSession, test_path: pathlib.Path, test_name: str, test_validators: Optional[List[spark_pipeline_framework_testing.test_classes.validator_types.Validator]], logger: spark_pipeline_framework.logger.yarn_logger.Logger, auto_find_helix_transformer: bool = True, helix_transformers: Optional[List[Type[spark_pipeline_framework.proxy_generator.proxy_base.ProxyBase]]] = None, mock_client: Optional[spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient] = None, fhir_server_url: Optional[str] = None, fhir_validation_url: Optional[str] = None, test_inputs: Optional[List[spark_pipeline_framework_testing.test_classes.input_types.TestInputType]] = None, temp_folder: Optional[str] = 'temp', extra_params: Optional[Dict[(str, Any)]] = None, capture_exceptions: bool = True, helix_pipeline_parameters: Optional[Dict[(str, Any)]] = None, parameters_filename: str = 'parameters.json')
+
+
+   .. attribute:: row_limit
+      :annotation: :int = 100
+
+      
+
+   .. method:: run_test2(self) -> None
+
+
+   .. method:: run_helix_transformers(self, parameters: Dict[(str, Any)], transformer_class: Optional[Type[pyspark.ml.Transformer]]) -> None
+
+
+   .. method:: find_transformer(testable_folder: str) -> Type[pyspark.ml.Transformer]
+      :staticmethod:
+
+
+

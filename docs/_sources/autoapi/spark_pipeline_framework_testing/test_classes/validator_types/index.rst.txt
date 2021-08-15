@@ -1,0 +1,83 @@
+:mod:`spark_pipeline_framework_testing.test_classes.validator_types`
+====================================================================
+
+.. py:module:: spark_pipeline_framework_testing.test_classes.validator_types
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   spark_pipeline_framework_testing.test_classes.validator_types.Validator
+   spark_pipeline_framework_testing.test_classes.validator_types.MockCallValidator
+   spark_pipeline_framework_testing.test_classes.validator_types.OutputFileValidator
+
+
+
+.. class:: Validator
+
+
+   Bases: :class:`abc.ABC`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. method:: validate(self, test_name: str, test_path: pathlib.Path, spark_session: pyspark.sql.SparkSession, temp_folder_path: pathlib.Path, logger: spark_pipeline_framework.logger.yarn_logger.Logger, mock_client: Optional[spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient] = None) -> None
+      :abstractmethod:
+
+
+
+.. class:: MockCallValidator(related_inputs: Optional[Union[(List[spark_pipeline_framework_testing.test_classes.input_types.FhirCalls], spark_pipeline_framework_testing.test_classes.input_types.FhirCalls)]])
+
+
+   Bases: :class:`spark_pipeline_framework_testing.test_classes.validator_types.Validator`
+
+   validates Mock calls
+
+   .. method:: validate(self, test_name: str, test_path: pathlib.Path, spark_session: pyspark.sql.SparkSession, temp_folder_path: pathlib.Path, logger: spark_pipeline_framework.logger.yarn_logger.Logger, mock_client: Optional[spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient] = None) -> None
+
+
+   .. method:: get_input_files(self) -> List[str]
+
+
+
+.. class:: OutputFileValidator(related_inputs: Union[(List[spark_pipeline_framework_testing.test_classes.input_types.FileInput], spark_pipeline_framework_testing.test_classes.input_types.FileInput)], func_path_modifier: Optional[Callable[([Union[(pathlib.Path, str)]], Union[(pathlib.Path, str)])]] = None, sort_output_by: Optional[List[str]] = None, output_as_json_only: bool = True, apply_schema_to_output: bool = True, ignore_views_for_output: Optional[List[str]] = None, output_folder: str = 'output', output_schema_folder: str = 'output_schema', output_schema: Optional[Union[(pyspark.sql.types.StructType, Dict[(str, pyspark.sql.types.StructType)])]] = None)
+
+
+   Bases: :class:`spark_pipeline_framework_testing.test_classes.validator_types.Validator`
+
+   compare input and output files
+
+   .. method:: validate(self, test_name: str, test_path: pathlib.Path, spark_session: pyspark.sql.SparkSession, temp_folder_path: pathlib.Path, logger: spark_pipeline_framework.logger.yarn_logger.Logger, mock_client: Optional[spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient] = None) -> None
+
+
+   .. method:: process_output_file(self, output_file: str, output_schema_folder: pathlib.Path, func_path_modifier: Optional[Callable[([Union[(pathlib.Path, str)]], Union[(pathlib.Path, str)])]], sort_output_by: Optional[List[str]], apply_schema_to_output: bool, output_schema: Optional[Union[(pyspark.sql.types.StructType, Dict[(str, pyspark.sql.types.StructType)])]]) -> Tuple[(bool, Optional[spark_data_frame_comparer.spark_data_frame_comparer_exception.SparkDataFrameComparerException])]
+
+      read predefined outputs and compare them with the current outputs
+      write outputs to disk if doesn't exists
+
+
+   .. method:: write_table_to_output(self, view_name: str, sort_output_by: Optional[List[str]], output_as_json_only: bool) -> None
+
+
+   .. method:: should_write_dataframe_as_json(df: pyspark.sql.DataFrame) -> bool
+      :staticmethod:
+
+
+   .. method:: combine_spark_csv_files_to_one_file(source_folder: pathlib.Path, destination_file: pathlib.Path, file_extension: str) -> None
+      :staticmethod:
+
+
+   .. method:: combine_spark_json_files_to_one_file(source_folder: pathlib.Path, destination_file: pathlib.Path, file_extension: str) -> None
+      :staticmethod:
+
+
+   .. method:: get_compare_path(result_path: Optional[pathlib.Path], expected_path: Optional[pathlib.Path], temp_folder: Optional[Union[(pathlib.Path, str)]], func_path_modifier: Optional[Callable[([Union[(pathlib.Path, str)]], Union[(pathlib.Path, str)])]], type_: str) -> Optional[pathlib.Path]
+      :staticmethod:
+
+
+
