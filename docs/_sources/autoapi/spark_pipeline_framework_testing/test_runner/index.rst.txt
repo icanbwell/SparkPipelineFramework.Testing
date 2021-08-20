@@ -1,0 +1,132 @@
+:mod:`spark_pipeline_framework_testing.test_runner`
+===================================================
+
+.. py:module:: spark_pipeline_framework_testing.test_runner
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   spark_pipeline_framework_testing.test_runner.SparkPipelineFrameworkTestRunner
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   spark_pipeline_framework_testing.test_runner.get_testable_folders
+   spark_pipeline_framework_testing.test_runner.list_files
+   spark_pipeline_framework_testing.test_runner.list_folders
+   spark_pipeline_framework_testing.test_runner.clean_spark_session
+
+
+.. class:: SparkPipelineFrameworkTestRunner
+
+   .. attribute:: row_limit
+      :annotation: :int = 100
+
+      
+
+   .. method:: run_tests(spark_session: pyspark.sql.SparkSession, folder_path: pathlib.Path, parameters: Optional[Dict[(str, Any)]] = None, func_path_modifier: Optional[Callable[([Union[(pathlib.Path, str)]], Union[(pathlib.Path, str)])]] = None, temp_folder: Optional[pathlib.Path] = None, transformer_type: Optional[Type[pyspark.ml.Transformer]] = None, sort_output_by: Optional[List[str]] = None, output_as_json_only: bool = True, apply_schema_to_output: bool = True, check_output: bool = True, ignore_views_for_output: Optional[List[str]] = None, input_schema: Optional[Union[(pyspark.sql.types.StructType, Dict[(str, pyspark.sql.types.StructType)])]] = None, output_schema: Optional[Union[(pyspark.sql.types.StructType, Dict[(str, pyspark.sql.types.StructType)])]] = None) -> None
+      :staticmethod:
+
+      Tests Spark Transformers without writing any code
+
+      1. Reads all the files in the `input` folder into Spark views (using filename as view name)
+      2. If input_schema folder is present then it uses those schemas when loading the files in input folder.
+      3. Runs the Spark Transformer at the same path in the project.  E.g., if your test is spf_tests/library/foo then
+          it will look for a transformer in library/foo. So basically it takes the path after `library` and looks
+          for a Transformer at that location
+      4. If output files or output_schema files are not present then this writes them out
+      5. If output files are present then this compares the actual view in Spark (after running the Transformer above)
+          with the view stored in the output file
+      6. If output_schema is present then it uses that when loading the output file
+
+
+      :param spark_session: Spark Session
+      :param folder_path: where to look for test files
+      :param parameters: (Optional) any parameters to pass to the transformer
+      :param func_path_modifier: (Optional) A function that can transform the paths
+      :param temp_folder: folder to use for temporary files.  Any existing files in this folder will be deleted.
+      :param transformer_type: (Optional) the transformer to run
+      :param sort_output_by: (Optional) sort by these columns before comparing or writing output files
+      :param output_as_json_only: (Optional) if set to True then do not output as csv
+      :param apply_schema_to_output: If true applies schema to output file
+      :param check_output: if set, check the output of the test.  Otherwise don't check the output.
+      :param ignore_views_for_output: list of view names to ignore when writing output schema and output json
+      :param input_schema: Optional input_schema to apply to the input data. Can be a schema or a dictionary
+                              of schemas where the key is name of the view
+      :param output_schema: Optional output_schema to apply to the input data. Can be a schema or a dictionary
+                              of schemas where the key is name of the view
+      :return: Throws SparkPipelineFrameworkTestingException if there are mismatches between
+                  expected output files and actual output files.  The `exceptions` list in
+                  SparkPipelineFrameworkTestingException holds all the mismatch exceptions
+
+
+   .. method:: run_transformer(spark_session: pyspark.sql.SparkSession, parameters: Optional[Dict[(str, Any)]], search_result: Match[str], testable_folder: str, transformer_type: Optional[Type[pyspark.ml.Transformer]]) -> None
+      :staticmethod:
+
+
+   .. method:: process_output_file(spark_session: pyspark.sql.SparkSession, output_file: str, output_folder: pathlib.Path, output_schema_folder: pathlib.Path, func_path_modifier: Optional[Callable[([Union[(pathlib.Path, str)]], Union[(pathlib.Path, str)])]], sort_output_by: Optional[List[str]], apply_schema_to_output: bool, output_schema: Optional[Union[(pyspark.sql.types.StructType, Dict[(str, pyspark.sql.types.StructType)])]], temp_folder: Optional[Union[(pathlib.Path, str)]] = None) -> Tuple[(bool, Optional[spark_data_frame_comparer.spark_data_frame_comparer_exception.SparkDataFrameComparerException])]
+      :staticmethod:
+
+
+   .. method:: get_compare_path(result_path: Optional[pathlib.Path], expected_path: Optional[pathlib.Path], temp_folder: Optional[Union[(pathlib.Path, str)]], func_path_modifier: Optional[Callable[([Union[(pathlib.Path, str)]], Union[(pathlib.Path, str)])]], type_: str) -> Optional[pathlib.Path]
+      :staticmethod:
+
+
+   .. method:: process_input_file(spark_session: pyspark.sql.SparkSession, input_file: str, input_folder: pathlib.Path, input_schema_folder: pathlib.Path, input_schema: Optional[Union[(pyspark.sql.types.StructType, Dict[(str, pyspark.sql.types.StructType)])]]) -> None
+      :staticmethod:
+
+
+   .. method:: get_view_name_from_file_path(input_file: str) -> str
+      :staticmethod:
+
+
+   .. method:: get_file_extension_from_file_path(file_name: str) -> str
+      :staticmethod:
+
+
+   .. method:: should_write_dataframe_as_json(df: pyspark.sql.DataFrame) -> bool
+      :staticmethod:
+
+
+   .. method:: write_table_to_output(spark_session: pyspark.sql.SparkSession, view_name: str, output_folder: pathlib.Path, temp_folder: pathlib.Path, sort_output_by: Optional[List[str]], output_as_json_only: bool) -> None
+      :staticmethod:
+
+
+   .. method:: combine_spark_csv_files_to_one_file(source_folder: pathlib.Path, destination_file: pathlib.Path, file_extension: str) -> None
+      :staticmethod:
+
+
+   .. method:: combine_spark_json_files_to_one_file(source_folder: pathlib.Path, destination_file: pathlib.Path, file_extension: str) -> None
+      :staticmethod:
+
+
+   .. method:: write_schema_to_output(spark_session: pyspark.sql.SparkSession, view_name: str, schema_folder: pathlib.Path) -> pathlib.Path
+      :staticmethod:
+
+
+
+.. function:: get_testable_folders(folder_path: pathlib.Path) -> List[str]
+
+
+.. function:: list_files(folder_path: pathlib.Path) -> List[str]
+
+
+.. function:: list_folders(folder_path: pathlib.Path) -> List[str]
+
+
+.. function:: clean_spark_session(session: pyspark.sql.SparkSession) -> None
+
+   :param session:
+   :return:
+
+

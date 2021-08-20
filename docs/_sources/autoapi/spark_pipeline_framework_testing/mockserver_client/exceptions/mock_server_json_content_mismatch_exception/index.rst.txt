@@ -1,0 +1,17 @@
+:mod:`spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_json_content_mismatch_exception`
+================================================================================================================
+
+.. py:module:: spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_json_content_mismatch_exception
+
+
+Module Contents
+---------------
+
+.. exception:: MockServerJsonContentMismatchException(actual: Union[(Dict[(str, Any)], List[Dict[(str, Any)]])], expected: Union[(Dict[(str, Any)], List[Dict[(str, Any)]])], differences: List[str], expected_file_path: pathlib.Path)
+
+
+   Bases: :class:`spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_exception.MockServerException`
+
+   Common base class for all non-exit exceptions.
+
+

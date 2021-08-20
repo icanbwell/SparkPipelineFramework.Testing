@@ -29,11 +29,11 @@ def test_request_response_call(spark_session: SparkSession) -> None:
     request = input_types.HttpJsonRequest(response_data_folder="request_response_call")
     logger = get_logger(__name__)
     SparkPipelineFrameworkTestRunnerV2(
-        logger=logger,
         spark_session=spark_session,
         test_path=test_path,
         test_name=test_name,
         test_validators=None,
+        logger=logger,
         auto_find_helix_transformer=False,
         helix_transformers=[FeaturesComplexFeature],
         mock_client=mock_client,

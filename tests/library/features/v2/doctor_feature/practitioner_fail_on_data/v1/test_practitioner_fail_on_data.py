@@ -30,7 +30,6 @@ def test_practitioner_fail_on_data(spark_session: SparkSession) -> None:
             input_file = FileInput()
             logger = get_logger(__name__)
             SparkPipelineFrameworkTestRunnerV2(
-                logger=logger,
                 spark_session=spark_session,
                 test_path=test_path,
                 test_name=test_name,
@@ -42,6 +41,7 @@ def test_practitioner_fail_on_data(spark_session: SparkSession) -> None:
                         ),
                     )
                 ],
+                logger=logger,
                 auto_find_helix_transformer=False,
                 helix_transformers=[FeaturesDoctorFeaturePractitionerFailOnDataV1],
                 mock_client=None,

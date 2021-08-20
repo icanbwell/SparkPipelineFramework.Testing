@@ -31,6 +31,10 @@ sparkautomapper=">=0.2.42"
 sparkfhirschemas=">=0.1.31"
 requests = ">=2.25.1"
 dictdiffer = ">=0.8.1"
+Sphinx="==3.5.3"
+sphinx-autoapi="==1.7.0"
+sphinx-rtd-theme="==0.5.1"
+recommonmark="==0.7.1"
 
 [requires]
 python_version = "3.7"

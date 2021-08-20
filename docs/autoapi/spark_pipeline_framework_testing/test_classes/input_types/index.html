@@ -1,0 +1,363 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>spark_pipeline_framework_testing.test_classes.input_types &mdash; Test Framework  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Test Framework
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Test Framework</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">spark_pipeline_framework_testing.test_classes.input_types</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../../../_sources/autoapi/spark_pipeline_framework_testing/test_classes/input_types/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-spark_pipeline_framework_testing.test_classes.input_types">
+<span id="spark-pipeline-framework-testing-test-classes-input-types"></span><h1><a class="reference internal" href="#module-spark_pipeline_framework_testing.test_classes.input_types" title="spark_pipeline_framework_testing.test_classes.input_types"><code class="xref py py-mod docutils literal notranslate"><span class="pre">spark_pipeline_framework_testing.test_classes.input_types</span></code></a><a class="headerlink" href="#module-spark_pipeline_framework_testing.test_classes.input_types" title="Permalink to this headline">¶</a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#spark_pipeline_framework_testing.test_classes.input_types.TestInputType" title="spark_pipeline_framework_testing.test_classes.input_types.TestInputType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestInputType</span></code></a></p></td>
+<td><p>Helper class that provides a standard way to create an ABC using</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#spark_pipeline_framework_testing.test_classes.input_types.FhirCalls" title="spark_pipeline_framework_testing.test_classes.input_types.FhirCalls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FhirCalls</span></code></a></p></td>
+<td><p>This class mocks and/or validates calls to a Fhir Server</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#spark_pipeline_framework_testing.test_classes.input_types.FileInput" title="spark_pipeline_framework_testing.test_classes.input_types.FileInput"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FileInput</span></code></a></p></td>
+<td><p>This class loads standard files to a Spark view</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#spark_pipeline_framework_testing.test_classes.input_types.HttpJsonRequest" title="spark_pipeline_framework_testing.test_classes.input_types.HttpJsonRequest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HttpJsonRequest</span></code></a></p></td>
+<td><p>This class help mock a http call using this format:</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#spark_pipeline_framework_testing.test_classes.input_types.ApiJsonResponse" title="spark_pipeline_framework_testing.test_classes.input_types.ApiJsonResponse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ApiJsonResponse</span></code></a></p></td>
+<td><p>Mock responses for all files from the folder and its sub-folders</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.TestInputType">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spark_pipeline_framework_testing.test_classes.input_types.</span></code><code class="sig-name descname"><span class="pre">TestInputType</span></code><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.TestInputType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Helper class that provides a standard way to create an ABC using
+inheritance.</p>
+<dl class="py method">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.TestInputType.initialize">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">initialize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">spark_pipeline_framework.logger.yarn_logger.Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../mockserver_client/mockserver_client/index.html#spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient" title="spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient"><span class="pre">spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark_session</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pyspark.sql.SparkSession</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.TestInputType.initialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.TestInputType.raise_if_not_exist">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">raise_if_not_exist</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.TestInputType.raise_if_not_exist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.FhirCalls">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spark_pipeline_framework_testing.test_classes.input_types.</span></code><code class="sig-name descname"><span class="pre">FhirCalls</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fhir_validation_url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'http://fhir:3000/4_0_0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fhir_calls_folder</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'fhir_calls'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_url_prefix</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.FhirCalls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spark_pipeline_framework_testing.test_classes.input_types.TestInputType" title="spark_pipeline_framework_testing.test_classes.input_types.TestInputType"><code class="xref py py-class docutils literal notranslate"><span class="pre">spark_pipeline_framework_testing.test_classes.input_types.TestInputType</span></code></a></p>
+<p>This class mocks and/or validates calls to a Fhir Server
+<a class="reference external" href="https://www.hl7.org/fhir/summary.html#:~:text=FHIR%C2%AE%20%E2%80%93%20Fast%20Healthcare%20Interoperability,a%20tight%20focus%20on%20implementability">https://www.hl7.org/fhir/summary.html#:~:text=FHIR%C2%AE%20%E2%80%93%20Fast%20Healthcare%20Interoperability,a%20tight%20focus%20on%20implementability</a>.</p>
+<dl class="py method">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.FhirCalls.initialize">
+<code class="sig-name descname"><span class="pre">initialize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">spark_pipeline_framework.logger.yarn_logger.Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../mockserver_client/mockserver_client/index.html#spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient" title="spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient"><span class="pre">spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark_session</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pyspark.sql.SparkSession</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.FhirCalls.initialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.FhirCalls._run_mocked_fhir_test">
+<code class="sig-name descname"><span class="pre">_run_mocked_fhir_test</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.FhirCalls._run_mocked_fhir_test" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.FileInput">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spark_pipeline_framework_testing.test_classes.input_types.</span></code><code class="sig-name descname"><span class="pre">FileInput</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_input_folder</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'input'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_schema_folder</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'input_schema'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_schema</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">pyspark.sql.types.StructType</span><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pyspark.sql.types.StructType</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_limit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.FileInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spark_pipeline_framework_testing.test_classes.input_types.TestInputType" title="spark_pipeline_framework_testing.test_classes.input_types.TestInputType"><code class="xref py py-class docutils literal notranslate"><span class="pre">spark_pipeline_framework_testing.test_classes.input_types.TestInputType</span></code></a></p>
+<p>This class loads standard files to a Spark view</p>
+<dl class="py method">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.FileInput.initialize">
+<code class="sig-name descname"><span class="pre">initialize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">spark_pipeline_framework.logger.yarn_logger.Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../mockserver_client/mockserver_client/index.html#spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient" title="spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient"><span class="pre">spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark_session</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pyspark.sql.SparkSession</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.FileInput.initialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.FileInput.ingest_input_files">
+<code class="sig-name descname"><span class="pre">ingest_input_files</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_schema</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">pyspark.sql.types.StructType</span><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pyspark.sql.types.StructType</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.FileInput.ingest_input_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.FileInput.read_input_file">
+<code class="sig-name descname"><span class="pre">read_input_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_folder</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_schema_folder</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_schema</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">pyspark.sql.types.StructType</span><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pyspark.sql.types.StructType</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.FileInput.read_input_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.HttpJsonRequest">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spark_pipeline_framework_testing.test_classes.input_types.</span></code><code class="sig-name descname"><span class="pre">HttpJsonRequest</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response_data_folder</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'source_api_calls'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_url_prefix</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.HttpJsonRequest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spark_pipeline_framework_testing.test_classes.input_types.TestInputType" title="spark_pipeline_framework_testing.test_classes.input_types.TestInputType"><code class="xref py py-class docutils literal notranslate"><span class="pre">spark_pipeline_framework_testing.test_classes.input_types.TestInputType</span></code></a></p>
+<p>This class help mock a http call using this format:
+{</p>
+<blockquote>
+<div><dl class="simple">
+<dt>“request_parameters”: {</dt><dd><p>“method”: “&lt;method name&gt;”,
+“querystring”: {
+…
+}</p>
+</dd>
+</dl>
+<p>},
+“request_result”: {
+….
+}</p>
+</div></blockquote>
+<p>}</p>
+<dl class="py method">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.HttpJsonRequest.initialize">
+<code class="sig-name descname"><span class="pre">initialize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">spark_pipeline_framework.logger.yarn_logger.Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../mockserver_client/mockserver_client/index.html#spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient" title="spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient"><span class="pre">spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark_session</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pyspark.sql.SparkSession</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.HttpJsonRequest.initialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.HttpJsonRequest.load_mock_source_api_responses_from_folder">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">load_mock_source_api_responses_from_folder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="../../mockserver_client/mockserver_client/index.html#spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient" title="spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient"><span class="pre">spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">url_prefix</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.HttpJsonRequest.load_mock_source_api_responses_from_folder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mock responses for all files from the folder and its sub-folders</p>
+<p>from <a class="reference external" href="https://pypi.org/project/mockserver-friendly-client/">https://pypi.org/project/mockserver-friendly-client/</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> – where to look for files (recursively)</p></li>
+<li><p><strong>mock_client</strong> – </p></li>
+<li><p><strong>url_prefix</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.ApiJsonResponse">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">spark_pipeline_framework_testing.test_classes.input_types.</span></code><code class="sig-name descname"><span class="pre">ApiJsonResponse</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response_data_folder</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'api_json_response'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_url_prefix</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.ApiJsonResponse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spark_pipeline_framework_testing.test_classes.input_types.TestInputType" title="spark_pipeline_framework_testing.test_classes.input_types.TestInputType"><code class="xref py py-class docutils literal notranslate"><span class="pre">spark_pipeline_framework_testing.test_classes.input_types.TestInputType</span></code></a></p>
+<p>Mock responses for all files from the folder and its sub-folders</p>
+<dl class="py method">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.ApiJsonResponse.initialize">
+<code class="sig-name descname"><span class="pre">initialize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">spark_pipeline_framework.logger.yarn_logger.Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../mockserver_client/mockserver_client/index.html#spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient" title="spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient"><span class="pre">spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark_session</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pyspark.sql.SparkSession</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.ApiJsonResponse.initialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="spark_pipeline_framework_testing.test_classes.input_types.ApiJsonResponse.load_mock_source_api_json_responses">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">load_mock_source_api_json_responses</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_client</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="../../mockserver_client/mockserver_client/index.html#spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient" title="spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient"><span class="pre">spark_pipeline_framework_testing.mockserver_client.mockserver_client.MockServerFriendlyClient</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">url_prefix</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_file_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#spark_pipeline_framework_testing.test_classes.input_types.ApiJsonResponse.load_mock_source_api_json_responses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mock responses for all files from the folder and its sub-folders</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> – where to look for files (recursively)</p></li>
+<li><p><strong>mock_client</strong> – </p></li>
+<li><p><strong>url_prefix</strong> – <a class="reference external" href="http:/">http:/</a>/{mock_server_url}/{url_prefix}…</p></li>
+<li><p><strong>add_file_name</strong> – <a class="reference external" href="http:/">http:/</a>/{mock_server_url}/{url_prefix}/{add_file_name}…</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Helix Team.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

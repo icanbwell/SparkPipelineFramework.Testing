@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Any
 
-from spark_pipeline_framework_testing.utils.path_converter import (
+from spark_pipeline_framework_testing.tests_common.path_converter import (
     convert_path_from_docker,
 )
 
