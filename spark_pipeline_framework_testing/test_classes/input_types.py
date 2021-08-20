@@ -9,7 +9,7 @@ from typing import List, Optional, Dict, Union
 
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
-from pyspark.sql.types import StructType
+from pyspark.sql.types import StructType, DataType
 from spark_pipeline_framework.logger.yarn_logger import Logger  # type: ignore
 from spark_pipeline_framework.utilities.json_to_jsonl_converter import (
     convert_json_to_jsonl,
@@ -123,7 +123,9 @@ class FileInput(TestInputType):
         self,
         test_input_folder: str = "input",
         input_schema_folder: str = "input_schema",
-        input_schema: Optional[Union[StructType, Dict[str, StructType]]] = None,
+        input_schema: Optional[
+            Union[StructType, Dict[str, StructType], DataType]
+        ] = None,
         row_limit: int = 100,
     ) -> None:
         """
@@ -157,7 +159,7 @@ class FileInput(TestInputType):
         self.input_table_names = input_table_names
 
     def ingest_input_files(
-        self, input_schema: Optional[Union[StructType, Dict[str, StructType]]]
+        self, input_schema: Optional[Union[StructType, Dict[str, StructType], DataType]]
     ) -> List[str]:
         print(f"Running test in folder: {self.test_path}...")
 
@@ -207,7 +209,7 @@ class FileInput(TestInputType):
         input_file: str,
         input_folder: Path,
         input_schema_folder: Path,
-        input_schema: Optional[Union[StructType, Dict[str, StructType]]],
+        input_schema: Optional[Union[StructType, Dict[str, StructType], DataType]],
     ) -> None:
         assert self.spark_session
 
