@@ -12,10 +12,7 @@ from library.features.complex_feature.features_complex_feature import (
 from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
 )
-from spark_pipeline_framework_testing.test_classes.input_types import (
-    FileInput,
-    SourceApiCall,
-)
+from spark_pipeline_framework_testing.test_classes import input_types
 from spark_pipeline_framework_testing.test_runner_v2 import (
     SparkPipelineFrameworkTestRunnerV2,
 )
@@ -29,8 +26,8 @@ def test_source_api_call(spark_session: SparkSession) -> None:
     mock_client = MockServerFriendlyClient(mock_server_url)
     mock_client.clear(test_name)
 
-    input_file = FileInput()
-    request = SourceApiCall()
+    input_file = input_types.FileInput()
+    request = input_types.HttpJsonRequest()
     logger = get_logger(__name__)
     SparkPipelineFrameworkTestRunnerV2(
         logger=logger,

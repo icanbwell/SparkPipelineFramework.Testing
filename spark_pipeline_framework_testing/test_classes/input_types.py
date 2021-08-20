@@ -9,7 +9,7 @@ from typing import List, Optional, Dict, Union
 
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
-from pyspark.sql.types import StructType
+from pyspark.sql.types import StructType, DataType
 from spark_pipeline_framework.logger.yarn_logger import Logger  # type: ignore
 from spark_pipeline_framework.utilities.json_to_jsonl_converter import (
     convert_json_to_jsonl,
@@ -25,7 +25,7 @@ from spark_pipeline_framework_testing.tests_common.common_functions import (
     get_file_extension_from_file_path,
     write_schema_to_output,
 )
-from spark_pipeline_framework_testing.utils.mock_requests_loader import (
+from spark_pipeline_framework_testing.tests_common.mock_requests_loader import (
     load_mock_fhir_requests_from_folder,
 )
 from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
@@ -66,10 +66,12 @@ class FhirCalls(TestInputType):
         self,
         fhir_validation_url: str = "http://fhir:3000/4_0_0",
         fhir_calls_folder: str = "fhir_calls",
+        mock_url_prefix: Optional[str] = None,
     ) -> None:
         super().__init__()
         self.fhir_calls_folder = fhir_calls_folder
         self.fhir_validation_url = fhir_validation_url
+        self.url_prefix = mock_url_prefix
 
         self.test_name: str
         self.test_path: Path
@@ -96,6 +98,8 @@ class FhirCalls(TestInputType):
         self.mock_client = mock_client
         self.spark_session = spark_session
         self.temp_folder_path = test_path.joinpath(self.test_path)
+        if self.url_prefix is None:
+            self.url_prefix = test_name
         fhir_calls_path: Path = self.test_path.joinpath(self.fhir_calls_folder)
         self.raise_if_not_exist(fhir_calls_path)
         self._run_mocked_fhir_test()
@@ -104,7 +108,7 @@ class FhirCalls(TestInputType):
         self.mocked_files = load_mock_fhir_requests_from_folder(
             folder=self.test_path.joinpath(self.fhir_calls_folder),
             mock_client=self.mock_client,
-            url_prefix=self.test_name,
+            url_prefix=self.url_prefix,
         )
 
         self.mock_client.expect_default()
@@ -119,9 +123,17 @@ class FileInput(TestInputType):
         self,
         test_input_folder: str = "input",
         input_schema_folder: str = "input_schema",
-        input_schema: Optional[Union[StructType, Dict[str, StructType]]] = None,
+        input_schema: Optional[
+            Union[StructType, Dict[str, StructType], DataType]
+        ] = None,
         row_limit: int = 100,
     ) -> None:
+        """
+        :param test_input_folder: name of the folder in the test directory
+        :param input_schema_folder: name of the folder containing the schema of the input
+        :param input_schema: schema of the input file (overwrites input_schema_folder)
+        :param row_limit: row limit for input file
+        """
         super().__init__()
         self.test_input_folder = test_input_folder
         self.input_schema = input_schema
@@ -147,7 +159,7 @@ class FileInput(TestInputType):
         self.input_table_names = input_table_names
 
     def ingest_input_files(
-        self, input_schema: Optional[Union[StructType, Dict[str, StructType]]]
+        self, input_schema: Optional[Union[StructType, Dict[str, StructType], DataType]]
     ) -> List[str]:
         print(f"Running test in folder: {self.test_path}...")
 
@@ -197,7 +209,7 @@ class FileInput(TestInputType):
         input_file: str,
         input_folder: Path,
         input_schema_folder: Path,
-        input_schema: Optional[Union[StructType, Dict[str, StructType]]],
+        input_schema: Optional[Union[StructType, Dict[str, StructType], DataType]],
     ) -> None:
         assert self.spark_session
 
@@ -271,7 +283,7 @@ class FileInput(TestInputType):
         ), input_file_path
 
 
-class SourceApiCall(TestInputType):
+class HttpJsonRequest(TestInputType):
     """
     This class help mock a http call using this format:
     {
@@ -290,10 +302,12 @@ class SourceApiCall(TestInputType):
     def __init__(
         self,
         response_data_folder: str = "source_api_calls",
+        mock_url_prefix: Optional[str] = None,
     ) -> None:
         super().__init__()
         self.response_data_folder = response_data_folder
         self.test_path: Path
+        self.url_prefix = mock_url_prefix
 
     def initialize(
         self,
@@ -306,12 +320,14 @@ class SourceApiCall(TestInputType):
         assert mock_client
         self.test_path = test_path
         self.logger = logger
+        if self.url_prefix is None:
+            self.url_prefix = test_name
         response_data_path = self.test_path.joinpath(self.response_data_folder)
         self.raise_if_not_exist(response_data_path)
         self.load_mock_source_api_responses_from_folder(
             folder=response_data_path,
             mock_client=mock_client,
-            url_prefix=test_name,
+            url_prefix=self.url_prefix,
         )
 
     @staticmethod
@@ -348,12 +364,18 @@ class SourceApiCall(TestInputType):
 
 
 class ApiJsonResponse(TestInputType):
+    """
+    Mock responses for all files from the folder and its sub-folders
+    """
+
     def __init__(
         self,
         response_data_folder: str = "api_json_response",
+        mock_url_prefix: Optional[str] = None,
     ) -> None:
         super().__init__()
         self.input_folder_name = response_data_folder
+        self.url_prefix = mock_url_prefix
 
     def initialize(
         self,
@@ -364,12 +386,14 @@ class ApiJsonResponse(TestInputType):
         spark_session: Optional[SparkSession] = None,
     ) -> None:
         assert mock_client
+        if self.url_prefix is None:
+            self.url_prefix = test_name
         expected_input_path = test_path.joinpath(self.input_folder_name)
         self.raise_if_not_exist(expected_input_path)
         self.load_mock_source_api_json_responses(
             folder=expected_input_path,
             mock_client=mock_client,
-            url_prefix=test_name,
+            url_prefix=self.url_prefix,
             add_file_name=True,
         )
 

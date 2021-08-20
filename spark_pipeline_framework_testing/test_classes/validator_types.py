@@ -10,7 +10,7 @@ from typing import List, Optional, Dict, Any, Tuple, Union, Callable, TYPE_CHECK
 import pytest
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
-from pyspark.sql.types import StructType
+from pyspark.sql.types import StructType, DataType
 from spark_data_frame_comparer.spark_data_frame_comparer import (
     assert_compare_data_frames,
 )
@@ -374,7 +374,7 @@ class OutputFileValidator(Validator):
         func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path, str]]],
         sort_output_by: Optional[List[str]],
         apply_schema_to_output: bool,
-        output_schema: Optional[Union[StructType, Dict[str, StructType]]],
+        output_schema: Optional[Union[StructType, Dict[str, StructType], DataType]],
     ) -> Tuple[bool, Optional[SparkDataFrameComparerException]]:
         """
         read predefined outputs and compare them with the current outputs
