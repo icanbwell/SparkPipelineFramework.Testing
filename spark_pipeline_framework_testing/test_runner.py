@@ -12,7 +12,7 @@ from typing import List, Optional, Match, Dict, Any, Tuple, Union, Callable, Typ
 from pyspark.ml import Transformer
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
-from pyspark.sql.types import StructType
+from pyspark.sql.types import StructType, DataType
 from spark_data_frame_comparer.spark_data_frame_comparer import (
     assert_compare_data_frames,
 )
@@ -49,8 +49,12 @@ class SparkPipelineFrameworkTestRunner:
         apply_schema_to_output: bool = True,
         check_output: bool = True,
         ignore_views_for_output: Optional[List[str]] = None,
-        input_schema: Optional[Union[StructType, Dict[str, StructType], DataType]] = None,
-        output_schema: Optional[Union[StructType, Dict[str, StructType], DataType]] = None,
+        input_schema: Optional[
+            Union[StructType, Dict[str, StructType], DataType]
+        ] = None,
+        output_schema: Optional[
+            Union[StructType, Dict[str, StructType], DataType]
+        ] = None,
     ) -> None:
         """
         Tests Spark Transformers without writing any code

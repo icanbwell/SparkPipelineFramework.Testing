@@ -247,7 +247,9 @@ class OutputFileValidator(Validator):
         ignore_views_for_output: Optional[List[str]] = None,
         output_folder: str = "output",
         output_schema_folder: str = "output_schema",
-        output_schema: Optional[Union[StructType, Dict[str, StructType], DataType]] = None,
+        output_schema: Optional[
+            Union[StructType, Dict[str, StructType], DataType]
+        ] = None,
     ):
         """
 
