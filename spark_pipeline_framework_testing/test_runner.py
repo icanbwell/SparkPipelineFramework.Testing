@@ -12,7 +12,7 @@ from typing import List, Optional, Match, Dict, Any, Tuple, Union, Callable, Typ
 from pyspark.ml import Transformer
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
-from pyspark.sql.types import StructType
+from pyspark.sql.types import StructType, DataType
 from spark_data_frame_comparer.spark_data_frame_comparer import (
     assert_compare_data_frames,
 )
@@ -49,8 +49,12 @@ class SparkPipelineFrameworkTestRunner:
         apply_schema_to_output: bool = True,
         check_output: bool = True,
         ignore_views_for_output: Optional[List[str]] = None,
-        input_schema: Optional[Union[StructType, Dict[str, StructType]]] = None,
-        output_schema: Optional[Union[StructType, Dict[str, StructType]]] = None,
+        input_schema: Optional[
+            Union[StructType, Dict[str, StructType], DataType]
+        ] = None,
+        output_schema: Optional[
+            Union[StructType, Dict[str, StructType], DataType]
+        ] = None,
     ) -> None:
         """
         Tests Spark Transformers without writing any code
@@ -315,7 +319,7 @@ class SparkPipelineFrameworkTestRunner:
         func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path, str]]],
         sort_output_by: Optional[List[str]],
         apply_schema_to_output: bool,
-        output_schema: Optional[Union[StructType, Dict[str, StructType]]],
+        output_schema: Optional[Union[StructType, Dict[str, StructType], DataType]],
         temp_folder: Optional[Union[Path, str]] = None,
     ) -> Tuple[bool, Optional[SparkDataFrameComparerException]]:
         data_frame_exception: Optional[SparkDataFrameComparerException] = None
@@ -505,7 +509,7 @@ class SparkPipelineFrameworkTestRunner:
         input_file: str,
         input_folder: Path,
         input_schema_folder: Path,
-        input_schema: Optional[Union[StructType, Dict[str, StructType]]],
+        input_schema: Optional[Union[StructType, Dict[str, StructType], DataType]],
     ) -> None:
         file_extension: str = (
             SparkPipelineFrameworkTestRunner.get_file_extension_from_file_path(
