@@ -28,7 +28,7 @@ def test_source_api_call(spark_session: SparkSession) -> None:
     mock_client.clear(test_name)
 
     input_file = input_types.FileInput()
-    request = input_types.HttpJsonRequest()
+    request = input_types.ApiJsonResponse()
     logger = get_logger(__name__)
     SparkPipelineFrameworkTestRunnerV2(
         spark_session=spark_session,
@@ -43,7 +43,7 @@ def test_source_api_call(spark_session: SparkSession) -> None:
         temp_folder="output/temp",
     ).run_test2()
 
-    with open(test_path.joinpath("source_api_calls/getProviderApptTypes.json")) as f:
+    with open(test_path.joinpath("api_json_response/getProviderApptTypes.json")) as f:
         content = json.load(f)
 
     response: Response = requests.get(
