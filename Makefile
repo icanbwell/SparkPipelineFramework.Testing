@@ -8,7 +8,7 @@ VENV_NAME=venv
 GIT_HASH=${CIRCLE_SHA1}
 SPARK_VER=3.1.1
 HADOOP_VER=3.2
-PACKAGES_FOLDER=venv/lib/python3.6/site-packages
+PACKAGES_FOLDER=/usr/local/lib/python3.7/dist-packages
 SPF_BASE=${PACKAGES_FOLDER}
 
 Pipfile.lock: Pipfile
@@ -17,6 +17,10 @@ Pipfile.lock: Pipfile
 .PHONY:devdocker
 devdocker: ## Builds the docker for dev
 	docker-compose build
+
+.PHONY:shell
+shell:devdocker ## Brings up the bash shell in dev docker
+	docker-compose run --rm --name spf_test_shell dev /bin/bash
 
 .PHONY:init
 init: devdocker up setup-pre-commit  ## Initializes the local developer environment
@@ -51,9 +55,9 @@ tests:
 	docker-compose run --rm --name spftest_tests dev pytest tests
 
 .PHONY:proxies
-proxies:
-	. ${VENV_NAME}/bin/activate && \
-	python3 ${PACKAGES_FOLDER}/spark_pipeline_framework/proxy_generator/generate_proxies.py
+proxies:devdocker ## Generates proxies for all the library transformers, auto mappers and pipelines
+	docker-compose run --rm --name helix_proxies dev \
+	python ${SPF_BASE}/spark_pipeline_framework/proxy_generator/generate_proxies.py
 
 .PHONY:continuous_integration
 continuous_integration: venv
