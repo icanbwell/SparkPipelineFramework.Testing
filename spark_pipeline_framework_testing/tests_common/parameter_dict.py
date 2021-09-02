@@ -2,7 +2,7 @@ from collections import UserDict
 from typing import Any
 
 
-class ParameterDict(UserDict[str, Any]):
+class ParameterDict(UserDict):  # type: ignore
     """
     This dictionary returns the value if the key exists otherwise if the key starts with view_
     then it returns the key minus view_
