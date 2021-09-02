@@ -2,9 +2,6 @@ from pathlib import Path
 
 from spark_pipeline_framework.logger.yarn_logger import get_logger
 
-from library.features.doctor_feature.practitioner.v1.features_doctor_feature_practitioner_v1 import (
-    FeaturesDoctorFeaturePractitionerV1,
-)
 from pyspark.sql import SparkSession
 
 from spark_pipeline_framework_testing.test_classes.input_types import FileInput
@@ -33,8 +30,6 @@ def test_practitioner(spark_session: SparkSession) -> None:
             OutputFileValidator(related_inputs=input_file, sort_output_by=["id"])
         ],
         logger=logger,
-        auto_find_helix_transformer=False,
-        helix_transformers=[FeaturesDoctorFeaturePractitionerV1],
         test_inputs=[input_file],
         temp_folder="output/temp",
     ).run_test2()
