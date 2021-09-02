@@ -149,7 +149,15 @@ class SparkPipelineFrameworkTestRunnerV2:
                             transformer_class=transformer,
                         )
             else:
-                transformer_class = self.find_transformer(str(self.test_path))
+                transformer_class = None
+                try:
+                    transformer_class = self.find_transformer(str(self.test_path))
+                except ModuleNotFoundError:
+                    # try one level up since we could be in a nested test folder
+                    transformer_class = self.find_transformer(
+                        str(self.test_path.parent)
+                    )
+
                 if transformer_class:
                     self.run_helix_transformers(
                         parameters=self.helix_pipeline_parameters
@@ -157,6 +165,8 @@ class SparkPipelineFrameworkTestRunnerV2:
                         else {},
                         transformer_class=transformer_class,
                     )
+                else:
+                    raise Exception(f"No Transformer found at: {str(self.test_path)}")
 
             if self.test_validators:
                 test_validator: Validator
