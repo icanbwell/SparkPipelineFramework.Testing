@@ -22,6 +22,7 @@ from spark_pipeline_framework.utilities.class_helpers import ClassHelpers
 from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
 )
+from spark_pipeline_framework_testing.tests_common.parameter_dict import ParameterDict
 
 if TYPE_CHECKING:
     from spark_pipeline_framework_testing.test_classes.input_types import TestInputType
@@ -98,7 +99,7 @@ class SparkPipelineFrameworkTestRunnerV2:
         self.extra_params = extra_params
         self.parameters_filename = parameters_filename
         # inject configs
-        standard_parameters = dict(
+        standard_parameters = ParameterDict(
             {
                 "run_id": "foo",
                 "source_filepath": test_path.joinpath("input"),
@@ -120,7 +121,7 @@ class SparkPipelineFrameworkTestRunnerV2:
         )
         if self.helix_pipeline_parameters:
             standard_parameters.update(self.helix_pipeline_parameters)
-            self.helix_pipeline_parameters = standard_parameters
+            self.helix_pipeline_parameters = standard_parameters  # type: ignore
 
     def run_test2(self) -> None:
         assert self.temp_folder_path
