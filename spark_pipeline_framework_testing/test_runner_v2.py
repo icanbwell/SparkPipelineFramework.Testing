@@ -144,9 +144,9 @@ class SparkPipelineFrameworkTestRunnerV2:
                 if self.helix_transformers:
                     for transformer in self.helix_transformers:
                         self.run_helix_transformers(
-                            parameters=self.helix_pipeline_parameters
+                            parameters=self.helix_pipeline_parameters  # type: ignore
                             if self.helix_pipeline_parameters
-                            else {},
+                            else ParameterDict({}),
                             transformer_class=transformer,
                         )
             else:
@@ -161,9 +161,9 @@ class SparkPipelineFrameworkTestRunnerV2:
 
                 if transformer_class:
                     self.run_helix_transformers(
-                        parameters=self.helix_pipeline_parameters
+                        parameters=self.helix_pipeline_parameters  # type: ignore
                         if self.helix_pipeline_parameters
-                        else {},
+                        else ParameterDict({}),
                         transformer_class=transformer_class,
                     )
                 else:
@@ -226,7 +226,7 @@ class SparkPipelineFrameworkTestRunnerV2:
     ) -> None:
         # read parameters.json if it exists
         if not parameters:
-            parameters = {}
+            parameters = ParameterDict({})  # type: ignore
         parameters_json_file: Path = Path(self.test_path).joinpath(
             self.parameters_filename
         )

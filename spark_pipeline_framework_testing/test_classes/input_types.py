@@ -80,7 +80,7 @@ class FhirCalls(TestInputType):
         self.temp_folder_path: Path
         self.mocked_files: Optional[
             List[str]
-        ] = None  # list of files that are used in mocking
+        ] = []  # list of files that are used in mocking
 
     def initialize(
         self,
