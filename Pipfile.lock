@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b30b4c089bb9c5fd25d24976c1bff2b23873bc62e793967a4fc2c3c94d376352"
+            "sha256": "defb9c9b35bdfd5eb0855166e8c3294d43675df82f4075287b87ad2dd7e0d519"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1378,11 +1378,11 @@
         },
         "sparkautomapper.fhir": {
             "hashes": [
-                "sha256:5c517822806564f1c432100acb0714ab8dd67a731e16fc1fbf31aa094caa13f8",
-                "sha256:a839a4c7c9201ee15bef16b92ab19b70e3e6dcfc31079030a8ea6f1ff5f37aa9"
+                "sha256:ba346e119ded26d351aaf802f99e93ac941f384a3e99a6f209d49e73d9849d5b",
+                "sha256:ec698da59d91f27384ec282aebbe3a34e2e2ef14f71ed00fd9597470b94ab000"
             ],
             "index": "pypi",
-            "version": "==1.0.0"
+            "version": "==1.0.2"
         },
         "sparkfhirschemas": {
             "hashes": [
