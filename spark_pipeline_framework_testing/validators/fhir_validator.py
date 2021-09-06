@@ -39,6 +39,7 @@ class FhirValidator(MockCallValidator):
         related_file_inputs: Union[List[FileInput], FileInput],
         mock_server_url: str,
         test_name: str,
+        fhir_validation_url: Optional[str] = None,
     ) -> None:
         super().__init__(related_inputs=related_inputs)
         self.related_file_inputs = (
@@ -50,6 +51,7 @@ class FhirValidator(MockCallValidator):
         self.mock_server_url: str = mock_server_url
         assert test_name
         self.test_name: str = test_name
+        self.fhir_validation_url: Optional[str] = fhir_validation_url
 
     def validate(
         self,
@@ -83,10 +85,17 @@ class FhirValidator(MockCallValidator):
             )
             # get resourceType and then find the fhir schema of that to apply
             for row in fhir_data_frame.collect():
-                print(row["fhir"])
                 # now send this row to mock fhir server as a merge command
                 row_dict: Dict[str, Any] = json.loads(row["fhir"])
                 resource_type: str = row_dict["resourceType"]
+
+                if self.fhir_validation_url:
+                    # validate the resource
+                    self.validate_resource(
+                        fhir_validation_url=self.fhir_validation_url,
+                        resource_dict=row_dict,
+                        resource_type=resource_type,
+                    )
                 full_uri: furl = furl(self.mock_server_url)
                 full_uri /= self.test_name
                 assert resource_type
@@ -126,3 +135,23 @@ class FhirValidator(MockCallValidator):
             logger=logger,
             mock_client=mock_client,
         )
+
+    def validate_resource(
+        self,
+        fhir_validation_url: str,
+        resource_dict: Dict[str, Any],
+        resource_type: str,
+    ) -> None:
+        full_uri: furl = furl(fhir_validation_url)
+        full_uri /= self.test_name
+        assert resource_type
+        full_uri /= resource_type
+        headers = {"Content-Type": "application/fhir+json"}
+        full_uri /= "$validate"
+        json_payload: str = json.dumps(resource_dict)
+        json_payload_bytes: bytes = json_payload.encode("utf-8")
+        http: Session = requests.Session()
+        validation_response = http.post(
+            url=full_uri.url, data=json_payload_bytes, headers=headers
+        )
+        assert validation_response.ok, validation_response.json()
