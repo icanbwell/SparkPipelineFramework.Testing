@@ -1,0 +1,38 @@
+{
+    "type": "struct",
+    "fields": [
+        {
+            "name": "complex_field",
+            "type": {
+                "type": "array",
+                "elementType": {
+                    "type": "struct",
+                    "fields": [
+                        {
+                            "name": "inner_key_int",
+                            "type": "long",
+                            "nullable": true,
+                            "metadata": {}
+                        },
+                        {
+                            "name": "inner_key_str",
+                            "type": "string",
+                            "nullable": true,
+                            "metadata": {}
+                        }
+                    ]
+                },
+                "containsNull": true
+            },
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "simple_field",
+            "type": "long",
+            "nullable": true,
+            "metadata": {}
+        }
+    ],
+    "$schema": "https://raw.githubusercontent.com/imranq2/SparkPipelineFramework.Testing/main/spark_json_schema.json "
+}

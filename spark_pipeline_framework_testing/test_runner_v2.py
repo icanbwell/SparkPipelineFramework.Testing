@@ -22,6 +22,7 @@ from spark_pipeline_framework.utilities.class_helpers import ClassHelpers
 from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
 )
+from spark_pipeline_framework_testing.tests_common.parameter_dict import ParameterDict
 
 if TYPE_CHECKING:
     from spark_pipeline_framework_testing.test_classes.input_types import TestInputType
@@ -98,7 +99,7 @@ class SparkPipelineFrameworkTestRunnerV2:
         self.extra_params = extra_params
         self.parameters_filename = parameters_filename
         # inject configs
-        standard_parameters = dict(
+        standard_parameters = ParameterDict(
             {
                 "run_id": "foo",
                 "source_filepath": test_path.joinpath("input"),
@@ -143,20 +144,30 @@ class SparkPipelineFrameworkTestRunnerV2:
                 if self.helix_transformers:
                     for transformer in self.helix_transformers:
                         self.run_helix_transformers(
-                            parameters=self.helix_pipeline_parameters
+                            parameters=self.helix_pipeline_parameters  # type: ignore
                             if self.helix_pipeline_parameters
-                            else {},
+                            else ParameterDict({}),
                             transformer_class=transformer,
                         )
             else:
-                transformer_class = self.find_transformer(str(self.test_path))
+                transformer_class = None
+                try:
+                    transformer_class = self.find_transformer(str(self.test_path))
+                except ModuleNotFoundError:
+                    # try one level up since we could be in a nested test folder
+                    transformer_class = self.find_transformer(
+                        str(self.test_path.parent)
+                    )
+
                 if transformer_class:
                     self.run_helix_transformers(
-                        parameters=self.helix_pipeline_parameters
+                        parameters=self.helix_pipeline_parameters  # type: ignore
                         if self.helix_pipeline_parameters
-                        else {},
+                        else ParameterDict({}),
                         transformer_class=transformer_class,
                     )
+                else:
+                    raise Exception(f"No Transformer found at: {str(self.test_path)}")
 
             if self.test_validators:
                 test_validator: Validator
@@ -215,7 +226,7 @@ class SparkPipelineFrameworkTestRunnerV2:
     ) -> None:
         # read parameters.json if it exists
         if not parameters:
-            parameters = {}
+            parameters = ParameterDict({})  # type: ignore
         parameters_json_file: Path = Path(self.test_path).joinpath(
             self.parameters_filename
         )

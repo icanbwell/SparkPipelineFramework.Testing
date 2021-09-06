@@ -8,7 +8,7 @@ VENV_NAME=venv
 GIT_HASH=${CIRCLE_SHA1}
 SPARK_VER=3.1.1
 HADOOP_VER=3.2
-PACKAGES_FOLDER=venv/lib/python3.6/site-packages
+PACKAGES_FOLDER=/usr/local/lib/python3.7/dist-packages
 SPF_BASE=${PACKAGES_FOLDER}
 
 Pipfile.lock: Pipfile
@@ -18,12 +18,18 @@ Pipfile.lock: Pipfile
 devdocker: ## Builds the docker for dev
 	docker-compose build
 
+.PHONY:shell
+shell:devdocker ## Brings up the bash shell in dev docker
+	docker-compose run --rm --name spf_test_shell dev /bin/bash
+
 .PHONY:init
 init: devdocker up setup-pre-commit  ## Initializes the local developer environment
 
 .PHONY: up
 up: Pipfile.lock
 	docker-compose up --build -d --remove-orphans
+	@echo MockServer dashboard: http://localhost:1080/mockserver/dashboard
+	@echo Fhir server dashboard http://localhost:3000/
 
 .PHONY: down
 down:
@@ -48,12 +54,12 @@ update: down Pipfile.lock setup-pre-commit  ## Updates all the packages using Pi
 
 .PHONY:tests
 tests:
-	docker-compose run --rm --name spftest_tests dev pytest tests
+	docker-compose run --rm --name spftest_tests dev pytest tests library
 
 .PHONY:proxies
-proxies:
-	. ${VENV_NAME}/bin/activate && \
-	python3 ${PACKAGES_FOLDER}/spark_pipeline_framework/proxy_generator/generate_proxies.py
+proxies:devdocker ## Generates proxies for all the library transformers, auto mappers and pipelines
+	docker-compose run --rm --name helix_proxies dev \
+	python ${SPF_BASE}/spark_pipeline_framework/proxy_generator/generate_proxies.py
 
 .PHONY:continuous_integration
 continuous_integration: venv
@@ -73,3 +79,15 @@ sphinx-html:
 	@mkdir docs
 	@touch docs/.nojekyll
 	cp -a docsrc/_build/html/. docs
+
+.DEFAULT_GOAL := help
+.PHONY: help
+help: ## Show this help.
+	# from https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+.PHONY: clean_data
+clean_data: down ## Cleans all the local docker setup
+ifneq ($(shell docker volume ls | grep "sparkpipelineframeworktesting"| awk '{print $$2}'),)
+	docker volume ls | grep "sparkpipelineframeworktesting" | awk '{print $$2}' | xargs docker volume rm
+endif
