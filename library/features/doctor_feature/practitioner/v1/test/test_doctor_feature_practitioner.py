@@ -24,18 +24,25 @@ def test_doctor_feature_practitioner(spark_session: SparkSession) -> None:
     test_name = "test_doctor_feature_practitioner"
     test_input = input_types.FileInput()
     test_fhir = input_types.FhirCalls()
-    test_validator = FhirValidator(related_inputs=test_fhir)
 
     logger = get_logger(__name__)
 
     mock_server_url = "http://mock-server:1080"
     mock_client = MockServerFriendlyClient(mock_server_url)
     mock_client.clear(f"/{test_name}/")
+    mock_client.expect_default()
 
     params = {
         "test_name": test_name,
         "mock_server_url": mock_server_url,
     }
+
+    test_validator = FhirValidator(
+        related_inputs=test_fhir,
+        related_file_inputs=test_input,
+        mock_server_url=mock_server_url,
+        test_name=test_name,
+    )
 
     SparkPipelineFrameworkTestRunnerV2(
         spark_session=spark_session,
