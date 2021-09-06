@@ -99,7 +99,7 @@ class MockCallValidator(Validator):
     ) -> None:
         assert MockServerFriendlyClient
         assert mock_client
-        self.logger = logger
+        # self.logger = logger
         data_folder_path: Path = test_path.joinpath(
             self.related_inputs[0].fhir_calls_folder
         )
@@ -166,7 +166,7 @@ class MockCallValidator(Validator):
                         )
                         with open(resource_file_path, "w") as file:
                             file.write(json.dumps(resource_obj, indent=2))
-                        self.logger.info(
+                        logger.info(
                             f"Writing http calls file to : {resource_file_path}"
                         )
                 elif isinstance(exception, MockServerExpectationNotFoundException):
@@ -175,7 +175,7 @@ class MockCallValidator(Validator):
                 else:
                     raise Exception(f"unknown exception type: {type(exception)}")
             for c in compare_files:
-                self.logger.info(c)
+                logger.info(c)
             compare_files_text: str = "\n".join(
                 [str(convert_path_from_docker(c)) for c in compare_files]
             )
@@ -213,7 +213,7 @@ class MockCallValidator(Validator):
                 warning_message += "\n".join(
                     [f"{c.url}: {c.json_dict}" for c in unexpected_requests]
                 )
-                self.logger.info(warning_message)
+                logger.info(warning_message)
 
             # if there is a failure then stop the test
             if failure_message:

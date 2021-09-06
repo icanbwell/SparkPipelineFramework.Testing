@@ -23,9 +23,14 @@ def test_doctor_feature_practitioner(spark_session: SparkSession) -> None:
 
     logger = get_logger(__name__)
 
-    mock_client_url = "http://mock-server:1080"
-    mock_client = MockServerFriendlyClient(mock_client_url)
-    mock_client.clear(test_name)
+    mock_server_url = "http://mock-server:1080"
+    mock_client = MockServerFriendlyClient(mock_server_url)
+    mock_client.clear(f"/{test_name}/")
+
+    params = {
+        "test_name": test_name,
+        "mock_server_url": mock_server_url,
+    }
 
     SparkPipelineFrameworkTestRunnerV2(
         spark_session=spark_session,
@@ -36,4 +41,5 @@ def test_doctor_feature_practitioner(spark_session: SparkSession) -> None:
         test_inputs=[test_input],
         temp_folder="output/temp",
         mock_client=mock_client,
+        helix_pipeline_parameters=params,
     ).run_test2()
