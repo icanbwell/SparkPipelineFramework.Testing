@@ -3,6 +3,10 @@ from pathlib import Path
 from spark_pipeline_framework.logger.yarn_logger import get_logger
 
 from pyspark.sql import SparkSession
+from spark_pipeline_framework_testing.test_classes.validator_types import (
+    OutputFileValidator,
+)
+
 from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
 )
@@ -36,7 +40,10 @@ def test_doctor_feature_practitioner(spark_session: SparkSession) -> None:
         spark_session=spark_session,
         test_path=data_dir,
         test_name=test_name,
-        test_validators=[test_validator],
+        test_validators=[
+            test_validator,
+            OutputFileValidator(related_inputs=test_input, sort_output_by=["id"]),
+        ],
         logger=logger,
         test_inputs=[test_input],
         temp_folder="output/temp",
