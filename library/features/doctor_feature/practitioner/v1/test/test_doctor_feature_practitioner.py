@@ -39,6 +39,7 @@ def test_doctor_feature_practitioner(spark_session: SparkSession) -> None:
         related_file_inputs=test_input,
         mock_server_url=mock_server_url,
         test_name=test_name,
+        fhir_validation_url="http://fhir:3000/4_0_0",
     )
 
     SparkPipelineFrameworkTestRunnerV2(

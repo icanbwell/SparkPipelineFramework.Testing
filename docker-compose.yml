@@ -9,14 +9,16 @@ services:
       - ./:/spftest/
     container_name: spftest_dev
     working_dir: /spftest
+
   mock-server:
     image: jamesdbloom/mockserver:mockserver-5.11.2
     command: -logLevel DEBUG -serverPort 1080
     ports:
-      - 1080:1080
+      - '1080:1080'
     environment:
       - LOG_LEVEL=DEBUG
       - MOCKSERVER_LIVENESS_HTTP_GET_PATH=/health
+
   fhir:
     depends_on:
       - mongo
@@ -39,6 +41,7 @@ services:
       IS_PRODUCTION:
       RETURN_BUNDLE: "1"
       VALIDATE_SCHEMA: "1"
+      AUTH_ENABLED: "0"
     ports:
       - '3000:3000'
     command: npm run dev
@@ -57,5 +60,6 @@ services:
     restart: always
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
+
 volumes:
   mongo_data:

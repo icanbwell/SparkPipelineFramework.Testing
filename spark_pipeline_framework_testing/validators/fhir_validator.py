@@ -136,14 +136,13 @@ class FhirValidator(MockCallValidator):
             mock_client=mock_client,
         )
 
+    @staticmethod
     def validate_resource(
-        self,
         fhir_validation_url: str,
         resource_dict: Dict[str, Any],
         resource_type: str,
     ) -> None:
         full_uri: furl = furl(fhir_validation_url)
-        full_uri /= self.test_name
         assert resource_type
         full_uri /= resource_type
         headers = {"Content-Type": "application/fhir+json"}
@@ -154,4 +153,6 @@ class FhirValidator(MockCallValidator):
         validation_response = http.post(
             url=full_uri.url, data=json_payload_bytes, headers=headers
         )
-        assert validation_response.ok, validation_response.json()
+        assert (
+            validation_response.ok
+        ), f"Failed validation for resource: {json_payload}: {validation_response.json()}"
