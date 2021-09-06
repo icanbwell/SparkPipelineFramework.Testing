@@ -15,7 +15,8 @@ from spark_pipeline_framework_testing.test_runner_v2 import (
     SparkPipelineFrameworkTestRunnerV2,
 )
 
-from spark_pipeline_framework_testing.test_classes import input_types, validator_types
+from spark_pipeline_framework_testing.test_classes import input_types
+from spark_pipeline_framework_testing.validators.fhir_validator import FhirValidator
 
 
 def test_doctor_feature_practitioner(spark_session: SparkSession) -> None:
@@ -23,7 +24,7 @@ def test_doctor_feature_practitioner(spark_session: SparkSession) -> None:
     test_name = "test_doctor_feature_practitioner"
     test_input = input_types.FileInput()
     test_fhir = input_types.FhirCalls()
-    test_validator = validator_types.MockCallValidator(related_inputs=test_fhir)
+    test_validator = FhirValidator(related_inputs=test_fhir)
 
     logger = get_logger(__name__)
 
