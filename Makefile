@@ -28,6 +28,8 @@ init: devdocker up setup-pre-commit  ## Initializes the local developer environm
 .PHONY: up
 up: Pipfile.lock
 	docker-compose up --build -d --remove-orphans
+	@echo MockServer dashboard: http://localhost:1080/mockserver/dashboard
+	@echo Fhir server dashboard http://localhost:3000/
 
 .PHONY: down
 down:
@@ -83,3 +85,9 @@ sphinx-html:
 help: ## Show this help.
 	# from https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+.PHONY: clean_data
+clean_data: down ## Cleans all the local docker setup
+ifneq ($(shell docker volume ls | grep "sparkpipelineframeworktesting"| awk '{print $$2}'),)
+	docker volume ls | grep "sparkpipelineframeworktesting" | awk '{print $$2}' | xargs docker volume rm
+endif
