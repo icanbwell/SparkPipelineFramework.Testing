@@ -276,5 +276,11 @@ class SparkPipelineFrameworkTestRunnerV2:
         lib_path: str = testable_folder[search_result_start_:].replace("/", ".")
         # load the transformer file (i.e., module)
         full_reference = lib_path + "." + transformer_file_name
-        my_class = ClassHelpers.get_first_class_in_file(full_reference)
-        return my_class
+        try:
+            my_class = ClassHelpers.get_first_class_in_file(full_reference)
+            return my_class
+        except ModuleNotFoundError:
+            # check if mapping_importer.py exists
+            full_reference = lib_path + "." + "mapping_importer"
+            my_class = ClassHelpers.get_first_class_in_file(full_reference)
+            return my_class
