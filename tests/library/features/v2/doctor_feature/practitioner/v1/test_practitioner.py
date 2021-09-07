@@ -2,7 +2,7 @@ from pathlib import Path
 
 from spark_pipeline_framework.logger.yarn_logger import get_logger
 
-from library.features.doctor_feature.practitioner.v1.features_doctor_feature_practitioner_v1 import (
+from library.features.doctor_feature.practitioner.v1.mapping_importer import (
     FeaturesDoctorFeaturePractitionerV1,
 )
 from pyspark.sql import SparkSession
