@@ -121,7 +121,7 @@ class SparkPipelineFrameworkTestRunnerV2:
         )
         if self.helix_pipeline_parameters:
             standard_parameters.update(self.helix_pipeline_parameters)
-            self.helix_pipeline_parameters = standard_parameters  # type: ignore
+        self.helix_pipeline_parameters = standard_parameters  # type: ignore
 
     def run_test2(self) -> None:
         assert self.temp_folder_path

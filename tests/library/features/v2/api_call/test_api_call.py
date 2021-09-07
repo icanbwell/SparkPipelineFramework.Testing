@@ -28,7 +28,7 @@ def test_source_api_call(spark_session: SparkSession) -> None:
     mock_client.clear(test_name)
 
     input_file = input_types.FileInput()
-    request = input_types.ApiJsonResponse()
+    request = input_types.ApiJsonResponse(response_data_folder="api_json_response")
     logger = get_logger(__name__)
     SparkPipelineFrameworkTestRunnerV2(
         spark_session=spark_session,

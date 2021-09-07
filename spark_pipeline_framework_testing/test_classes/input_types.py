@@ -301,7 +301,7 @@ class HttpJsonRequest(TestInputType):
 
     def __init__(
         self,
-        response_data_folder: str = "source_api_calls",
+        response_data_folder: str = "request_json_calls",
         mock_url_prefix: Optional[str] = None,
     ) -> None:
         super().__init__()
@@ -391,7 +391,7 @@ class ApiJsonResponse(TestInputType):
 
     def __init__(
         self,
-        response_data_folder: str = "api_json_response",
+        response_data_folder: str = "source_api_calls",
         mock_url_prefix: Optional[str] = None,
     ) -> None:
         super().__init__()

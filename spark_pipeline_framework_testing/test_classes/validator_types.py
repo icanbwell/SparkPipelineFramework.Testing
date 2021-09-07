@@ -50,7 +50,6 @@ from spark_pipeline_framework_testing.testing_exception import (
 from spark_pipeline_framework_testing.tests_common.common_functions import (
     write_schema_to_output,
     get_view_name_from_file_path,
-    clean_spark_session,
     get_file_extension_from_file_path,
     camel_case_to_snake_case,
 )
@@ -375,7 +374,6 @@ class OutputFileValidator(Validator):
                 sort_output_by=self.sort_output_by,
                 output_as_json_only=self.output_as_json_only,
             )
-        clean_spark_session(session=self.spark_session)
         if len(data_frame_exceptions) > 0:
             raise SparkPipelineFrameworkTestingException(
                 exceptions=data_frame_exceptions
