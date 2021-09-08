@@ -47,6 +47,6 @@ def test_source_api_call(spark_session: SparkSession) -> None:
         content = json.load(f)
 
     response: Response = requests.get(
-        f"{mock_server_url}/{test_name}/getProviderApptTypes.json"
+        f"{mock_server_url}/{test_name}/getProviderApptTypes"
     )
     assert response.json() == content
