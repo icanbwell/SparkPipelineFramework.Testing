@@ -436,14 +436,14 @@ class ApiJsonResponse(TestInputType):
         )
         for file_path in files:
             with open(file_path, "r") as file:
-                content = file.read()
-                path = f"{('/' + url_prefix) if url_prefix else ''}/{os.path.basename(file_path)}"
+                content = json.load(file)
+                path = f"{('/' + url_prefix) if url_prefix else ''}/{os.path.splitext(os.path.basename(file_path))[0]}"
                 mock_client.expect(
                     request(
                         method="GET",
                         path=path,
                     ),
-                    response(body=content),
+                    response(body=json.dumps(content)),
                     timing=times(1),
                 )
                 print(f"Mocking: GET {mock_client.base_url}{path}")
