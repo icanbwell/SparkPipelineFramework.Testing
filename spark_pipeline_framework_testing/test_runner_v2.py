@@ -18,11 +18,11 @@ from spark_pipeline_framework.utilities.FriendlySparkException import (
     FriendlySparkException,
 )
 from spark_pipeline_framework.utilities.class_helpers import ClassHelpers
+from spark_pipeline_framework.utilities.parameter_dict import ParameterDict
 
 from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
 )
-from spark_pipeline_framework_testing.tests_common.parameter_dict import ParameterDict
 
 if TYPE_CHECKING:
     from spark_pipeline_framework_testing.test_classes.input_types import TestInputType
