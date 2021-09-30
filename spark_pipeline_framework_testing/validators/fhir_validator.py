@@ -67,6 +67,8 @@ class FhirValidator(MockCallValidator):
         assert self.related_file_inputs[0].input_table_names  # type: ignore
 
         input_table_names = self.related_file_inputs[0].input_table_names  # type: ignore
+        if "output" in input_table_names:
+            input_table_names.remove("output")
         # write out any missing output schemas
         output_tables: List[Table] = spark_session.catalog.listTables("default")
         output_tables_for_writing_schema: List[str] = [

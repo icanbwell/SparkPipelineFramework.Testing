@@ -1,0 +1,317 @@
+[
+  {
+    "resourceType": "Practitioner",
+    "id": "4610",
+    "meta": {
+      "source": "http://www.icanbwell.com",
+      "security": [
+        {
+          "system": "https://www.icanbwell.com/owner",
+          "code": "bwell"
+        },
+        {
+          "system": "https://www.icanbwell.com/access",
+          "code": "bwell"
+        },
+        {
+          "system": "https://www.icanbwell.com/vendor",
+          "code": "bwell"
+        }
+      ]
+    },
+    "identifier": [
+      {
+        "use": "usual",
+        "type": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/identifier-use",
+              "code": "PRN"
+            }
+          ]
+        },
+        "system": "medstarhealth.org",
+        "value": "4610"
+      },
+      {
+        "use": "official",
+        "type": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/identifier-use",
+              "code": "NPI"
+            }
+          ]
+        },
+        "system": "http://hl7.org/fhir/sid/us-npi",
+        "value": "1598000000"
+      }
+    ],
+    "active": true,
+    "name": [
+      {
+        "use": "usual",
+        "text": "",
+        "family": "DOCTOR4",
+        "given": [
+          "FIRST4"
+        ],
+        "suffix": []
+      }
+    ],
+    "telecom": [],
+    "address": [
+      {
+        "use": "work",
+        "type": "Physical",
+        "text": "Good Medical Center",
+        "line": [
+          "Good Building",
+          "123 Main Street"
+        ],
+        "city": "HAWAII",
+        "district": "",
+        "state": "HI",
+        "postalCode": "20000",
+        "country": "USA"
+      }
+    ],
+    "gender": "unknown"
+  },
+  {
+    "resourceType": "Practitioner",
+    "id": "4657",
+    "meta": {
+      "source": "http://www.icanbwell.com",
+      "security": [
+        {
+          "system": "https://www.icanbwell.com/owner",
+          "code": "bwell"
+        },
+        {
+          "system": "https://www.icanbwell.com/access",
+          "code": "bwell"
+        },
+        {
+          "system": "https://www.icanbwell.com/vendor",
+          "code": "bwell"
+        }
+      ]
+    },
+    "identifier": [
+      {
+        "use": "usual",
+        "type": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/identifier-use",
+              "code": "PRN"
+            }
+          ]
+        },
+        "system": "medstarhealth.org",
+        "value": "4657"
+      },
+      {
+        "use": "official",
+        "type": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/identifier-use",
+              "code": "NPI"
+            }
+          ]
+        },
+        "system": "http://hl7.org/fhir/sid/us-npi",
+        "value": "1679000000"
+      }
+    ],
+    "active": true,
+    "name": [
+      {
+        "use": "usual",
+        "text": "",
+        "family": "DOCTOR1",
+        "given": [
+          "FIRST1"
+        ],
+        "suffix": []
+      }
+    ],
+    "telecom": [],
+    "address": [
+      {
+        "use": "work",
+        "type": "Physical",
+        "text": "Good Medical Center",
+        "line": [
+          "Good Building",
+          "123 Main Street"
+        ],
+        "city": "HAWAII",
+        "district": "",
+        "state": "HI",
+        "postalCode": "20000",
+        "country": "USA"
+      }
+    ],
+    "gender": "unknown"
+  },
+  {
+    "resourceType": "Practitioner",
+    "id": "4664",
+    "meta": {
+      "source": "http://www.icanbwell.com",
+      "security": [
+        {
+          "system": "https://www.icanbwell.com/owner",
+          "code": "bwell"
+        },
+        {
+          "system": "https://www.icanbwell.com/access",
+          "code": "bwell"
+        },
+        {
+          "system": "https://www.icanbwell.com/vendor",
+          "code": "bwell"
+        }
+      ]
+    },
+    "identifier": [
+      {
+        "use": "usual",
+        "type": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/identifier-use",
+              "code": "PRN"
+            }
+          ]
+        },
+        "system": "medstarhealth.org",
+        "value": "4664"
+      },
+      {
+        "use": "official",
+        "type": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/identifier-use",
+              "code": "NPI"
+            }
+          ]
+        },
+        "system": "http://hl7.org/fhir/sid/us-npi",
+        "value": "1730000000"
+      }
+    ],
+    "active": true,
+    "name": [
+      {
+        "use": "usual",
+        "text": "",
+        "family": "DOCTOR3",
+        "given": [
+          "FIRST3"
+        ],
+        "suffix": []
+      }
+    ],
+    "telecom": [],
+    "address": [
+      {
+        "use": "work",
+        "type": "Physical",
+        "text": "Good Medical Center",
+        "line": [
+          "Good Building",
+          "123 Main Street"
+        ],
+        "city": "HAWAII",
+        "district": "",
+        "state": "HI",
+        "postalCode": "20000",
+        "country": "USA"
+      }
+    ],
+    "gender": "unknown"
+  },
+  {
+    "resourceType": "Practitioner",
+    "id": "4940",
+    "meta": {
+      "source": "http://www.icanbwell.com",
+      "security": [
+        {
+          "system": "https://www.icanbwell.com/owner",
+          "code": "bwell"
+        },
+        {
+          "system": "https://www.icanbwell.com/access",
+          "code": "bwell"
+        },
+        {
+          "system": "https://www.icanbwell.com/vendor",
+          "code": "bwell"
+        }
+      ]
+    },
+    "identifier": [
+      {
+        "use": "usual",
+        "type": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/identifier-use",
+              "code": "PRN"
+            }
+          ]
+        },
+        "system": "medstarhealth.org",
+        "value": "4940"
+      },
+      {
+        "use": "official",
+        "type": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/identifier-use",
+              "code": "NPI"
+            }
+          ]
+        },
+        "system": "http://hl7.org/fhir/sid/us-npi"
+      }
+    ],
+    "active": true,
+    "name": [
+      {
+        "use": "usual",
+        "text": "",
+        "family": "DOCTOR2",
+        "given": [
+          "FIRST2"
+        ],
+        "suffix": []
+      }
+    ],
+    "telecom": [],
+    "address": [
+      {
+        "use": "work",
+        "type": "Physical",
+        "text": "Good Medical Center",
+        "line": [
+          "Good Building",
+          "123 Main Street"
+        ],
+        "city": "HAWAII",
+        "district": "",
+        "state": "HI",
+        "postalCode": "20000",
+        "country": "USA"
+      }
+    ],
+    "gender": "unknown"
+  }
+]
