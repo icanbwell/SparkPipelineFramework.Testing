@@ -1,6 +1,23 @@
 {
   "resourceType": "Practitioner",
   "id": "4657",
+  "meta": {
+    "source": "http://www.icanbwell.com",
+    "security": [
+      {
+        "system": "https://www.icanbwell.com/owner",
+        "code": "bwell"
+      },
+      {
+        "system": "https://www.icanbwell.com/access",
+        "code": "bwell"
+      },
+      {
+        "system": "https://www.icanbwell.com/vendor",
+        "code": "bwell"
+      }
+    ]
+  },
   "identifier": [
     {
       "use": "usual",
@@ -33,7 +50,7 @@
   "name": [
     {
       "use": "usual",
-      "text": "",
+      "text": " ",
       "family": "DOCTOR1",
       "given": [
         "FIRST1"
@@ -45,14 +62,14 @@
   "address": [
     {
       "use": "work",
-      "type": "Physical",
+      "type": "physical",
       "text": "Good Medical Center",
       "line": [
         "Good Building",
         "123 Main Street"
       ],
       "city": "HAWAII",
-      "district": "",
+      "district": " ",
       "state": "HI",
       "postalCode": "20000",
       "country": "USA"
