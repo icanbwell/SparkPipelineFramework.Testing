@@ -89,6 +89,9 @@ class FhirValidator(MockCallValidator):
             for row in fhir_data_frame.collect():
                 # now send this row to mock fhir server as a merge command
                 row_dict: Dict[str, Any] = json.loads(row["fhir"])
+                if "resourceType" not in row_dict:
+                    continue
+
                 resource_type: str = row_dict["resourceType"]
 
                 if self.fhir_validation_url:
