@@ -67,6 +67,8 @@ class FhirValidator(MockCallValidator):
         assert self.related_file_inputs[0].input_table_names  # type: ignore
 
         input_table_names = self.related_file_inputs[0].input_table_names  # type: ignore
+        if "output" in input_table_names:
+            input_table_names.remove("output")
         # write out any missing output schemas
         output_tables: List[Table] = spark_session.catalog.listTables("default")
         output_tables_for_writing_schema: List[str] = [
@@ -155,4 +157,10 @@ class FhirValidator(MockCallValidator):
         )
         assert (
             validation_response.ok
+        ), f"Failed validation for resource: {json_payload}: {validation_response.json()}"
+
+        validation_json = validation_response.json()
+        issues = [d for d in validation_json["issue"] if d["severity"] == "error"]
+        assert (
+            len(issues) == 0
         ), f"Failed validation for resource: {json_payload}: {validation_response.json()}"
