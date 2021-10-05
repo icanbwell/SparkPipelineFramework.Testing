@@ -101,7 +101,7 @@ def mapping(parameters: Dict[str, Any]) -> AutoMapper:
                         family=A.column("provider_last_name"),
                         suffix=FhirList([A.column("provider_title")]),
                         use=NameUseCodeValues.Usual,
-                        text=A.text(" "),
+                        text=A.text(""),
                     )
                 ]
             ),
@@ -125,7 +125,7 @@ def mapping(parameters: Dict[str, Any]) -> AutoMapper:
                     Address(
                         use=AddressUseCodeValues.Work,  # AddressUseCode.Work,
                         type_=AddressTypeCode(
-                            A.text("physical")
+                            A.text("Physical")
                         ),  # AddressTypeCode.Physical,
                         text=A.column("practice_name"),
                         line=FhirList(
@@ -135,7 +135,7 @@ def mapping(parameters: Dict[str, Any]) -> AutoMapper:
                             ]
                         ),
                         city=A.column("scheduling_location_city"),
-                        district=A.text(" "),
+                        district=A.text(""),
                         state=A.column("scheduling_location_state"),
                         postalCode=A.column("scheduling_location_zip"),
                         country=A.text("USA"),

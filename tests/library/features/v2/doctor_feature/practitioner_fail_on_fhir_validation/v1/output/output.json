@@ -51,7 +51,7 @@
     "name": [
       {
         "use": "usual",
-        "text": " ",
+        "text": "",
         "family": "DOCTOR4",
         "given": [
           "FIRST4"
@@ -63,14 +63,14 @@
     "address": [
       {
         "use": "work",
-        "type": "physical",
+        "type": "Physical",
         "text": "Good Medical Center",
         "line": [
           "Good Building",
           "123 Main Street"
         ],
         "city": "HAWAII",
-        "district": " ",
+        "district": "",
         "state": "HI",
         "postalCode": "20000",
         "country": "USA"
@@ -130,7 +130,7 @@
     "name": [
       {
         "use": "usual",
-        "text": " ",
+        "text": "",
         "family": "DOCTOR1",
         "given": [
           "FIRST1"
@@ -142,14 +142,14 @@
     "address": [
       {
         "use": "work",
-        "type": "physical",
+        "type": "Physical",
         "text": "Good Medical Center",
         "line": [
           "Good Building",
           "123 Main Street"
         ],
         "city": "HAWAII",
-        "district": " ",
+        "district": "",
         "state": "HI",
         "postalCode": "20000",
         "country": "USA"
@@ -209,7 +209,7 @@
     "name": [
       {
         "use": "usual",
-        "text": " ",
+        "text": "",
         "family": "DOCTOR3",
         "given": [
           "FIRST3"
@@ -221,14 +221,14 @@
     "address": [
       {
         "use": "work",
-        "type": "physical",
+        "type": "Physical",
         "text": "Good Medical Center",
         "line": [
           "Good Building",
           "123 Main Street"
         ],
         "city": "HAWAII",
-        "district": " ",
+        "district": "",
         "state": "HI",
         "postalCode": "20000",
         "country": "USA"
@@ -287,7 +287,7 @@
     "name": [
       {
         "use": "usual",
-        "text": " ",
+        "text": "",
         "family": "DOCTOR2",
         "given": [
           "FIRST2"
@@ -299,14 +299,14 @@
     "address": [
       {
         "use": "work",
-        "type": "physical",
+        "type": "Physical",
         "text": "Good Medical Center",
         "line": [
           "Good Building",
           "123 Main Street"
         ],
         "city": "HAWAII",
-        "district": " ",
+        "district": "",
         "state": "HI",
         "postalCode": "20000",
         "country": "USA"
