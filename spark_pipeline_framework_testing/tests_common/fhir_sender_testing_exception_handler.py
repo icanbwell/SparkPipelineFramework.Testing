@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Optional, Callable, Union
 
-from helix_fhir_client_sdk.exceptions.fhir_sender_exception import FhirSenderException
+from helix_fhir_client_sdk.exceptions.fhir_sender_exception import FhirSenderException  # type: ignore
 from spark_pipeline_framework.utilities.FriendlySparkException import (
     FriendlySparkException,
 )

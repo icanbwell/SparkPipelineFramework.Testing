@@ -6,7 +6,7 @@ from re import search
 from typing import List, Optional, Match, Dict, Any, Type, TYPE_CHECKING
 
 import pytest
-from helix_fhir_client_sdk.exceptions.fhir_sender_exception import FhirSenderException
+from helix_fhir_client_sdk.exceptions.fhir_sender_exception import FhirSenderException  # type: ignore
 from pyspark.ml import Transformer
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import StructType
