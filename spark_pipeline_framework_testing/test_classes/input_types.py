@@ -27,6 +27,7 @@ from spark_pipeline_framework_testing.tests_common.common_functions import (
 )
 from spark_pipeline_framework_testing.tests_common.mock_requests_loader import (
     load_mock_fhir_requests_from_folder,
+    load_mock_source_api_json_responses,
 )
 from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
@@ -109,6 +110,65 @@ class FhirCalls(TestInputType):
             folder=self.test_path.joinpath(self.fhir_calls_folder),
             mock_client=self.mock_client,
             url_prefix=self.url_prefix,
+        )
+
+        self.mock_client.expect_default()
+
+
+class FhirRequestResponseCalls(TestInputType):
+    def __init__(
+        self,
+        fhir_data_folder: str,
+        fhir_validation_url: str = "http://fhir:3000/4_0_0",
+        mock_url_prefix: Optional[str] = None,
+        add_file_name_to_request: Optional[bool] = False,
+        url_suffix: Optional[str] = None,
+    ) -> None:
+        super().__init__()
+        self.fhir_data_folder = fhir_data_folder
+        self.fhir_validation_url = fhir_validation_url
+        self.url_prefix = mock_url_prefix
+        self.add_file_name_to_request = add_file_name_to_request
+        self.url_suffix = url_suffix
+
+        self.test_name: str
+        self.test_path: Path
+        self.mock_client: MockServerFriendlyClient
+        self.spark_session: SparkSession
+        self.temp_folder_path: Path
+        self.mocked_files: Optional[
+            List[str]
+        ] = []  # list of files that are used in mocking
+
+    def initialize(
+        self,
+        test_name: str,
+        test_path: Path,
+        logger: Logger,
+        mock_client: Optional[MockServerFriendlyClient] = None,
+        spark_session: Optional[SparkSession] = None,
+    ) -> None:
+        assert mock_client
+        assert spark_session
+        self.test_name = test_name
+        self.test_path = test_path
+        self.logger = logger
+        self.mock_client = mock_client
+        self.spark_session = spark_session
+        self.temp_folder_path = test_path.joinpath(self.test_path)
+        if self.url_prefix is None:
+            self.url_prefix = test_name
+        fhir_calls_path: Path = self.test_path.joinpath(self.fhir_data_folder)
+        self.raise_if_not_exist(fhir_calls_path)
+        self._run_mocked_fhir_test()
+
+    def _run_mocked_fhir_test(self) -> None:
+        self.mocked_files = load_mock_source_api_json_responses(
+            folder=self.test_path.joinpath(self.fhir_data_folder),
+            mock_client=self.mock_client,
+            add_file_name=self.add_file_name_to_request,
+            url_prefix=self.url_prefix,
+            url_suffix=self.url_suffix,
         )
 
         self.mock_client.expect_default()

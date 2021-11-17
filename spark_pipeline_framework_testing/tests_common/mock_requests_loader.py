@@ -311,7 +311,8 @@ def load_mock_source_api_json_responses(
     folder: Path,
     mock_client: MockServerFriendlyClient,
     url_prefix: Optional[str],
-    add_file_name: bool = False,
+    add_file_name: Optional[bool] = False,
+    url_suffix: Optional[str] = None,
 ) -> List[str]:
     """
     Mock responses for all files from the folder and its sub-folders
@@ -320,6 +321,7 @@ def load_mock_source_api_json_responses(
     :param mock_client:
     :param url_prefix: http://{mock_server_url}/{url_prefix}...
     :param add_file_name: http://{mock_server_url}/{url_prefix}/{add_file_name}...
+    :param url_suffix: http://{mock_server_url}/{url_prefix}/{add_file_name}/{url_suffix}?
     """
     file_path: str
     files: List[str] = sorted(glob(str(folder.joinpath("**/*.json")), recursive=True))
@@ -337,6 +339,8 @@ def load_mock_source_api_json_responses(
 
             path = f"{('/' + url_prefix) if url_prefix else ''}"
             path = f"{path}/{os.path.splitext(file_name)[0]}" if add_file_name else path
+            if url_suffix:
+                path = f"{path}/{url_suffix}"
 
             try:
                 request_result = content["request_result"]
