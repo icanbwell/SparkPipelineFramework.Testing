@@ -115,7 +115,7 @@ class FhirCalls(TestInputType):
         self.mock_client.expect_default()
 
 
-class FhirRequestResponseCalls(TestInputType):
+class MockRequestResponseCalls(TestInputType):
     """
     Mock fhir requests and responses
     """

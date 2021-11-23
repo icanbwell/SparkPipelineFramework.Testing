@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     from spark_pipeline_framework_testing.test_classes.input_types import (
         FhirCalls,
         FileInput,
-        FhirRequestResponseCalls,
+        MockRequestResponseCalls,
     )
 from spark_pipeline_framework_testing.testing_exception import (
     SparkPipelineFrameworkTestingException,
@@ -85,8 +85,8 @@ class MockCallValidator(Validator):
             Union[
                 List["FhirCalls"],
                 "FhirCalls",
-                List["FhirRequestResponseCalls"],
-                "FhirRequestResponseCalls",
+                List["MockRequestResponseCalls"],
+                "MockRequestResponseCalls",
             ]
         ],
     ) -> None:
@@ -242,7 +242,7 @@ class MockCallValidator(Validator):
         if not self.related_inputs:
             return []
         all_files: List[str] = []
-        related_input: Union["FhirCalls", "FhirRequestResponseCalls"]
+        related_input: Union["FhirCalls", "MockRequestResponseCalls"]
         for related_input in self.related_inputs:
             if related_input:
                 all_files.extend(related_input.mocked_files)  # type: ignore
