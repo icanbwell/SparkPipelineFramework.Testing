@@ -116,16 +116,20 @@ class FhirCalls(TestInputType):
 
 
 class FhirRequestResponseCalls(TestInputType):
+    """
+    Mock fhir requests and responses
+    """
+
     def __init__(
         self,
-        fhir_data_folder: str,
+        fhir_calls_folder: str,
         fhir_validation_url: str = "http://fhir:3000/4_0_0",
         mock_url_prefix: Optional[str] = None,
         add_file_name_to_request: Optional[bool] = False,
         url_suffix: Optional[str] = None,
     ) -> None:
         super().__init__()
-        self.fhir_data_folder = fhir_data_folder
+        self.fhir_calls_folder = fhir_calls_folder
         self.fhir_validation_url = fhir_validation_url
         self.url_prefix = mock_url_prefix
         self.add_file_name_to_request = add_file_name_to_request
@@ -158,13 +162,13 @@ class FhirRequestResponseCalls(TestInputType):
         self.temp_folder_path = test_path.joinpath(self.test_path)
         if self.url_prefix is None:
             self.url_prefix = test_name
-        fhir_calls_path: Path = self.test_path.joinpath(self.fhir_data_folder)
+        fhir_calls_path: Path = self.test_path.joinpath(self.fhir_calls_folder)
         self.raise_if_not_exist(fhir_calls_path)
         self._run_mocked_fhir_test()
 
     def _run_mocked_fhir_test(self) -> None:
         self.mocked_files = load_mock_source_api_json_responses(
-            folder=self.test_path.joinpath(self.fhir_data_folder),
+            folder=self.test_path.joinpath(self.fhir_calls_folder),
             mock_client=self.mock_client,
             add_file_name=self.add_file_name_to_request,
             url_prefix=self.url_prefix,
