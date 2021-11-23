@@ -123,13 +123,8 @@ class MockServerFriendlyClient(object):
             found_expectation: bool = False
             try:
                 for recorded_request in recorded_requests:
-                    if (
-                        "method" in expected_request
-                        and expected_request["method"] == recorded_request["method"]
-                        and expected_request["path"] == recorded_request["path"]
-                        and self.does_request_match(
-                            request1=expected_request, request2=recorded_request
-                        )
+                    if "method" in expected_request and self.does_request_match(
+                        request1=expected_request, request2=recorded_request
                     ):
                         found_expectation = True
                         # remove request from unmatched_requests
@@ -165,6 +160,7 @@ class MockServerFriendlyClient(object):
                 MockServerExpectationNotFoundException(
                     url=expectation["path"],
                     json=expectation["body"]["json"] if "body" in expectation else None,
+                    querystring_params=expectation["queryStringParameters"],
                 )
             )
         # and for every request in unmatched_requests
@@ -185,6 +181,12 @@ class MockServerFriendlyClient(object):
         return (
             request1["method"] == request2["method"]
             and request1["path"] == request2["path"]
+            and MockServerFriendlyClient.normalize_querystring_params(
+                request1.get("queryStringParameters")
+            )
+            == MockServerFriendlyClient.normalize_querystring_params(
+                request2.get("queryStringParameters")
+            )
             and MockServerFriendlyClient.does_id_in_request_match(
                 request1=request1, request2=request2
             )
@@ -277,6 +279,39 @@ class MockServerFriendlyClient(object):
         result = self._call("retrieve")
         # https://app.swaggerhub.com/apis/jamesdbloom/mock-server-openapi/5.11.x#/control/put_retrieve
         return cast(List[Dict[str, Any]], json.loads(result.text))
+
+    @staticmethod
+    def normalize_querystring_params(
+        querystring_params: Optional[Union[List[Dict[str, Any]], Dict[str, Any]]] = None
+    ) -> Optional[Dict[str, Any]]:
+        """
+        ensure a dictionary of querystring params is formatted so that the param name is the dictionary key.
+        querystring dictionaries from requests sometimes look like this. dont want that.
+        "queryStringParameters": [
+            {
+                "name": "contained",
+                "values": [
+                    "true"
+                ]
+            },
+            {
+                "name": "id",
+                "values": [
+                    "1023011178"
+                ]
+            }
+        ],
+        """
+        if querystring_params is None:
+            return None
+        if type(querystring_params) is dict:
+            return querystring_params
+
+        normalized_params: Dict[str, Any] = {}
+        for param_dict in querystring_params:
+            params: Dict[str, Any] = param_dict  # type: ignore
+            normalized_params[params["name"]] = params["values"]
+        return normalized_params
 
 
 def request(

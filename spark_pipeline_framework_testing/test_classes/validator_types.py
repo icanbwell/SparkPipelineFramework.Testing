@@ -43,6 +43,7 @@ if TYPE_CHECKING:
     from spark_pipeline_framework_testing.test_classes.input_types import (
         FhirCalls,
         FileInput,
+        MockRequestResponseCalls,
     )
 from spark_pipeline_framework_testing.testing_exception import (
     SparkPipelineFrameworkTestingException,
@@ -80,7 +81,14 @@ class MockCallValidator(Validator):
 
     def __init__(
         self,
-        related_inputs: Optional[Union[List["FhirCalls"], "FhirCalls"]],
+        related_inputs: Optional[
+            Union[
+                List["FhirCalls"],
+                "FhirCalls",
+                List["MockRequestResponseCalls"],
+                "MockRequestResponseCalls",
+            ]
+        ],
     ) -> None:
         if related_inputs:
             self.related_inputs = (
@@ -149,25 +157,30 @@ class MockCallValidator(Validator):
                         else exception.json_dict
                     )
                     if resource_obj:
-                        assert "resourceType" in resource_obj, resource_obj
-                        resource_type = resource_obj["resourceType"]
-                        assert "id" in resource_obj, resource_obj
-                        resource_id = resource_obj["id"]
-                        resource_type_folder_name: str = camel_case_to_snake_case(
-                            resource_type
-                        )
-                        resource_path: Path = data_folder_path.joinpath(
-                            f"{resource_type_folder_name}"
-                        )
-                        os.makedirs(resource_path, exist_ok=True)
-                        resource_file_path: Path = resource_path.joinpath(
-                            f"{resource_id}.json"
-                        )
-                        with open(resource_file_path, "w") as file:
-                            file.write(json.dumps(resource_obj, indent=2))
-                        logger.info(
-                            f"Writing http calls file to : {resource_file_path}"
-                        )
+                        # assert "resourceType" in resource_obj, resource_obj
+                        resource_type = resource_obj.get("resourceType", None)
+                        if resource_type:
+                            assert "id" in resource_obj, resource_obj
+                            resource_id = resource_obj["id"]
+                            resource_type_folder_name: str = camel_case_to_snake_case(
+                                resource_type
+                            )
+                            resource_path: Path = data_folder_path.joinpath(
+                                f"{resource_type_folder_name}"
+                            )
+                            os.makedirs(resource_path, exist_ok=True)
+                            resource_file_path: Path = resource_path.joinpath(
+                                f"{resource_id}.json"
+                            )
+                            with open(resource_file_path, "w") as file:
+                                file.write(json.dumps(resource_obj, indent=2))
+                            logger.info(
+                                f"Writing http calls file to : {resource_file_path}"
+                            )
+                        else:
+                            logger.info(
+                                f"a non standard fhir request was expected and not found. {resource_obj}"
+                            )
                 elif isinstance(exception, MockServerExpectationNotFoundException):
                     # add to error
                     pass
@@ -196,9 +209,12 @@ class MockCallValidator(Validator):
                 if isinstance(c, MockServerExpectationNotFoundException)
             ]
             if len(expectations_not_met_exceptions) > 0:
-                failure_message += "\nExpectations not met:\n"
+                failure_message += "\nThese requests were expected but not made:\n-----------------------\n"
                 failure_message += "\n".join(
-                    [f"{c.url}: {c.json}" for c in expectations_not_met_exceptions]
+                    [
+                        f"url: {c.url} \nquery params: {c.querystring_params} \njson: {c.json}\n-----------------------\n"
+                        for c in expectations_not_met_exceptions
+                    ]
                 )
 
             unexpected_requests: List[MockServerRequestNotFoundException] = [
@@ -206,8 +222,8 @@ class MockCallValidator(Validator):
                 for c in e.exceptions
                 if isinstance(c, MockServerRequestNotFoundException)
             ]
+            warning_message = ""
             if len(unexpected_requests) > 0:
-                warning_message = ""
                 warning_message += "\nUnexpected requests:\n"
                 warning_message += "\n".join(
                     [f"{c.url}: {c.json_dict}" for c in unexpected_requests]
@@ -216,13 +232,17 @@ class MockCallValidator(Validator):
 
             # if there is a failure then stop the test
             if failure_message:
-                pytest.fail(failure_message)
+                # want to print the warnings out here too to make it easier to see in test output
+                test_failure_message = "\nMOCKED REQUEST FAILURE:\n"
+                test_failure_message += failure_message
+                test_failure_message += warning_message
+                pytest.fail(test_failure_message)
 
     def get_input_files(self) -> List[str]:
         if not self.related_inputs:
             return []
         all_files: List[str] = []
-        related_input: "FhirCalls"
+        related_input: Union["FhirCalls", "MockRequestResponseCalls"]
         for related_input in self.related_inputs:
             if related_input:
                 all_files.extend(related_input.mocked_files)  # type: ignore
