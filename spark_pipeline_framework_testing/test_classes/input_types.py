@@ -278,7 +278,13 @@ class FileInput(TestInputType):
         assert self.spark_session
 
         file_extension: str = get_file_extension_from_file_path(input_file)
-        if file_extension.lower() not in [".csv", ".json", ".jsonl", ".parquet"]:
+        if file_extension.lower() not in [
+            ".csv",
+            ".json",
+            ".jsonl",
+            ".parquet",
+            ".txt",
+        ]:
             return  # todo: issue a warning
 
         view_name: str = get_view_name_from_file_path(input_file)
@@ -335,6 +341,8 @@ class FileInput(TestInputType):
             input_df = reader.json(path=jsonl_input_file_path).limit(self.row_limit)
         elif file_extension.lower() == ".parquet":
             input_df = reader.parquet(path=input_file_path).limit(self.row_limit)
+        elif file_extension.lower() == ".txt":
+            input_df = reader.text(paths=input_file_path).limit(self.row_limit)
         else:
             assert (
                 False
