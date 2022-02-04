@@ -7,7 +7,7 @@ name = "pypi"
 numpy = ">=1.19.2"
 pyspark = "==3.1.1"
 logger = ">=1.4"
-sparkpipelineframework = "==1.0.5"
+sparkpipelineframework = "==1.0.6"
 "sparkdataframecomparer" = "==0.1.68"
 Deprecated = "==1.2.12"
 

@@ -7,8 +7,8 @@ from spark_pipeline_framework.transformers.framework_fixed_width_loader.v1.frame
     FrameworkFixedWidthLoader,
     ColumnSpec,
 )
-from spark_pipeline_framework.transformers.framework_sql_transformer.v1.framework_sql_transformer import (
-    FrameworkSqlTransformer,
+from spark_pipeline_framework.transformers.framework_xml_loader.v1.framework_xml_loader import (
+    FrameworkXmlLoader,
 )
 
 
@@ -45,5 +45,9 @@ class FixedWidthPipeline(FrameworkPipeline):
                     ),
                 ],
             ),
-            FrameworkSqlTransformer(sql="select * from my_view", view="my_view_2"),
+            FrameworkXmlLoader(
+                view="my_xml_view",
+                filepath=parameters["input_xml_path"],
+                row_tag="book",
+            ),
         ]

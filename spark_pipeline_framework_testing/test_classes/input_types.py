@@ -9,8 +9,12 @@ from typing import List, Optional, Dict, Union
 
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
+from pyspark.sql.functions import trim, col
 from pyspark.sql.types import StructType, DataType
 from spark_pipeline_framework.logger.yarn_logger import Logger  # type: ignore
+from spark_pipeline_framework.transformers.framework_fixed_width_loader.v1.framework_fixed_width_loader import (
+    ColumnSpec,
+)
 from spark_pipeline_framework.utilities.json_to_jsonl_converter import (
     convert_json_to_jsonl,
 )
@@ -191,6 +195,8 @@ class FileInput(TestInputType):
             Union[StructType, Dict[str, StructType], DataType]
         ] = None,
         row_limit: int = 100,
+        row_tag: Optional[str] = None,
+        fixed_width_columns: Optional[List[ColumnSpec]] = None,
     ) -> None:
         """
         :param test_input_folder: name of the folder in the test directory
@@ -206,6 +212,8 @@ class FileInput(TestInputType):
         self.row_limit = row_limit
         self.input_table_names: List[str]
         self.spark_session: SparkSession
+        self.row_tag = row_tag
+        self.fixed_width_columns = fixed_width_columns
 
     def initialize(
         self,
@@ -233,7 +241,9 @@ class FileInput(TestInputType):
         input_files: List[str] = []
         if isdir(input_folder):
             input_files = [
-                f for f in listdir(input_folder) if isfile(join(input_folder, f))
+                f
+                for f in listdir(input_folder)
+                if isfile(join(input_folder, f) and not f.endswith(".py"))
             ]
         input_schema_folder = Path(self.test_path).joinpath(self.input_schema_folder)
 
@@ -284,8 +294,11 @@ class FileInput(TestInputType):
             ".jsonl",
             ".parquet",
             ".txt",
+            ".xml",
         ]:
-            return  # todo: issue a warning
+            assert (
+                False
+            ), f"Unsupported file extension: {file_extension}. Extend input_types.read_input_file to handle {file_extension} files."
 
         view_name: str = get_view_name_from_file_path(input_file)
 
@@ -342,7 +355,27 @@ class FileInput(TestInputType):
         elif file_extension.lower() == ".parquet":
             input_df = reader.parquet(path=input_file_path).limit(self.row_limit)
         elif file_extension.lower() == ".txt":
-            input_df = reader.text(paths=input_file_path).limit(self.row_limit)
+            if self.fixed_width_columns:
+                input_df = reader.text(paths=input_file_path).limit(self.row_limit)
+                input_df = input_df.select(
+                    *[
+                        trim(col("value").substr(column.start_pos, column.length))
+                        .cast(column.data_type)
+                        .alias(column.column_name)
+                        for column in self.fixed_width_columns
+                    ]
+                )
+            else:
+                assert (
+                    False
+                ), "You must specify column definitions for a fixed width input type"
+        elif file_extension.lower() == ".xml":
+            input_df = (
+                reader.format("xml")
+                .options(rowTag=self.row_tag)
+                .load(path=input_file_path)
+                .limit(self.row_limit)
+            )
         else:
             assert (
                 False

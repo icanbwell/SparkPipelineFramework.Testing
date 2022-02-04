@@ -80,6 +80,7 @@ def spark_session(request: Any) -> SparkSession:
         .config("spark.sql.shuffle.partitions", "2")
         .config("spark.default.parallelism", "4")
         .config("spark.sql.broadcastTimeout", "2400")
+        .config("spark.jars.packages", "com.databricks:spark-xml_2.12:0.14.0")
         .enableHiveSupport()
         .getOrCreate()
     )
