@@ -298,7 +298,7 @@ class FileInput(TestInputType):
         ]:
             assert (
                 False
-            ), f"Unsupported file extension: {file_extension}. Extend input_types.read_input_file to handle {file_extension} files."
+            ), f"Unsupported file extension: {file_extension} for file {input_file}. Extend input_types.read_input_file to handle {file_extension} files."
 
         view_name: str = get_view_name_from_file_path(input_file)
 
