@@ -243,7 +243,12 @@ class FileInput(TestInputType):
             input_files = [
                 f
                 for f in listdir(input_folder)
-                if isfile(join(input_folder, f) and not f.endswith(".py"))
+                if isfile(
+                    join(input_folder, f)
+                    and not f.endswith(".py")
+                    and get_file_extension_from_file_path(f) != ""
+                    and get_file_extension_from_file_path(f) is not None
+                )
             ]
         input_schema_folder = Path(self.test_path).joinpath(self.input_schema_folder)
 
