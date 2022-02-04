@@ -1,0 +1,5 @@
+{
+    "type": "struct",
+    "fields": [],
+    "$schema": "https://raw.githubusercontent.com/imranq2/SparkPipelineFramework.Testing/main/spark_json_schema.json "
+}
