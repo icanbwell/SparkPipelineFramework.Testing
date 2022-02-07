@@ -360,8 +360,8 @@ class FileInput(TestInputType):
         elif file_extension.lower() == ".parquet":
             input_df = reader.parquet(path=input_file_path).limit(self.row_limit)
         elif file_extension.lower() == ".txt":
+            input_df = reader.text(paths=input_file_path).limit(self.row_limit)
             if self.fixed_width_columns:
-                input_df = reader.text(paths=input_file_path).limit(self.row_limit)
                 input_df = input_df.select(
                     *[
                         trim(col("value").substr(column.start_pos, column.length))
@@ -370,10 +370,6 @@ class FileInput(TestInputType):
                         for column in self.fixed_width_columns
                     ]
                 )
-            else:
-                assert (
-                    False
-                ), "You must specify column definitions for a fixed width input type"
         elif file_extension.lower() == ".xml":
             input_df = (
                 reader.format("xml")
