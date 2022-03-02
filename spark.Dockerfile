@@ -1,5 +1,5 @@
-FROM imranq2/spark_python:0.1.28
-# https://github.com/imranq2/docker.spark_python
+FROM imranq2/spark-py:3.0.49
+# https://github.com/imranq2/kubernetes.spark_python
 USER root
 
 ENV PYTHONPATH=/spftest
