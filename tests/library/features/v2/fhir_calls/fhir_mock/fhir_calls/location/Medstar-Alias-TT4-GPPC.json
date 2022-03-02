@@ -1,31 +1,29 @@
-[
-  {
-    "resourceType": "Location",
-    "id": "Medstar-Alias-TT4-GPPC",
-    "meta": {
-      "source": "http://medstarhealth.org/provider_appointment_type",
-      "security": [
-        {
-          "system": "https://www.icanbwell.com/access",
-          "code": "medstar"
-        },
-        {
-          "system": "https://www.icanbwell.com/owner",
-          "code": "medstar"
-        }
-      ]
-    },
-    "type": [
+{
+  "resourceType": "Location",
+  "id": "Medstar-Alias-TT4-GPPC",
+  "meta": {
+    "source": "http://medstarhealth.org/provider_appointment_type",
+    "security": [
       {
-        "coding": [
-          {
-            "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
-            "code": "anaphylaxis",
-            "display": "Anaphylaxis"
-          }
-        ],
-        "text": "Indicator for Covid Vaccine locations that accept anaphylaxic patients"
+        "system": "https://www.icanbwell.com/access",
+        "code": "medstar"
+      },
+      {
+        "system": "https://www.icanbwell.com/owner",
+        "code": "medstar"
       }
     ]
-  }
-]
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+          "code": "anaphylaxis",
+          "display": "Anaphylaxis"
+        }
+      ],
+      "text": "Indicator for Covid Vaccine locations that accept anaphylaxic patients"
+    }
+  ]
+}

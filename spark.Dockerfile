@@ -16,6 +16,9 @@ RUN pipenv sync --dev --system
 
 COPY . /spftest
 
+# override entrypoint to remove extra logging
+RUN mv /opt/minimal_entrypoint.sh /opt/entrypoint.sh
+
 # run pre-commit once so it installs all the hooks and subsequent runs are fast
 # RUN pre-commit install
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1

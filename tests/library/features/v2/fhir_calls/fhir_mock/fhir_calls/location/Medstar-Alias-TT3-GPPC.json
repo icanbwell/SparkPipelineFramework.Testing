@@ -1,20 +1,18 @@
-[
-  {
-    "resourceType": "Location",
-    "id": "Medstar-Alias-TT3-GPPC",
-    "meta": {
-      "source": "http://medstarhealth.org/provider_appointment_type",
-      "security": [
-        {
-          "system": "https://www.icanbwell.com/access",
-          "code": "medstar"
-        },
-        {
-          "system": "https://www.icanbwell.com/owner",
-          "code": "medstar"
-        }
-      ]
-    },
-    "type": []
-  }
-]
+{
+  "resourceType": "Location",
+  "id": "Medstar-Alias-TT3-GPPC",
+  "meta": {
+    "source": "http://medstarhealth.org/provider_appointment_type",
+    "security": [
+      {
+        "system": "https://www.icanbwell.com/access",
+        "code": "medstar"
+      },
+      {
+        "system": "https://www.icanbwell.com/owner",
+        "code": "medstar"
+      }
+    ]
+  },
+  "type": []
+}
