@@ -11,7 +11,7 @@ services:
     working_dir: /spftest
 
   mock-server:
-    image: jamesdbloom/mockserver:mockserver-5.11.2
+    image: jamesdbloom/mockserver:mockserver-5.12.0
     command: -logLevel DEBUG -serverPort 1080
     ports:
       - '1080:1080'
@@ -22,7 +22,7 @@ services:
   fhir:
     depends_on:
       - mongo
-    image: imranq2/node-fhir-server-mongo:2.0.34
+    image: imranq2/node-fhir-server-mongo:2.0.68
     # To use local fhir code, comment above line and uncomment below
 #    build:
 #      dockerfile: Dockerfile
@@ -42,15 +42,20 @@ services:
       RETURN_BUNDLE: "1"
       VALIDATE_SCHEMA: "1"
       AUTH_ENABLED: "0"
+      ENABLE_GRAPHQL: "1"
+      LOGLEVEL: "DEBUG"
+      SET_INDEX_HINTS: 0
+      CREATE_INDEX_ON_COLLECTION_CREATION: 1
+      USE_TWO_STEP_SEARCH_OPTIMIZATION: "1"
     ports:
       - '3000:3000'
-    command: npm run dev
+    command: yarn start
     restart: on-failure
     healthcheck:
         test: ["CMD-SHELL", "curl --silent --fail localhost:3000/health || exit 1"]
 
   mongo:
-    image: docker.io/bitnami/mongodb:4.4.8
+    image: docker.io/bitnami/mongodb:4.4.12
     ports:
       - '27017:27017'
     environment:

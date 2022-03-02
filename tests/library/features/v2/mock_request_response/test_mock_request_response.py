@@ -1,13 +1,11 @@
 from pathlib import Path
 
+from mockserver_client.mockserver_client import MockServerFriendlyClient
 from pyspark.sql import SparkSession
 from spark_pipeline_framework.logger.yarn_logger import get_logger
 
 from library.pipeline.mock_request_responses.v1.pipeline_mock_request_responses_v1 import (
     PipelineMockRequestResponsesV1,
-)
-from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
-    MockServerFriendlyClient,
 )
 from spark_pipeline_framework_testing.test_classes.input_types import (
     MockRequestResponseCalls,

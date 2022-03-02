@@ -3,13 +3,12 @@ import os
 from pathlib import Path
 from typing import Optional, Callable, Union
 
-from helix_fhir_client_sdk.exceptions.fhir_sender_exception import FhirSenderException  # type: ignore
+from helix_fhir_client_sdk.exceptions.fhir_sender_exception import FhirSenderException
+from mockserver_client.exceptions.mock_server_json_content_mismatch_exception import (
+    MockServerJsonContentMismatchException,
+)
 from spark_pipeline_framework.utilities.FriendlySparkException import (
     FriendlySparkException,
-)
-
-from spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_json_content_mismatch_exception import (
-    MockServerJsonContentMismatchException,
 )
 
 

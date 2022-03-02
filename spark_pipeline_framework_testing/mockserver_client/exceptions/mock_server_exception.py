@@ -1,2 +1,0 @@
-class MockServerException(Exception):
-    pass

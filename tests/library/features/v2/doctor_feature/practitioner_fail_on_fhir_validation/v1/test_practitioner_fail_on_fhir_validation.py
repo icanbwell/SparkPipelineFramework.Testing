@@ -1,12 +1,9 @@
 from pathlib import Path
 
 import pytest
+from mockserver_client.mockserver_client import MockServerFriendlyClient
 from spark_pipeline_framework.logger.yarn_logger import get_logger
 from spark_pipeline_framework_testing.validators.fhir_validator import FhirValidator
-
-from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
-    MockServerFriendlyClient,
-)
 
 from library.features.doctor_feature.practitioner_fail_on_fhir_validation.v1.features_doctor_feature_practitioner_fail_on_fhir_validation_v1 import (
     FeaturesDoctorFeaturePractitionerFailOnFhirValidationV1,

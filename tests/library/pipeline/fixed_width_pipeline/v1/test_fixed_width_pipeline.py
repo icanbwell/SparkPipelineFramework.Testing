@@ -1,14 +1,11 @@
 from pathlib import Path
 
+from mockserver_client.mockserver_client import MockServerFriendlyClient
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StringType, IntegerType
 from spark_pipeline_framework.logger.yarn_logger import get_logger
 from spark_pipeline_framework.transformers.framework_fixed_width_loader.v1.framework_fixed_width_loader import (
     ColumnSpec,
-)
-
-from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
-    MockServerFriendlyClient,
 )
 
 from spark_pipeline_framework_testing.test_runner_v2 import (

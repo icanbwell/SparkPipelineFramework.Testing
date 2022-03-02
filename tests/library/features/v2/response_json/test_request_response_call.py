@@ -2,15 +2,13 @@ import json
 from pathlib import Path
 
 import requests
+from mockserver_client.mockserver_client import MockServerFriendlyClient
 from pyspark.sql import SparkSession
 from requests import Response
 from spark_pipeline_framework.logger.yarn_logger import get_logger
 
 from library.features.complex_feature.features_complex_feature import (
     FeaturesComplexFeature,
-)
-from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
-    MockServerFriendlyClient,
 )
 from spark_pipeline_framework_testing.test_classes import input_types
 from spark_pipeline_framework_testing.test_runner_v2 import (

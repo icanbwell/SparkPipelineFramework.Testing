@@ -46,6 +46,13 @@ fix_setuptools()
 
 # create the package setup
 setup(
+    install_requires=[
+        "pyspark==3.1.1",
+        "sparkpipelineframework>=1.0.10",
+        "sparkdataframecomparer>=0.1.70",
+        "deprecated>=1.2.12",
+        "helix.fhir.client.sdk>=1.0.0",
+    ],
     name=package_name,
     version=version,
     author="Imran Qureshi",

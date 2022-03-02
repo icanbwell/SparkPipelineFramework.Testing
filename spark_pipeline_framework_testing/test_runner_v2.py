@@ -6,7 +6,8 @@ from re import search
 from typing import List, Optional, Match, Dict, Any, Type, TYPE_CHECKING
 
 import pytest
-from helix_fhir_client_sdk.exceptions.fhir_sender_exception import FhirSenderException  # type: ignore
+from helix_fhir_client_sdk.exceptions.fhir_sender_exception import FhirSenderException
+from mockserver_client.mockserver_client import MockServerFriendlyClient
 from pyspark.ml import Transformer
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import StructType
@@ -19,10 +20,6 @@ from spark_pipeline_framework.utilities.FriendlySparkException import (
 )
 from spark_pipeline_framework.utilities.class_helpers import ClassHelpers
 from spark_pipeline_framework.utilities.parameter_dict import ParameterDict
-
-from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
-    MockServerFriendlyClient,
-)
 
 if TYPE_CHECKING:
     from spark_pipeline_framework_testing.test_classes.input_types import TestInputType

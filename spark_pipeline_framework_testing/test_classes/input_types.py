@@ -7,6 +7,12 @@ from os.path import isfile, join, isdir
 from pathlib import Path
 from typing import List, Optional, Dict, Union
 
+from mockserver_client.mockserver_client import (
+    MockServerFriendlyClient,
+    mock_request,
+    mock_response,
+    times,
+)
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
 from pyspark.sql.functions import trim, col
@@ -19,11 +25,6 @@ from spark_pipeline_framework.utilities.json_to_jsonl_converter import (
     convert_json_to_jsonl,
 )
 
-from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
-    request,
-    response,
-    times,
-)
 from spark_pipeline_framework_testing.tests_common.common_functions import (
     get_view_name_from_file_path,
     get_file_extension_from_file_path,
@@ -32,9 +33,6 @@ from spark_pipeline_framework_testing.tests_common.common_functions import (
 from spark_pipeline_framework_testing.tests_common.mock_requests_loader import (
     load_mock_fhir_requests_from_folder,
     load_mock_source_api_json_responses,
-)
-from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
-    MockServerFriendlyClient,
 )
 
 
@@ -480,8 +478,8 @@ class HttpJsonRequest(TestInputType):
                         "`request_result` key not found. It is supposed to contain the expected result of the requst function."
                     )
                 mock_client.expect(
-                    request(path=path, **request_parameters),
-                    response(body=json.dumps(request_result)),
+                    mock_request(path=path, **request_parameters),
+                    mock_response(body=json.dumps(request_result)),
                     timing=times(1),
                 )
                 print(f"Mocking {mock_client.base_url}{path}: {request_parameters}")
@@ -543,11 +541,11 @@ class ApiJsonResponse(TestInputType):
                 content = json.load(file)
                 path = f"{('/' + url_prefix) if url_prefix else ''}/{os.path.splitext(os.path.basename(file_path))[0]}"
                 mock_client.expect(
-                    request(
+                    mock_request(
                         method="GET",
                         path=path,
                     ),
-                    response(body=json.dumps(content)),
+                    mock_response(body=json.dumps(content)),
                     timing=times(1),
                 )
                 print(f"Mocking: GET {mock_client.base_url}{path}")
