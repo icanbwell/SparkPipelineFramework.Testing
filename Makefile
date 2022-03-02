@@ -52,6 +52,7 @@ update: down Pipfile.lock setup-pre-commit  ## Updates all the packages using Pi
 	docker-compose run --rm --name spftest_pipenv dev pipenv sync --dev && \
 	make devdocker
 
+
 .PHONY:tests
 tests:
 	docker-compose run --rm --name spftest_tests dev pytest tests library
@@ -91,3 +92,7 @@ clean_data: down ## Cleans all the local docker setup
 ifneq ($(shell docker volume ls | grep "sparkpipelineframeworktesting"| awk '{print $$2}'),)
 	docker volume ls | grep "sparkpipelineframeworktesting" | awk '{print $$2}' | xargs docker volume rm
 endif
+
+.PHONY:pipenv-setup
+pipenv-setup:devdocker ## Brings up the bash shell in dev docker
+	docker-compose run --rm --name spf_test dev pipenv-setup sync --pipfile
