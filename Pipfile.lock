@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c6e35d0b91204e1f4d4927c28afde5424d58767d1d143236afc376e8302e0e00"
+            "sha256": "b95d5dc6b8a9c37e9d6ac800cde618d55af57175fe0a79820185c68f4606a1a5"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1310,6 +1310,14 @@
             "index": "pypi",
             "version": "==4.0.1"
         },
+        "helix-mockserver-client": {
+            "hashes": [
+                "sha256:138a90ea8b50266e4ccede21c1c3eb1f58138f206e61710745fe8b985812eee4",
+                "sha256:bd09a2029bdccc7e63f696994b4daf11bb483431364b87b39d7579faae2342b6"
+            ],
+            "index": "pypi",
+            "version": "==0.0.7"
+        },
         "identify": {
             "hashes": [
                 "sha256:2986942d3974c8f2e5019a190523b0b0e2a07cb8e89bf236727fb4b26f27f8fd",
@@ -1999,7 +2007,7 @@
                 "sha256:f290617f74a610849bd8f5514e34ae3d09eafd521dceaa6cf68b3f4414266d4e",
                 "sha256:f30ddd110634c2d7534b2d4e0e22967e88366b0d356b24de87419cc4410c41b7"
             ],
-            "markers": "python_version < '3.8' and implementation_name == 'cpython'",
+            "markers": "python_version < '3.8'",
             "version": "==1.5.2"
         },
         "types-deprecated": {
@@ -2009,6 +2017,20 @@
             ],
             "index": "pypi",
             "version": "==1.2.5"
+        },
+        "types-requests": {
+            "hashes": [
+                "sha256:917d6d0a8d8fe2d084ab6dc28d379ec4e6fa34738e905908680bbfa0ce2d8485",
+                "sha256:f7e611082208358045fdeac6edb5d20422ce8cfc935d57dbbef6a6b3a59bfae2"
+            ],
+            "version": "==0.1.13"
+        },
+        "types-urllib3": {
+            "hashes": [
+                "sha256:a26898f530e6c3f43f25b907f2b884486868ffd56a9faa94cbf9b3eb6e165d6a",
+                "sha256:d755278d5ecd7a7a6479a190e54230f241f1a99c19b81518b756b19dc69e518c"
+            ],
+            "version": "==1.26.10"
         },
         "typing-extensions": {
             "hashes": [

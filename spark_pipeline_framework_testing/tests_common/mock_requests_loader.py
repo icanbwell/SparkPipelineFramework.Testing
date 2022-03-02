@@ -4,14 +4,14 @@ from glob import glob
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
-from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
+from mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
-    request,
-    response,
+    mock_request,
+    json_equals,
+    mock_response,
+    times_any,
     times,
     text_equals,
-    times_any,
-    json_equals,
 )
 
 
@@ -88,12 +88,12 @@ def mock_single_request(
         )
         payload: str = json.dumps([{"id": id_, "updated": False, "created": True}])
         mock_client.expect(
-            request(
+            mock_request(
                 method="POST",
                 path=path,
                 body=json_equals([fhir_request]),
             ),
-            response(body=payload),
+            mock_response(body=payload),
             timing=times_any(),
         )
         print(f"Mocking: POST {mock_client.base_url}{path}: {json.dumps(fhir_request)}")
@@ -106,15 +106,15 @@ def mock_single_request(
                 f"{('/' + url_prefix) if url_prefix else ''}/4_0_0/{resourceType}/{id_}"
             )
             mock_client.expect(
-                request(method="GET", path=path, querystring=query_string),
-                response(body=json.dumps(fhir_request)),
+                mock_request(method="GET", path=path, querystring=query_string),
+                mock_response(body=json.dumps(fhir_request)),
                 timing=times(1),
             )
         else:
             path = f"{('/' + url_prefix) if url_prefix else ''}/4_0_0/{relative_path}"
             mock_client.expect(
-                request(method="GET", path=path, querystring=query_string),
-                response(body=json.dumps(fhir_request)),
+                mock_request(method="GET", path=path, querystring=query_string),
+                mock_response(body=json.dumps(fhir_request)),
                 timing=times(1),
             )
 
@@ -148,11 +148,11 @@ def load_mock_fhir_everything_requests_from_folder(
             id_: str = fhir_request["id"]
             path = f"{('/' + url_prefix) if url_prefix else ''}/4_0_0/{resourceType}/{id_}/$everything"
             mock_client.expect(
-                request(
+                mock_request(
                     method="GET",
                     path=path,
                 ),
-                response(body=json.dumps(fhir_request)),
+                mock_response(body=json.dumps(fhir_request)),
                 timing=times(1),
             )
             print(f"Mocking: GET {mock_client.base_url}{path}")
@@ -202,8 +202,8 @@ def load_mock_fhir_everything_batch_requests_from_folder(
         f"{('/' + url_prefix) if url_prefix else ''}/4_0_0/{resourceType}/$everything"
     )
     mock_client.expect(
-        request(method="GET", path=path, querystring={"id": ",".join(ids)}),
-        response(body=json.dumps(result_bundle)),
+        mock_request(method="GET", path=path, querystring={"id": ",".join(ids)}),
+        mock_response(body=json.dumps(result_bundle)),
         timing=times(1),
     )
     print(f"Mocking: GET {mock_client.base_url}{path}")
@@ -238,12 +238,12 @@ def load_mock_elasticsearch_requests_from_folder(
             path = f"/{index}/_bulk"
             # noinspection SpellCheckingInspection
             mock_client.expect(
-                request(
+                mock_request(
                     method="POST",
                     path=path,
                     body=text_equals(http_request),
                 ),
-                response(
+                mock_response(
                     headers={"Content-Type": "application/json"},
                     body=f"""
 {{
@@ -296,11 +296,11 @@ def load_mock_source_api_responses_from_folder(
             content = file.read()
             path = f"{('/' + url_prefix) if url_prefix else ''}/{os.path.basename(file_path)}"
             mock_client.expect(
-                request(
+                mock_request(
                     method="GET",
                     path=path,
                 ),
-                response(body=content),
+                mock_response(body=content),
                 timing=times(1),
             )
             print(f"Mocking: GET {mock_client.base_url}{path}")
@@ -349,8 +349,8 @@ def load_mock_source_api_json_responses(
                     "`request_result` key not found. It is supposed to contain the expected result of the requst function."
                 )
             mock_client.expect(
-                request(path=path, **request_parameters),
-                response(body=json.dumps(request_result)),
+                mock_request(path=path, **request_parameters),
+                mock_response(body=json.dumps(request_result)),
                 timing=times(1),
             )
             print(f"Mocking {mock_client.base_url}{path}: {request_parameters}")

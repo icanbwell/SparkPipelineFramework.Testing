@@ -4,14 +4,11 @@ from typing import Optional, Union, List, Any, Dict
 
 import requests
 from furl import furl
+from mockserver_client.mockserver_client import MockServerFriendlyClient
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import to_json, struct
 from pyspark.sql.session import SparkSession
 from requests import Session
-
-from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
-    MockServerFriendlyClient,
-)
 
 from spark_pipeline_framework_testing.test_classes.input_types import (
     FhirCalls,

@@ -8,6 +8,17 @@ from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple, Union, Callable, TYPE_CHECKING
 
 import pytest
+from mockserver_client.exceptions.mock_server_expectation_not_found_exception import (
+    MockServerExpectationNotFoundException,
+)
+from mockserver_client.exceptions.mock_server_json_content_mismatch_exception import (
+    MockServerJsonContentMismatchException,
+)
+from mockserver_client.exceptions.mock_server_request_not_found_exception import (
+    MockServerRequestNotFoundException,
+)
+from mockserver_client.mockserver_client import MockServerFriendlyClient
+from mockserver_client.mockserver_verify_exception import MockServerVerifyException
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
 from pyspark.sql.types import StructType, DataType
@@ -20,23 +31,8 @@ from spark_data_frame_comparer.spark_data_frame_comparer_exception import (
 )
 from spark_pipeline_framework.logger.yarn_logger import Logger  # type: ignore
 
-from spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_expectation_not_found_exception import (
-    MockServerExpectationNotFoundException,
-)
-from spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_json_content_mismatch_exception import (
-    MockServerJsonContentMismatchException,
-)
-from spark_pipeline_framework_testing.mockserver_client.exceptions.mock_server_request_not_found_exception import (
-    MockServerRequestNotFoundException,
-)
-from spark_pipeline_framework_testing.mockserver_client.mockserver_client import (
-    MockServerFriendlyClient,
-)
 from spark_pipeline_framework_testing.tests_common.path_converter import (
     convert_path_from_docker,
-)
-from spark_pipeline_framework_testing.mockserver_client.mockserver_verify_exception import (
-    MockServerVerifyException,
 )
 
 if TYPE_CHECKING:
