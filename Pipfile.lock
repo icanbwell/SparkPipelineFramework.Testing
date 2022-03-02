@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b95d5dc6b8a9c37e9d6ac800cde618d55af57175fe0a79820185c68f4606a1a5"
+            "sha256": "fb3bc63f90debf317fb0e86345548ba578bc18671170ed6c35b18440dc515a97"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1312,11 +1312,11 @@
         },
         "helix-mockserver-client": {
             "hashes": [
-                "sha256:138a90ea8b50266e4ccede21c1c3eb1f58138f206e61710745fe8b985812eee4",
-                "sha256:bd09a2029bdccc7e63f696994b4daf11bb483431364b87b39d7579faae2342b6"
+                "sha256:1b2260528fa3653f6a0f5eafa5180cdcb9bbca0e1f217ad597f776d3e7973811",
+                "sha256:dd872dbc557c3906fd031250ea0e277f94ab0fea2e243cb7e103d7ec666793ab"
             ],
             "index": "pypi",
-            "version": "==0.0.7"
+            "version": "==0.0.8"
         },
         "identify": {
             "hashes": [
@@ -1961,7 +1961,7 @@
                 "sha256:cac4aeaff42f18fef6e07831c2c2689a51df76cf2ede07a6a4fa5fcb83558870",
                 "sha256:d99946c6aed3387c98b89d91fb9edff8f901bf9255901081266a84fb5604adcd"
             ],
-            "markers": "python_version >= '3.6' and python_version < '4'",
+            "markers": "python_version >= '3.6' and python_version < '4.0'",
             "version": "==0.10.0"
         },
         "tqdm": {

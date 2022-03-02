@@ -42,9 +42,14 @@ services:
       RETURN_BUNDLE: "1"
       VALIDATE_SCHEMA: "1"
       AUTH_ENABLED: "0"
+      ENABLE_GRAPHQL: "1"
+      LOGLEVEL: "DEBUG"
+      SET_INDEX_HINTS: 0
+      CREATE_INDEX_ON_COLLECTION_CREATION: 1
+      USE_TWO_STEP_SEARCH_OPTIMIZATION: "1"
     ports:
       - '3000:3000'
-    command: npm run dev
+    command: yarn start
     restart: on-failure
     healthcheck:
         test: ["CMD-SHELL", "curl --silent --fail localhost:3000/health || exit 1"]

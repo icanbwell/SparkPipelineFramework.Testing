@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import requests
 from requests import Response
@@ -19,11 +19,21 @@ class FhirCalls(FrameworkPipeline):
 
         for fhir_file in resources:
             with open(fhir_file) as f:
-                content: List[Dict[str, Any]] = json.load(f)
-            for resource in content:
-                resource_name = resource.get("resourceType")
+                content: Union[Dict[str, Any], List[Dict[str, Any]]] = json.load(f)
+            if isinstance(content, list):
+                for resource in content:
+                    resource_name = resource.get("resourceType")
+                    url = (
+                        f"{mock_server_url}/{test_name}/4_0_0/{resource_name}/1/$merge"
+                    )
+                    response: Response = requests.post(f"{url}", json=resource)
+                    assert response.ok
+                    print(">>>", response.text)
+            elif isinstance(content, dict):
+                resource_name = content.get("resourceType")
                 url = f"{mock_server_url}/{test_name}/4_0_0/{resource_name}/1/$merge"
-                response: Response = requests.post(f"{url}", json=resource)
+                response = requests.post(f"{url}", json=[content])
+                assert response.ok
                 print(">>>", response.text)
 
         self.steps = []
