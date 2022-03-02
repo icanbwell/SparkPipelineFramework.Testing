@@ -4,13 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-numpy = ">=1.19.2"
 pyspark = "==3.1.1"
-logger = ">=1.4"
 sparkpipelineframework = ">=1.0.10"
 "sparkdataframecomparer" = ">=0.1.70"
 Deprecated = ">=1.2.12"
-"helix.fhir.client.sdk" = ">=0.1.53"
+"helix.fhir.client.sdk" = ">=1.0.0"
 
 [dev-packages]
 setuptools=">=60.9.3"
@@ -37,7 +35,6 @@ sphinx-autoapi="==1.8.4"
 sphinx-rtd-theme="==0.5.2"
 myst-parser="==0.15.1"
 recommonmark="==0.7.1"
-helix-mockserver-client=">=0.0.7"
 pipenv-setup = ">=3.2.0"
 
 [requires]
