@@ -1,4 +1,4 @@
-FROM imranq2/spark-py:3.0.49
+FROM imranq2/spark-py:3.0.50
 # https://github.com/imranq2/kubernetes.spark_python
 USER root
 
@@ -20,8 +20,7 @@ COPY . /spftest
 RUN mv /opt/minimal_entrypoint.sh /opt/entrypoint.sh
 
 # run pre-commit once so it installs all the hooks and subsequent runs are fast
-# RUN pre-commit install
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+
 RUN mkdir -p /fhir && chmod 777 /fhir
 RUN mkdir -p /.local/share/virtualenvs && chmod 777 /.local/share/virtualenvs
 # USER 1001

@@ -55,7 +55,7 @@ update: down Pipfile.lock setup-pre-commit  ## Updates all the packages using Pi
 
 
 .PHONY:tests
-tests:
+tests: up
 	docker-compose run --rm --name spftest_tests dev pytest tests library
 
 .PHONY:proxies
