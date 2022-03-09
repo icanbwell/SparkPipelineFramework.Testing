@@ -255,7 +255,7 @@ class OutputFileValidator(Validator):
         related_inputs: Union[List["FileInput"], "FileInput"],
         func_path_modifier: Optional[
             Callable[[Union[Path, str]], Union[Path, str]]
-        ] = None,
+        ] = convert_path_from_docker,
         sort_output_by: Optional[List[str]] = None,
         output_as_json_only: bool = True,
         apply_schema_to_output: bool = True,
