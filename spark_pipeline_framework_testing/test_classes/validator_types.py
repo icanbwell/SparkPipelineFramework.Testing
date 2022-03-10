@@ -227,7 +227,7 @@ class MockCallValidator(Validator):
                 logger.info(warning_message)
 
             # if there is a failure then stop the test
-            if failure_message:
+            if failure_message or warning_message:
                 # want to print the warnings out here too to make it easier to see in test output
                 test_failure_message = "\nMOCKED REQUEST FAILURE:\n"
                 test_failure_message += failure_message
