@@ -51,7 +51,7 @@ setup(
         "sparkpipelineframework>=1.0.11",
         "sparkdataframecomparer>=1.0.0",
         "deprecated>=1.2.12",
-        "helix.fhir.client.sdk>=1.0.0",
+        "helix.fhir.client.sdk>=1.0.2",
     ],
     name=package_name,
     version=version,
