@@ -190,7 +190,7 @@ class FileInput(TestInputType):
         test_input_folder: str = "input",
         input_schema_folder: str = "input_schema",
         input_schema: Optional[
-            Union[StructType, Dict[str, StructType], DataType]
+            Union[StructType, Dict[str, StructType], Dict[str, DataType], DataType]
         ] = None,
         row_limit: int = 100,
         row_tag: Optional[str] = None,
@@ -229,7 +229,10 @@ class FileInput(TestInputType):
         self.input_table_names = input_table_names
 
     def ingest_input_files(
-        self, input_schema: Optional[Union[StructType, Dict[str, StructType], DataType]]
+        self,
+        input_schema: Optional[
+            Union[StructType, Dict[str, StructType], Dict[str, DataType], DataType]
+        ],
     ) -> List[str]:
         print(f"Running test in folder: {self.test_path}...")
 
@@ -284,7 +287,9 @@ class FileInput(TestInputType):
         input_file: str,
         input_folder: Path,
         input_schema_folder: Path,
-        input_schema: Optional[Union[StructType, Dict[str, StructType], DataType]],
+        input_schema: Optional[
+            Union[StructType, Dict[str, StructType], Dict[str, DataType], DataType]
+        ],
     ) -> None:
         assert self.spark_session
 

@@ -100,6 +100,7 @@ class FhirValidator(MockCallValidator):
                     )
                 full_uri: furl = furl(self.mock_server_url)
                 full_uri /= self.test_name
+                full_uri /= "4_0_0"
                 assert resource_type
                 full_uri /= resource_type
                 headers = {"Content-Type": "application/fhir+json"}
