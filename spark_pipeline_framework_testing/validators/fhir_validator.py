@@ -123,7 +123,9 @@ class FhirValidator(MockCallValidator):
                             responses = [{"issue": str(e)}]
                     else:
                         responses = []
-                    logger.info(f"Responses:{json.dumps(responses)}")
+                    logger.info(
+                        f"Request: {full_uri.url} {json_payload}, Responses:{json.dumps(responses)}"
+                    )
                 else:
                     logger.error(response.status_code, response.text)
                     assert (
