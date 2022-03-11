@@ -31,6 +31,15 @@ def test_doctor_feature_practitioner(spark_session: SparkSession) -> None:
         "mock_server_url": mock_server_url,
     }
 
+    # initialize the mock calls
+    test_fhir.initialize(
+        test_name=test_name,
+        test_path=data_dir,
+        logger=logger,
+        mock_client=mock_client,
+        spark_session=spark_session,
+    )
+
     test_validator = FhirValidator(
         related_inputs=test_fhir,
         related_file_inputs=test_input,
