@@ -85,7 +85,9 @@ class MockCallValidator(Validator):
                 "MockRequestResponseCalls",
             ]
         ],
+        fail_on_warning: bool = False,
     ) -> None:
+        self.fail_on_warning: bool = fail_on_warning
         if related_inputs:
             self.related_inputs = (
                 related_inputs if isinstance(related_inputs, list) else [related_inputs]
@@ -226,13 +228,25 @@ class MockCallValidator(Validator):
                 )
                 logger.info(warning_message)
 
+            # now try to match up unexpected requests with unmatched expectations
+            for unexpected_request in unexpected_requests:
+                for expectations_not_met_exception in expectations_not_met_exceptions:
+                    # check if the url matches.  If so then the content is different
+                    if unexpected_request.url == expectations_not_met_exception.url:
+                        warning_message += (
+                            "Content of request is different than expected for url: "
+                            f"{unexpected_request.url}"
+                        )
+
             # if there is a failure then stop the test
-            if failure_message or warning_message:
+            if failure_message or (warning_message and self.fail_on_warning):
                 # want to print the warnings out here too to make it easier to see in test output
                 test_failure_message = "\nMOCKED REQUEST FAILURE:\n"
                 test_failure_message += failure_message
                 test_failure_message += warning_message
                 pytest.fail(test_failure_message)
+            elif warning_message:
+                print(warning_message)
 
     def get_input_files(self) -> List[str]:
         if not self.related_inputs:
