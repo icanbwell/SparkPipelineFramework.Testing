@@ -198,7 +198,20 @@ class MockCallValidator(Validator):
             ]
             failure_message: str = ""
             if len(content_not_matched_exceptions) > 0:
-                failure_message += f"{len(content_not_matched_exceptions)} files did not match: \n{compare_files_text}"
+                if compare_files_text:
+                    failure_message += (
+                        f"{len(content_not_matched_exceptions)} files did not match: \n"
+                    )
+                    failure_message += f"{compare_files_text}\n"
+                else:
+                    failure_message += f"{len(content_not_matched_exceptions)} requests did not match: \n"
+                    msg = "\n".join(
+                        [
+                            f"expected: {c.expected}\nactual: {c.actual}"
+                            for c in content_not_matched_exceptions
+                        ]
+                    )
+                    failure_message += f"{msg}\n"
             expectations_not_met_exceptions: List[
                 MockServerExpectationNotFoundException
             ] = [
