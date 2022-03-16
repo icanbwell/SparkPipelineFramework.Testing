@@ -114,6 +114,9 @@ class MockCallValidator(Validator):
             )
         except MockServerVerifyException as e:
             compare_files: List[str] = []
+            existing_resource_folders: List[str] = [
+                f.name for f in list(os.scandir(data_folder_path)) if f.is_dir()
+            ]
             for exception in e.exceptions:
                 if isinstance(exception, MockServerJsonContentMismatchException):
                     expected_path = exception.expected_file_path
@@ -166,15 +169,33 @@ class MockCallValidator(Validator):
                             resource_path: Path = data_folder_path.joinpath(
                                 f"{resource_type_folder_name}"
                             )
-                            os.makedirs(resource_path, exist_ok=True)
-                            resource_file_path: Path = resource_path.joinpath(
-                                f"{resource_id}.json"
-                            )
-                            with open(resource_file_path, "w") as file:
-                                file.write(json.dumps(resource_obj, indent=2))
-                            logger.info(
-                                f"Writing http calls file to : {resource_file_path}"
-                            )
+                            # if folder does not exist or is empty then write out the files
+                            if (
+                                resource_type_folder_name
+                                not in existing_resource_folders
+                            ):
+                                os.makedirs(resource_path, exist_ok=True)
+                                resource_file_path: Path = resource_path.joinpath(
+                                    f"{resource_id}.json"
+                                )
+                                # check if file already exists
+                                if os.path.exists(resource_file_path):
+                                    # # see if the content matches
+                                    # with open(resource_file_path, "r") as file:
+                                    #     file_json: Dict[str, Any] = json.loads(file.read())
+                                    # check if file with .1, .2 etc. exists
+                                    for index in range(1, 10):
+                                        resource_file_path = resource_path.joinpath(
+                                            f"{resource_id}.{index}.json"
+                                        )
+                                        if not os.path.exists(resource_file_path):
+                                            break
+                                # write the output to disk
+                                with open(resource_file_path, "w") as file:
+                                    file.write(json.dumps(resource_obj, indent=2))
+                                logger.info(
+                                    f"Writing http calls file to : {resource_file_path}"
+                                )
                         else:
                             logger.info(
                                 f"a non standard fhir request was expected and not found. {resource_obj}"
