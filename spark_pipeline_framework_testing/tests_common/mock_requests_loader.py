@@ -9,7 +9,6 @@ from mockserver_client.mockserver_client import (
     mock_request,
     json_equals,
     mock_response,
-    times_any,
     times,
     text_equals,
 )
@@ -94,7 +93,7 @@ def mock_single_request(
                 body=json_equals([fhir_request]),
             ),
             mock_response(body=payload),
-            timing=times_any(),
+            timing=times(1),
         )
         print(f"Mocking: POST {mock_client.base_url}{path}: {json.dumps(fhir_request)}")
     else:
