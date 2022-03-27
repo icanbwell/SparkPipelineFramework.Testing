@@ -17,6 +17,8 @@ from mockserver_client.exceptions.mock_server_json_content_mismatch_exception im
 from mockserver_client.exceptions.mock_server_request_not_found_exception import (
     MockServerRequestNotFoundException,
 )
+from mockserver_client.mock_expectation import MockExpectation
+from mockserver_client.mock_request import MockRequest
 from mockserver_client.mockserver_client import MockServerFriendlyClient
 from mockserver_client.mockserver_verify_exception import MockServerVerifyException
 from pyspark.sql import SparkSession, DataFrame
@@ -137,7 +139,9 @@ class MockCallValidator(Validator):
                             "actual_http_calls"
                         ).joinpath(expected_file_name)
                         with open(result_path, "w") as file_result:
-                            file_result.write(json.dumps(exception.actual, indent=2))
+                            file_result.write(
+                                json.dumps(exception.actual_json, indent=2)
+                            )
                         with open(compare_sh_path, "w") as compare_sh:
                             compare_sh.write(
                                 f"/usr/local/bin/charm diff "
@@ -228,7 +232,7 @@ class MockCallValidator(Validator):
                     failure_message += f"{len(content_not_matched_exceptions)} requests did not match: \n"
                     msg = "\n".join(
                         [
-                            f"expected: {c.expected}\nactual: {c.actual}"
+                            f"expected: {c.expected_json}\nactual: {c.actual_json}"
                             for c in content_not_matched_exceptions
                         ]
                     )
@@ -244,7 +248,9 @@ class MockCallValidator(Validator):
                 failure_message += "\nThese requests were expected but not made:\n-----------------------\n"
                 failure_message += "\n".join(
                     [
-                        f"url: {c.url} \nquery params: {c.querystring_params} \njson: {c.json}\n-----------------------\n"
+                        "\n-----------------------\n"
+                        + str(c)
+                        + "\n-----------------------\n"
                         for c in expectations_not_met_exceptions
                     ]
                 )
@@ -278,6 +284,22 @@ class MockCallValidator(Validator):
                 test_failure_message = "\nMOCKED REQUEST FAILURE:\n"
                 test_failure_message += failure_message
                 test_failure_message += warning_message
+                all_requests: List[MockRequest] = mock_client.retrieve_requests()
+                all_expectations: List[MockExpectation] = mock_client.expectations
+                logger.info("\n ---- ALL EXPECTATIONS -------\n")
+                for expectation in all_expectations:
+                    logger.info(
+                        "\n-----------------------\n"
+                        + str(expectation.request)
+                        + "\n-----------------------\n"
+                    )
+                logger.info("\n ---- ALL REQUESTS -------\n")
+                for request in all_requests:
+                    logger.info(
+                        "\n-----------------------\n"
+                        + str(request)
+                        + "\n-----------------------\n"
+                    )
                 pytest.fail(test_failure_message)
             elif warning_message:
                 print(warning_message)

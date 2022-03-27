@@ -39,7 +39,9 @@ def handle_fhir_sender_exception(
     # write actual to result_path
     result_path: Path = temp_folder.joinpath(expected_file_name)
     with open(result_path, "w") as file_result:
-        file_result.write(json.dumps(json_content_mismatch_exception.actual, indent=2))
+        file_result.write(
+            json.dumps(json_content_mismatch_exception.actual_json, indent=2)
+        )
     with open(compare_sh_path, "w") as compare_sh:
         compare_sh.write(
             f"/usr/local/bin/charm diff "
