@@ -1,5 +1,5 @@
-FROM imranq2/spark-py:3.0.54
-# https://github.com/imranq2/kubernetes.spark_python
+FROM imranq2/helix.spark:3.1.2.8-slim
+# https://github.com/icanbwell/helix.spark
 USER root
 
 ENV PYTHONPATH=/spftest
@@ -9,7 +9,7 @@ COPY Pipfile* /spftest/
 WORKDIR /spftest
 
 RUN df -h # for space monitoring
-RUN pipenv sync --dev --system
+RUN pipenv sync --dev --system --verbose
 
 # COPY ./jars/* /opt/bitnami/spark/jars/
 # COPY ./conf/* /opt/bitnami/spark/conf/
