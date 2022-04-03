@@ -7,16 +7,17 @@ services:
       context: .
     volumes:
       - ./:/spftest/
+      - ~/.local/share/virtualenvs:/root/.local/share/virtualenvs:rw
     container_name: spftest_dev
     working_dir: /spftest
 
   mock-server:
     image: jamesdbloom/mockserver:mockserver-5.12.0
-    command: -logLevel DEBUG -serverPort 1080
+    command: -logLevel INFO -serverPort 1080
     ports:
       - '1080:1080'
     environment:
-      - LOG_LEVEL=DEBUG
+      - LOG_LEVEL=INFO
       - MOCKSERVER_LIVENESS_HTTP_GET_PATH=/health
 
   fhir:
