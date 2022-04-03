@@ -12,7 +12,7 @@ PACKAGES_FOLDER=/usr/local/lib/python3.7/dist-packages
 SPF_BASE=${PACKAGES_FOLDER}
 
 Pipfile.lock: Pipfile
-	docker-compose run --rm --name spftest_pip dev sh -c "rm -f Pipfile.lock && pipenv lock --dev --clear --verbose"
+	docker-compose run --rm --name spftest_pip dev sh -c "rm -f Pipfile.lock && pipenv lock --dev --verbose"
 
 .PHONY:devdocker
 devdocker: ## Builds the docker for dev
