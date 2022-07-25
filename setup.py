@@ -49,8 +49,8 @@ setup(
     install_requires=[
         "pyspark>=3.1.1",
         "protobuf==3.20.*",
-        "sparkpipelineframework>=1.0.25.a1",
-        "sparkdataframecomparer>=1.0.5.a2",
+        "sparkpipelineframework==1.0.25.a1",
+        "sparkdataframecomparer==1.0.5.a2",
         "deprecated>=1.2.12",
         "helix.fhir.client.sdk>=1.0.2",
         "helix-mockserver-client>=0.1.3",
