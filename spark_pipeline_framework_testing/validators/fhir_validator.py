@@ -158,9 +158,10 @@ class FhirValidator(MockCallValidator):
         validation_response = http.post(
             url=full_uri.url, data=json_payload_bytes, headers=headers
         )
+
         assert (
             validation_response.ok
-        ), f"Failed validation for resource: {json_payload}: {validation_response.json()}"
+        ), f"Failed validation for resource: {json_payload}: {validation_response.json() if 'json' in validation_response.headers['content-type'] else validation_response}"
 
         validation_json = validation_response.json()
         issues = [d for d in validation_json["issue"] if d["severity"] == "error"]
