@@ -177,8 +177,6 @@ class MockRequestResponseCalls(TestInputType):
             url_suffix=self.url_suffix,
         )
 
-        self.mock_client.expect_default()
-
 
 class FileInput(TestInputType):
     """
