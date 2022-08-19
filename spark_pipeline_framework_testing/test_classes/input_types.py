@@ -408,11 +408,13 @@ class HttpJsonRequest(TestInputType):
         self,
         response_data_folder: str = "request_json_calls",
         mock_url_prefix: Optional[str] = None,
+        add_file_name_to_request: bool = True,
     ) -> None:
         super().__init__()
         self.response_data_folder = response_data_folder
         self.test_path: Path
         self.url_prefix = mock_url_prefix
+        self.add_file_name_to_request = add_file_name_to_request
 
     def initialize(
         self,
@@ -433,7 +435,7 @@ class HttpJsonRequest(TestInputType):
             folder=response_data_path,
             mock_client=mock_client,
             url_prefix=self.url_prefix,
-            add_file_name=True,
+            add_file_name=self.add_file_name_to_request,
         )
 
     @staticmethod
@@ -486,70 +488,4 @@ class HttpJsonRequest(TestInputType):
                     timing=times(1),
                 )
                 print(f"Mocking {mock_client.base_url}{path}: {request_parameters}")
-        return files
-
-
-class ApiJsonResponse(TestInputType):
-    """
-    Mock responses for all files from the folder and its sub-folders
-    """
-
-    def __init__(
-        self,
-        response_data_folder: str = "source_api_calls",
-        mock_url_prefix: Optional[str] = None,
-    ) -> None:
-        super().__init__()
-        self.input_folder_name = response_data_folder
-        self.url_prefix = mock_url_prefix
-
-    def initialize(
-        self,
-        test_name: str,
-        test_path: Path,
-        logger: Logger,
-        mock_client: Optional[MockServerFriendlyClient] = None,
-        spark_session: Optional[SparkSession] = None,
-    ) -> None:
-        assert mock_client
-        if self.url_prefix is None:
-            self.url_prefix = test_name
-        expected_input_path = test_path.joinpath(self.input_folder_name)
-        self.raise_if_not_exist(expected_input_path)
-        self.load_mock_source_api_responses_from_folder(
-            folder=expected_input_path,
-            mock_client=mock_client,
-            url_prefix=self.url_prefix,
-        )
-
-    @staticmethod
-    def load_mock_source_api_responses_from_folder(
-        folder: Path, mock_client: MockServerFriendlyClient, url_prefix: Optional[str]
-    ) -> List[str]:
-        """
-        Mock responses for all files from the folder and its sub-folders
-
-        from https://pypi.org/project/mockserver-friendly-client/
-
-        :param folder: where to look for files (recursively)
-        :param mock_client:
-        :param url_prefix:
-        """
-        file_path: str
-        files: List[str] = sorted(
-            glob.glob(str(folder.joinpath("**/*")), recursive=True)
-        )
-        for file_path in files:
-            with open(file_path, "r") as file:
-                content = json.load(file)
-                path = f"{('/' + url_prefix) if url_prefix else ''}/{os.path.splitext(os.path.basename(file_path))[0]}"
-                mock_client.expect(
-                    mock_request(
-                        method="GET",
-                        path=path,
-                    ),
-                    mock_response(body=json.dumps(content)),
-                    timing=times(1),
-                )
-                print(f"Mocking: GET {mock_client.base_url}{path}")
         return files

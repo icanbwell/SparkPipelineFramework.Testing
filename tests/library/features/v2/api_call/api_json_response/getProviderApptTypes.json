@@ -1,25 +1,30 @@
-[
+{
+  "request_parameters": {
+    "method": "GET"
+  },
+  "request_result": [
     {
-        "appointment_types": [
-            "NEW",
-            "EV4",
-            "RET",
-            "ERN",
-            "C1A"
-        ],
-        "npi": "1790914448",
-        "alias": "TT4-GPPC",
-        "dept": "PrimaryCare"
+      "appointment_types": [
+        "NEW",
+        "EV4",
+        "RET",
+        "ERN",
+        "C1A"
+      ],
+      "npi": "1790914448",
+      "alias": "TT4-GPPC",
+      "dept": "PrimaryCare"
     },
     {
-        "appointment_types": [
-            "NEW",
-            "EV4",
-            "RET",
-            "ERN"
-        ],
-        "npi": "1629334859",
-        "alias": "TT3-GPPC",
-        "dept": "PrimaryCare"
+      "appointment_types": [
+        "NEW",
+        "EV4",
+        "RET",
+        "ERN"
+      ],
+      "npi": "1629334859",
+      "alias": "TT3-GPPC",
+      "dept": "PrimaryCare"
     }
-]
+  ]
+}
