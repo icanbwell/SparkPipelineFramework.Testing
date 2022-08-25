@@ -1,4 +1,3 @@
-import glob
 import json
 import os
 from abc import ABC, abstractmethod
@@ -9,9 +8,6 @@ from typing import List, Optional, Dict, Union
 
 from mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
-    mock_request,
-    mock_response,
-    times,
 )
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.catalog import Table
@@ -62,6 +58,7 @@ class TestInputType(ABC):
 class FhirCalls(TestInputType):
     """
     This class mocks and/or validates calls to a Fhir Server
+
     https://www.hl7.org/fhir/summary.html#:~:text=FHIR%C2%AE%20%E2%80%93%20Fast%20Healthcare%20Interoperability,a%20tight%20focus%20on%20implementability.
     """
 
@@ -115,67 +112,6 @@ class FhirCalls(TestInputType):
         )
 
         self.mock_client.expect_default()
-
-
-class MockRequestResponseCalls(TestInputType):
-    """
-    Mock fhir requests and responses
-    """
-
-    def __init__(
-        self,
-        fhir_calls_folder: str,
-        fhir_validation_url: str = "http://fhir:3000/4_0_0",
-        mock_url_prefix: Optional[str] = None,
-        add_file_name_to_request: Optional[bool] = False,
-        url_suffix: Optional[str] = None,
-    ) -> None:
-        super().__init__()
-        self.fhir_calls_folder = fhir_calls_folder
-        self.fhir_validation_url = fhir_validation_url
-        self.url_prefix = mock_url_prefix
-        self.add_file_name_to_request = add_file_name_to_request
-        self.url_suffix = url_suffix
-
-        self.test_name: str
-        self.test_path: Path
-        self.mock_client: MockServerFriendlyClient
-        self.spark_session: SparkSession
-        self.temp_folder_path: Path
-        self.mocked_files: Optional[
-            List[str]
-        ] = []  # list of files that are used in mocking
-
-    def initialize(
-        self,
-        test_name: str,
-        test_path: Path,
-        logger: Logger,
-        mock_client: Optional[MockServerFriendlyClient] = None,
-        spark_session: Optional[SparkSession] = None,
-    ) -> None:
-        assert mock_client
-        assert spark_session
-        self.test_name = test_name
-        self.test_path = test_path
-        self.logger = logger
-        self.mock_client = mock_client
-        self.spark_session = spark_session
-        self.temp_folder_path = test_path.joinpath(self.test_path)
-        if self.url_prefix is None:
-            self.url_prefix = test_name
-        fhir_calls_path: Path = self.test_path.joinpath(self.fhir_calls_folder)
-        self.raise_if_not_exist(fhir_calls_path)
-        self._run_mocked_fhir_test()
-
-    def _run_mocked_fhir_test(self) -> None:
-        self.mocked_files = load_mock_source_api_json_responses(
-            folder=self.test_path.joinpath(self.fhir_calls_folder),
-            mock_client=self.mock_client,
-            add_file_name=self.add_file_name_to_request,
-            url_prefix=self.url_prefix,
-            url_suffix=self.url_suffix,
-        )
 
 
 class FileInput(TestInputType):
@@ -431,61 +367,53 @@ class HttpJsonRequest(TestInputType):
             self.url_prefix = test_name
         response_data_path = self.test_path.joinpath(self.response_data_folder)
         self.raise_if_not_exist(response_data_path)
-        self.load_mock_http_json_request(
+        load_mock_source_api_json_responses(
             folder=response_data_path,
             mock_client=mock_client,
             url_prefix=self.url_prefix,
             add_file_name=self.add_file_name_to_request,
         )
 
-    @staticmethod
-    def load_mock_http_json_request(
-        folder: Path,
-        mock_client: MockServerFriendlyClient,
-        url_prefix: Optional[str],
-        add_file_name: bool = False,
-    ) -> List[str]:
-        """
-        Mock responses for all files from the folder and its sub-folders
 
-        :param folder: where to look for files (recursively)
-        :param mock_client:
-        :param url_prefix: http://{mock_server_url}/{url_prefix}...
-        :param add_file_name: http://{mock_server_url}/{url_prefix}/{add_file_name}...
+class MockFhirRequest(TestInputType):
+    def __init__(
+        self,
+        fhir_calls_folder: str,
+        fhir_resource_type: Optional[str] = None,
+        fhir_endpoint: Optional[str] = None,
+    ) -> None:
         """
-        file_path: str
-        files: List[str] = sorted(
-            glob.glob(str(folder.joinpath("**/*.json")), recursive=True)
+        :param fhir_calls_folder: the folder name with the requests to mock
+        :param fhir_resource_type: the fhir resource name being mocked. generally used when mocking a GET request for a single fhir resource
+        :param fhir_endpoint: set this when doing a request such as $graph
+        """
+        super().__init__()
+        self.fhir_calls_folder = fhir_calls_folder
+        self.test_path: Path
+        self.fhir_resource_type = fhir_resource_type
+        self.fhir_endpoint = fhir_endpoint
+        self.mocked_files: Optional[
+            List[str]
+        ] = []  # list of files that are used in mocking
+
+    def initialize(
+        self,
+        test_name: str,
+        test_path: Path,
+        logger: Logger,
+        mock_client: Optional[MockServerFriendlyClient] = None,
+        spark_session: Optional[SparkSession] = None,
+    ) -> None:
+        assert mock_client
+        url_prefix = f"{test_name}/4_0_0"
+        if self.fhir_resource_type:
+            url_prefix = f"{url_prefix}/{self.fhir_resource_type}"
+        response_data_path = test_path.joinpath(self.fhir_calls_folder)
+        self.raise_if_not_exist(response_data_path)
+        self.mocked_files = load_mock_source_api_json_responses(
+            folder=response_data_path,
+            mock_client=mock_client,
+            url_prefix=url_prefix,
+            add_file_name=True,
+            url_suffix=self.fhir_endpoint,
         )
-        for file_path in files:
-            file_name = os.path.basename(file_path)
-            with open(file_path, "r") as file:
-                content = json.loads(file.read())
-
-                try:
-                    request_parameters = content["request_parameters"]
-                except ValueError:
-                    raise Exception(
-                        "`request_parameters` key not found! It is supposed to contain parameters of the request function."
-                    )
-
-                path = f"{('/' + url_prefix) if url_prefix else ''}"
-                path = (
-                    f"{path}/{os.path.splitext(file_name)[0]}"
-                    if add_file_name
-                    else path
-                )
-
-                try:
-                    request_result = content["request_result"]
-                except ValueError:
-                    raise Exception(
-                        "`request_result` key not found. It is supposed to contain the expected result of the requst function."
-                    )
-                mock_client.expect(
-                    mock_request(path=path, **request_parameters),
-                    mock_response(body=json.dumps(request_result)),
-                    timing=times(1),
-                )
-                print(f"Mocking {mock_client.base_url}{path}: {request_parameters}")
-        return files
