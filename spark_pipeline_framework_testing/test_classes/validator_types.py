@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     from spark_pipeline_framework_testing.test_classes.input_types import (
         FhirCalls,
         FileInput,
-        MockRequestResponseCalls,
+        MockFhirRequest,
     )
 from spark_pipeline_framework_testing.testing_exception import (
     SparkPipelineFrameworkTestingException,
@@ -83,8 +83,8 @@ class MockCallValidator(Validator):
             Union[
                 List["FhirCalls"],
                 "FhirCalls",
-                List["MockRequestResponseCalls"],
-                "MockRequestResponseCalls",
+                List["MockFhirRequest"],
+                "MockFhirRequest",
             ]
         ],
         fail_on_warning: bool = False,
@@ -106,7 +106,7 @@ class MockCallValidator(Validator):
     ) -> None:
         assert MockServerFriendlyClient
         assert mock_client
-        # self.logger = logger
+        # why cant we just provide the path to the validator init if it just needs the path to the directory?
         data_folder_path: Path = test_path.joinpath(
             self.related_inputs[0].fhir_calls_folder
         )
@@ -308,7 +308,8 @@ class MockCallValidator(Validator):
         if not self.related_inputs:
             return []
         all_files: List[str] = []
-        related_input: Union["FhirCalls", "MockRequestResponseCalls"]
+        related_input: Union["FhirCalls", "MockFhirRequest"]
+        # why use related_inputs when we just need the path to the directories?
         for related_input in self.related_inputs:
             if related_input:
                 all_files.extend(related_input.mocked_files)  # type: ignore

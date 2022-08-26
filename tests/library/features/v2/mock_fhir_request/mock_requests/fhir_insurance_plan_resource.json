@@ -1,0 +1,80 @@
+{
+  "request_parameters": {
+    "method": "GET"
+  },
+  "request_result": {
+    "entry": [
+      {
+        "resource": {
+          "resourceType": "InsurancePlan",
+          "id": "fhir_insurance_plan_resource",
+          "meta": {
+            "versionId": "43",
+            "lastUpdated": "2022-05-25T15:42:44.000Z",
+            "source": "http://medstarhealth.org/insurance",
+            "security": [
+              {
+                "system": "https://www.icanbwell.com/access",
+                "code": "medstar"
+              },
+              {
+                "system": "https://www.icanbwell.com/owner",
+                "code": "medstar"
+              }
+            ]
+          },
+          "name": "AETNA-Aetna Better Health of Maryland",
+          "ownedBy": {
+            "reference": "Organization/AETNA"
+          },
+          "plan": [
+            {
+              "identifier": [
+                {
+                  "type": {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                        "code": "XV",
+                        "display": "Health Plan"
+                      }
+                    ]
+                  },
+                  "value": "Aetna Better Health of Maryland"
+                }
+              ]
+            },
+            {
+              "identifier": [
+                {
+                  "type": {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                        "code": "XV",
+                        "display": "Health Plan"
+                      }
+                    ]
+                  },
+                  "value": "Aetna Better Health of Maryland"
+                }
+              ],
+              "coverageArea": [
+                {
+                  "reference": "Location/MD"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "resourceType": "Bundle",
+    "type": "searchset",
+    "timestamp": "2022-08-10T03:52:11.1111Z",
+    "total": 0
+  }
+}
+
+
+  
