@@ -41,7 +41,9 @@ def test_mock_fhir_request_with_validation(spark_session: SparkSession) -> None:
     )
 
 
-def test_mock_request_validator_without_mock_requests_folder(spark_session: SparkSession) -> None:
+def test_mock_request_validator_without_mock_requests_folder(
+    spark_session: SparkSession,
+) -> None:
     test_path: Path = Path(__file__).parent.joinpath("./")
     test_name = "test_mock_fhir_request"
 
@@ -59,7 +61,7 @@ def test_mock_request_validator_without_mock_requests_folder(spark_session: Spar
     )
     requests.get(
         f"{mock_server_url}/{test_name}/4_0_0/InsurancePlan/fhir_insurance_plan_resource"
-    )   
+    )
     mock_call_validator = MockRequestValidator()
     mock_call_validator.validate(
         test_name=test_name,

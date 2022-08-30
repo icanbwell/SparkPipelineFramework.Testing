@@ -347,9 +347,7 @@ class MockRequestValidator(Validator):
         assert mock_client
         data_folder_path: Optional[Path] = None
         if self.mock_requests_folder:
-            data_folder_path = test_path.joinpath(
-                self.mock_requests_folder
-            )
+            data_folder_path = test_path.joinpath(self.mock_requests_folder)
         try:
             mock_client.verify_expectations(
                 test_name=test_name, files=self.get_input_files(data_folder_path)
@@ -391,7 +389,12 @@ class MockRequestValidator(Validator):
                             os.fchmod(compare_sh.fileno(), 0o7777)
                         compare_files.append(str(compare_sh_path))
                 elif isinstance(exception, MockServerRequestNotFoundException):
-                    # write to file
+                    # attempts to write the body of the request (exception.json_dict) to a file with id as the name
+                    # if the following conditions are met:
+                    # 1. the body of the request (exception.json_dict) is a FHIR resource
+                    # 2. the data_folder_path is set
+                    # 3. there is not an existing subfolder of data_folder_path with the name of the
+                    # resource converted to camel case
                     resource_obj: Optional[Dict[str, Any]] = (
                         (
                             exception.json_dict[0]
@@ -401,7 +404,7 @@ class MockRequestValidator(Validator):
                         if isinstance(exception.json_dict, list)
                         else exception.json_dict
                     )
-                    if resource_obj:
+                    if resource_obj and data_folder_path:
                         # assert "resourceType" in resource_obj, resource_obj
                         resource_type = resource_obj.get("resourceType", None)
                         if resource_type:
