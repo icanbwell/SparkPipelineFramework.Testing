@@ -31,6 +31,7 @@ class FhirCalls(FrameworkPipeline):
                     print(">>>", response.text)
             elif isinstance(content, dict):
                 resource_name = content.get("resourceType")
+                # content["meta"]["source"] = "foo"
                 url = f"{mock_server_url}/{test_name}/4_0_0/{resource_name}/1/$merge"
                 response = requests.post(f"{url}", json=[content])
                 assert response.ok

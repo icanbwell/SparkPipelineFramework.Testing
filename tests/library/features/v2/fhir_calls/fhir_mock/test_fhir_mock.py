@@ -9,7 +9,7 @@ from library.pipeline.fhir_calls.fhir_mock.v1.pipeline_fhir_calls_fhir_mock_v1 i
 )
 from spark_pipeline_framework_testing.test_classes.input_types import FhirCalls
 from spark_pipeline_framework_testing.test_classes.validator_types import (
-    MockCallValidator,
+    MockRequestValidator,
 )
 from spark_pipeline_framework_testing.test_runner_v2 import (
     SparkPipelineFrameworkTestRunnerV2,
@@ -26,7 +26,8 @@ def test_fhir_mock(spark_session: SparkSession) -> None:
     mock_client.clear(f"/{test_name}/")
 
     fhir_calls = FhirCalls()
-    test_validators = MockCallValidator(related_inputs=fhir_calls)
+    test_validators = MockRequestValidator(mock_requests_folder="fhir_calls")
+
     params = {
         "test_name": test_name,
         "mock_server_url": mock_server_url,

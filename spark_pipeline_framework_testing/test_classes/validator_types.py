@@ -1,4 +1,4 @@
-import glob
+from glob import glob
 import json
 import os
 from abc import ABC, abstractmethod
@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple, Union, Callable, TYPE_CHECKING
 
 import pytest
+from deprecated import deprecated
 from mockserver_client.exceptions.mock_server_expectation_not_found_exception import (
     MockServerExpectationNotFoundException,
 )
@@ -72,6 +73,7 @@ class Validator(ABC):
         pass
 
 
+@deprecated("This function is deprecated. Use MockRequestValidator instead")
 class MockCallValidator(Validator):
     """
     validates Mock calls
@@ -314,6 +316,241 @@ class MockCallValidator(Validator):
             if related_input:
                 all_files.extend(related_input.mocked_files)  # type: ignore
         return all_files
+
+
+class MockRequestValidator(Validator):
+    def __init__(
+        self,
+        mock_requests_folder: Optional[str] = None,
+        fail_on_warning: bool = False,
+    ) -> None:
+        """
+        Validates all mocked requests on the mock server. Only one of these is needed per test it will validate all
+        expectations on the mock server.
+
+        :param mock_requests_folder: name of the folder where the mock request files are. if set the files in the folder will have their contents compared to the actual request and a diff will be generated
+        :param fail_on_warning: if true the test will fail if there are warnings, an example is a request for which there is no expectation
+        """
+        self.fail_on_warning: bool = fail_on_warning
+        self.mock_requests_folder = mock_requests_folder
+
+    def validate(
+        self,
+        test_name: str,
+        test_path: Path,
+        spark_session: SparkSession,
+        temp_folder_path: Path,
+        logger: Logger,
+        mock_client: Optional[MockServerFriendlyClient] = None,
+    ) -> None:
+        assert MockServerFriendlyClient
+        assert mock_client
+        data_folder_path: Optional[Path] = None
+        if self.mock_requests_folder:
+            data_folder_path = test_path.joinpath(
+                self.mock_requests_folder
+            )
+        try:
+            mock_client.verify_expectations(
+                test_name=test_name, files=self.get_input_files(data_folder_path)
+            )
+        except MockServerVerifyException as e:
+            compare_files: List[str] = []
+            existing_resource_folders: List[str] = [
+                f.name for f in list(os.scandir(data_folder_path)) if f.is_dir()
+            ]
+            for exception in e.exceptions:
+                if isinstance(exception, MockServerJsonContentMismatchException):
+                    expected_path = exception.expected_file_path
+                    if len(expected_path.parts) > 0:
+                        expected_file_name: str = os.path.basename(expected_path)
+                        # create a temp file to launch the diff tool
+                        # use .command:
+                        # https://stackoverflow.com/questions/5125907/how-to-run-a-shell-script-in-os-x-by-double-clicking
+                        compare_sh_path = temp_folder_path.joinpath(
+                            f"compare_http_{expected_file_name}.command"
+                        )
+                        # write actual to result_path
+                        os.makedirs(
+                            temp_folder_path.joinpath("actual_http_calls"),
+                            exist_ok=True,
+                        )
+                        result_path: Path = temp_folder_path.joinpath(
+                            "actual_http_calls"
+                        ).joinpath(expected_file_name)
+                        with open(result_path, "w") as file_result:
+                            file_result.write(
+                                json.dumps(exception.actual_json, indent=2)
+                            )
+                        with open(compare_sh_path, "w") as compare_sh:
+                            compare_sh.write(
+                                f"/usr/local/bin/charm diff "
+                                f"{convert_path_from_docker(result_path) if convert_path_from_docker else result_path} "
+                                f"{convert_path_from_docker(expected_path) if convert_path_from_docker else expected_path}"
+                            )
+                            os.fchmod(compare_sh.fileno(), 0o7777)
+                        compare_files.append(str(compare_sh_path))
+                elif isinstance(exception, MockServerRequestNotFoundException):
+                    # write to file
+                    resource_obj: Optional[Dict[str, Any]] = (
+                        (
+                            exception.json_dict[0]
+                            if len(exception.json_dict) > 0
+                            else None
+                        )
+                        if isinstance(exception.json_dict, list)
+                        else exception.json_dict
+                    )
+                    if resource_obj:
+                        # assert "resourceType" in resource_obj, resource_obj
+                        resource_type = resource_obj.get("resourceType", None)
+                        if resource_type:
+                            assert "id" in resource_obj, resource_obj
+                            resource_id = resource_obj["id"]
+                            resource_type_folder_name: str = camel_case_to_snake_case(
+                                resource_type
+                            )
+                            resource_path: Path = data_folder_path.joinpath(
+                                f"{resource_type_folder_name}"
+                            )
+                            # if folder does not exist or is empty then write out the files
+                            if (
+                                resource_type_folder_name
+                                not in existing_resource_folders
+                            ):
+                                os.makedirs(resource_path, exist_ok=True)
+                                resource_file_path: Path = resource_path.joinpath(
+                                    f"{resource_id}.json"
+                                )
+                                # check if file already exists
+                                if os.path.exists(resource_file_path):
+                                    # # see if the content matches
+                                    # with open(resource_file_path, "r") as file:
+                                    #     file_json: Dict[str, Any] = json.loads(file.read())
+                                    # check if file with .1, .2 etc. exists
+                                    for index in range(1, 10):
+                                        resource_file_path = resource_path.joinpath(
+                                            f"{resource_id}.{index}.json"
+                                        )
+                                        if not os.path.exists(resource_file_path):
+                                            break
+                                # write the output to disk
+                                with open(resource_file_path, "w") as file:
+                                    file.write(json.dumps(resource_obj, indent=2))
+                                logger.info(
+                                    f"Writing http calls file to : {resource_file_path}"
+                                )
+                        else:
+                            logger.info(
+                                f"a non standard fhir request was expected and not found. {resource_obj}"
+                            )
+                elif isinstance(exception, MockServerExpectationNotFoundException):
+                    # add to error
+                    pass
+                else:
+                    raise Exception(f"unknown exception type: {type(exception)}")
+            for c in compare_files:
+                logger.info(c)
+            compare_files_text: str = "\n".join(
+                [str(convert_path_from_docker(c)) for c in compare_files]
+            )
+            content_not_matched_exceptions: List[
+                MockServerJsonContentMismatchException
+            ] = [
+                c
+                for c in e.exceptions
+                if isinstance(c, MockServerJsonContentMismatchException)
+            ]
+            failure_message: str = ""
+            if len(content_not_matched_exceptions) > 0:
+                if compare_files_text:
+                    failure_message += (
+                        f"{len(content_not_matched_exceptions)} files did not match: \n"
+                    )
+                    failure_message += f"{compare_files_text}\n"
+                else:
+                    failure_message += f"{len(content_not_matched_exceptions)} requests did not match: \n"
+                    msg = "\n".join(
+                        [
+                            f"expected: {c.expected_json}\nactual: {c.actual_json}"
+                            for c in content_not_matched_exceptions
+                        ]
+                    )
+                    failure_message += f"{msg}\n"
+            expectations_not_met_exceptions: List[
+                MockServerExpectationNotFoundException
+            ] = [
+                c
+                for c in e.exceptions
+                if isinstance(c, MockServerExpectationNotFoundException)
+            ]
+            if len(expectations_not_met_exceptions) > 0:
+                failure_message += "\nThese requests were expected but not made:\n-----------------------\n"
+                failure_message += "\n".join(
+                    [
+                        "\n-----------------------\n"
+                        + str(c)
+                        + "\n-----------------------\n"
+                        for c in expectations_not_met_exceptions
+                    ]
+                )
+
+            unexpected_requests: List[MockServerRequestNotFoundException] = [
+                c
+                for c in e.exceptions
+                if isinstance(c, MockServerRequestNotFoundException)
+            ]
+            warning_message = ""
+            if len(unexpected_requests) > 0:
+                warning_message += "\nUnexpected requests:\n"
+                warning_message += "\n".join(
+                    [f"{c.url}: {c.json_dict}" for c in unexpected_requests]
+                )
+                logger.info(warning_message)
+
+            # now try to match up unexpected requests with unmatched expectations
+            for unexpected_request in unexpected_requests:
+                for expectations_not_met_exception in expectations_not_met_exceptions:
+                    # check if the url matches.  If so then the content is different
+                    if unexpected_request.url == expectations_not_met_exception.url:
+                        warning_message += (
+                            "Content of request is different than expected for url: "
+                            f"{unexpected_request.url}"
+                        )
+
+            # if there is a failure then stop the test
+            if failure_message or (warning_message and self.fail_on_warning):
+                # want to print the warnings out here too to make it easier to see in test output
+                test_failure_message = "\nMOCKED REQUEST FAILURE:\n"
+                test_failure_message += failure_message
+                test_failure_message += warning_message
+                all_requests: List[MockRequest] = mock_client.retrieve_requests()
+                all_expectations: List[MockExpectation] = mock_client.expectations
+                logger.info("\n ---- ALL EXPECTATIONS -------\n")
+                for expectation in all_expectations:
+                    logger.info(
+                        "\n-----------------------\n"
+                        + str(expectation.request)
+                        + "\n-----------------------\n"
+                    )
+                logger.info("\n ---- ALL REQUESTS -------\n")
+                for request in all_requests:
+                    logger.info(
+                        "\n-----------------------\n"
+                        + str(request)
+                        + "\n-----------------------\n"
+                    )
+                pytest.fail(test_failure_message)
+            elif warning_message:
+                print(warning_message)
+
+    def get_input_files(self, data_folder_path: Optional[Path]) -> List[str]:
+        if data_folder_path is None:
+            return []
+        files: List[str] = sorted(
+            glob(str(data_folder_path.joinpath("**/*.json")), recursive=True)
+        )
+        return files
 
 
 class OutputFileValidator(Validator):
@@ -697,7 +934,7 @@ class OutputFileValidator(Validator):
     ) -> None:
         file_pattern_to_search: Path = source_folder.joinpath(f"*.{file_extension}")
         # find files with that extension in source_folder
-        files: List[str] = glob.glob(str(file_pattern_to_search))
+        files: List[str] = glob(str(file_pattern_to_search))
         lines: List[str] = []
         for file in files:
             with open(file, "r") as file_source:
@@ -713,7 +950,7 @@ class OutputFileValidator(Validator):
     ) -> None:
         file_pattern_to_search: Path = source_folder.joinpath(f"*.{file_extension}")
         # find files with that extension in source_folder
-        files: List[str] = glob.glob(str(file_pattern_to_search))
+        files: List[str] = glob(str(file_pattern_to_search))
         # now copy the first file to the destination
         lines: List[str] = []
         for file in files:
