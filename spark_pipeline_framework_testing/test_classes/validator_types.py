@@ -558,12 +558,12 @@ class MockRequestValidator(Validator):
 
 class OutputFileValidator(Validator):
     """
-    compare input and output files
+    Validates the output files from a feature or pipeline
     """
 
     def __init__(
         self,
-        related_inputs: Union[List["FileInput"], "FileInput"],
+        related_inputs: Optional[Union[List["FileInput"], "FileInput"]] = None,
         func_path_modifier: Optional[
             Callable[[Union[Path, str]], Union[Path, str]]
         ] = convert_path_from_docker,
@@ -579,7 +579,8 @@ class OutputFileValidator(Validator):
     ):
         """
 
-        :param related_inputs: the corresponding input for this validator
+        :param related_inputs: the corresponding input for this validator, optional if the pipeline input comes
+            from calling an api
         :param func_path_modifier: in case you want to change paths e.g. docker to local
         :param sort_output_by: order of column names [col1, col2,...]
         :param output_as_json_only: save output as json
@@ -619,11 +620,11 @@ class OutputFileValidator(Validator):
         mock_client: Optional[MockServerFriendlyClient] = None,
     ) -> None:
         assert spark_session
-        assert self.related_inputs
-        assert self.related_inputs[0].input_table_names  # type: ignore
         self.logger = logger
 
-        self.input_table_names = self.related_inputs[0].input_table_names  # type: ignore
+        self.input_table_names = []
+        if self.related_inputs:
+            self.input_table_names = self.related_inputs[0].input_table_names  # type: ignore
         self.spark_session = spark_session
         self.test_path = test_path
         self.output_folder_path = test_path.joinpath(self.output_folder)
