@@ -47,12 +47,10 @@ fix_setuptools()
 # create the package setup
 setup(
     install_requires=[
-        "pyspark>=3.1.1,<3.2",
+        "pyspark>=3.1.1",
         "protobuf==3.20.*",
-        "sparkpipelineframework>=1.0.23",
-        "sparkdataframecomparer>=1.0.4",
         "deprecated>=1.2.12",
-        "helix.fhir.client.sdk>=1.0.8",
+        "helix.fhir.client.sdk>=1.0.12",
         "helix-mockserver-client>=0.1.3",
     ],
     name=package_name,
