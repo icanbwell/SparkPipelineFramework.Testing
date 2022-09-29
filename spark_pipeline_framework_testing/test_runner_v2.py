@@ -77,24 +77,28 @@ class SparkPipelineFrameworkTestRunnerV2:
         :param temp_folder: folder to use for temporary files.  Any existing files in this folder will be deleted.
         """
 
-        self.test_path = test_path
-        self.spark_session = spark_session
-        self.helix_pipeline_parameters = helix_pipeline_parameters
-        self.test_name = test_name
-        self.test_validators = test_validators
-        self.test_inputs = test_inputs
-        self.helix_transformers = helix_transformers
-        self.mock_client = mock_client
+        self.test_path: Path = test_path
+        self.spark_session: SparkSession = spark_session
+        self.helix_pipeline_parameters: Optional[
+            Dict[str, Any]
+        ] = helix_pipeline_parameters
+        self.test_name: str = test_name
+        self.test_validators: Optional[List[Validator]] = test_validators
+        self.test_inputs: Optional[List["TestInputType"]] = test_inputs
+        self.helix_transformers: Optional[List[Type[ProxyBase]]] = helix_transformers
+        self.mock_client: Optional[MockServerFriendlyClient] = mock_client
         self.auto_find_helix_transformer = auto_find_helix_transformer
-        self.fhir_server_url = fhir_server_url
-        self.fhir_validation_url = fhir_validation_url
-        self.capture_exceptions = capture_exceptions
-        self.logger = logger
-        self.temp_folder_path = test_path.joinpath(temp_folder) if temp_folder else None
+        self.fhir_server_url: Optional[str] = fhir_server_url
+        self.fhir_validation_url: Optional[str] = fhir_validation_url
+        self.capture_exceptions: bool = capture_exceptions
+        self.logger: Logger = logger
+        self.temp_folder_path: Optional[Path] = (
+            test_path.joinpath(temp_folder) if temp_folder else None
+        )
         if not self.temp_folder_path:
             self.temp_folder_path = self.test_path.joinpath("temp")
-        self.extra_params = extra_params
-        self.parameters_filename = parameters_filename
+        self.extra_params: Optional[Dict[str, Any]] = extra_params
+        self.parameters_filename: str = parameters_filename
         # inject configs
         standard_parameters = ParameterDict(
             {
@@ -137,6 +141,9 @@ class SparkPipelineFrameworkTestRunnerV2:
                         self.mock_client,
                         self.spark_session,
                     )
+            if self.mock_client:
+                self.mock_client.expect_default()
+
             if not self.auto_find_helix_transformer:
                 if self.helix_transformers:
                     for transformer in self.helix_transformers:
