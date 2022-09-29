@@ -67,6 +67,7 @@ class FhirCalls(TestInputType):
         fhir_validation_url: str = "http://fhir:3000/4_0_0",
         fhir_calls_folder: str = "fhir_calls",
         mock_url_prefix: Optional[str] = None,
+        method: str = "POST",
     ) -> None:
         super().__init__()
         self.fhir_calls_folder = fhir_calls_folder
@@ -81,6 +82,7 @@ class FhirCalls(TestInputType):
         self.mocked_files: Optional[
             List[str]
         ] = []  # list of files that are used in mocking
+        self.method: str = method
 
     def initialize(
         self,
@@ -109,6 +111,7 @@ class FhirCalls(TestInputType):
             folder=self.test_path.joinpath(self.fhir_calls_folder),
             mock_client=self.mock_client,
             url_prefix=self.url_prefix,
+            method=self.method,
         )
 
         self.mock_client.expect_default()

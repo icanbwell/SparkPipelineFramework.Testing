@@ -336,10 +336,18 @@ def load_mock_source_api_json_responses(
                     "`request_parameters` key not found! It is supposed to contain parameters of the request function."
                 )
 
-            path = f"{('/' + url_prefix) if url_prefix else ''}"
-            path = f"{path}/{os.path.splitext(file_name)[0]}" if add_file_name else path
-            if url_suffix:
-                path = f"{path}/{url_suffix}"
+            if "path" in request_parameters:
+                path = request_parameters["path"]
+                del request_parameters["path"]
+            else:
+                path = f"{('/' + url_prefix) if url_prefix else ''}"
+                path = (
+                    f"{path}/{os.path.splitext(file_name)[0]}"
+                    if add_file_name
+                    else path
+                )
+                if url_suffix:
+                    path = f"{path}/{url_suffix}"
 
             try:
                 request_result = content["request_result"]
