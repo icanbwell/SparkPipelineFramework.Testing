@@ -114,8 +114,6 @@ class FhirCalls(TestInputType):
             method=self.method,
         )
 
-        self.mock_client.expect_default()
-
 
 class FileInput(TestInputType):
     """
