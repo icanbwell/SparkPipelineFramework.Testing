@@ -193,8 +193,8 @@ def load_mock_fhir_everything_batch_requests_from_folder(
             print(f"{file_name} has no entry property!")
             continue
         for entry in fhir_bundle["entry"]:
-            id = entry.get("resource", {}).get("id", "")
-            if id in ids:
+            id_ = entry.get("resource", {}).get("id", "")
+            if id_ in ids:
                 result_bundle["entry"].append(entry)  # type: ignore
     # find id and resourceType
     path = (
@@ -355,6 +355,7 @@ def load_mock_source_api_json_responses(
                 raise Exception(
                     "`request_result` key not found. It is supposed to contain the expected result of the requst function."
                 )
+
             mock_client.expect(
                 mock_request(path=path, **request_parameters),
                 mock_response(body=json.dumps(request_result)),
