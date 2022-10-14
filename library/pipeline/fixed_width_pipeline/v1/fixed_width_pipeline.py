@@ -20,7 +20,7 @@ class FixedWidthPipeline(FrameworkPipeline):
         self.steps = [
             FrameworkFixedWidthLoader(
                 view="my_view",
-                filepath=parameters["input_file_path"],
+                file_path=parameters["input_file_path"],
                 columns=[
                     ColumnSpec(
                         column_name="id", start_pos=1, length=3, data_type=StringType()
@@ -47,7 +47,7 @@ class FixedWidthPipeline(FrameworkPipeline):
             ),
             FrameworkXmlLoader(
                 view="my_xml_view",
-                filepath=parameters["input_xml_path"],
+                file_path=parameters["input_xml_path"],
                 row_tag="book",
             ),
         ]

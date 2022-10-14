@@ -27,7 +27,7 @@ types-Deprecated=">=0.1.2"
 sparkautomapper = "==1.0.17"
 "sparkautomapper.fhir" = "==1.0.26"
 "sparkfhirschemas" = "==1.0.12"
-sparkpipelineframework = "==1.0.28"
+sparkpipelineframework = "==1.0.30"
 "sparkdataframecomparer" = "==1.0.7"
 requests = ">=2.25.1"
 dictdiffer = ">=0.9.0"
@@ -37,6 +37,7 @@ sphinx-rtd-theme="==0.5.2"
 myst-parser="==0.15.1"
 recommonmark="==0.7.1"
 pipenv-setup = ">=3.2.0"
+vistir="==0.6.1" # https://github.com/Madoshakalaka/pipenv-setup/issues/138
 
 [requires]
 python_version = "3.7"
