@@ -1,7 +1,7 @@
 import json
 import os
 from abc import ABC, abstractmethod
-from os import listdir
+from os import listdir, makedirs
 from os.path import isfile, join, isdir
 from pathlib import Path
 from typing import List, Optional, Dict, Union
@@ -54,6 +54,11 @@ class TestInputType(ABC):
                 f"input path '{path}' was not found! Please create the dir and put the input files in it."
             )
 
+    @staticmethod
+    def create_if_not_exist(path: Path) -> None:
+        if not path.exists():
+            makedirs(path, exist_ok=True)
+
 
 class FhirCalls(TestInputType):
     """
@@ -103,7 +108,7 @@ class FhirCalls(TestInputType):
         if self.url_prefix is None:
             self.url_prefix = test_name
         fhir_calls_path: Path = self.test_path.joinpath(self.fhir_calls_folder)
-        self.raise_if_not_exist(fhir_calls_path)
+        self.create_if_not_exist(fhir_calls_path)
         self._run_mocked_fhir_test()
 
     def _run_mocked_fhir_test(self) -> None:
