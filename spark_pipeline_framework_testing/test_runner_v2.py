@@ -259,9 +259,7 @@ class SparkPipelineFrameworkTestRunnerV2:
             df: DataFrame = self.spark_session.createDataFrame(
                 self.spark_session.sparkContext.emptyRDD(), schema
             )
-            progress_logger.write_to_log(
-                my_instance.__class__.__name__, str(my_instance)
-            )
+            progress_logger.write_to_log("pipeline", str(my_instance))
             my_instance.transform(df)
 
     @staticmethod
