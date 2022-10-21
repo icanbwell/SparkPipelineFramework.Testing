@@ -337,7 +337,11 @@ def load_mock_source_api_json_responses(
                 )
 
             if "path" in request_parameters:
-                path = request_parameters["path"]
+                if not request_parameters["path"].startswith("/"):
+                    path = f"{('/' + url_prefix) if url_prefix else ''}"
+                    path = f"{path}/{request_parameters['path']}"
+                else:
+                    path = request_parameters["path"]
                 del request_parameters["path"]
             else:
                 path = f"{('/' + url_prefix) if url_prefix else ''}"
