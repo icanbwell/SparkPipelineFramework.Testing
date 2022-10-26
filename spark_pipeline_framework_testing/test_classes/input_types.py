@@ -6,6 +6,10 @@ from os.path import isfile, join, isdir
 from pathlib import Path
 from typing import List, Optional, Dict, Union
 
+from mockserver_client.mock_requests_loader import (
+    load_mock_fhir_requests_from_folder,
+    load_mock_source_api_json_responses,
+)
 from mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
 )
@@ -17,7 +21,7 @@ from spark_pipeline_framework.logger.yarn_logger import Logger  # type: ignore
 from spark_pipeline_framework.transformers.framework_fixed_width_loader.v1.framework_fixed_width_loader import (
     ColumnSpec,
 )
-from spark_pipeline_framework.utilities.json_to_jsonl_converter import (
+from spark_pipeline_framework.utilities.json_to_jsonl_converter.json_to_jsonl_converter import (
     convert_json_to_jsonl,
 )
 
@@ -25,10 +29,6 @@ from spark_pipeline_framework_testing.tests_common.common_functions import (
     get_view_name_from_file_path,
     get_file_extension_from_file_path,
     write_schema_to_output,
-)
-from spark_pipeline_framework_testing.tests_common.mock_requests_loader import (
-    load_mock_fhir_requests_from_folder,
-    load_mock_source_api_json_responses,
 )
 
 
@@ -181,6 +181,7 @@ class FileInput(TestInputType):
             raise
         input_files: List[str] = []
         if isdir(input_folder):
+            # noinspection PyTypeChecker
             input_files = [
                 f
                 for f in listdir(input_folder)
