@@ -51,7 +51,7 @@ setup(
         "protobuf==3.20.*",
         "deprecated>=1.2.12",
         "helix.fhir.client.sdk>=1.0.16",
-        "helix-mockserver-client>=0.1.3",
+        "helix-mockserver-client>=1.0.0",
     ],
     name=package_name,
     version=version,

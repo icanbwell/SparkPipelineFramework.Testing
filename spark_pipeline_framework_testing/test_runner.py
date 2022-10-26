@@ -22,7 +22,7 @@ from spark_data_frame_comparer.spark_data_frame_comparer_exception import (
 )
 from spark_pipeline_framework.progress_logger.progress_logger import ProgressLogger
 from spark_pipeline_framework.utilities.class_helpers import ClassHelpers
-from spark_pipeline_framework.utilities.json_to_jsonl_converter import (
+from spark_pipeline_framework.utilities.json_to_jsonl_converter.json_to_jsonl_converter import (
     convert_json_to_jsonl,
 )
 
