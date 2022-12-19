@@ -29,9 +29,9 @@ class DiffFilesHelper:
             file_result.write(json.dumps(actual, indent=2))
         with open(compare_sh_path, "w") as compare_sh:
             compare_sh.write(
-                f"/usr/local/bin/charm diff "
-                f"{convert_path_from_docker(result_path) if convert_path_from_docker else result_path} "
-                f"{convert_path_from_docker(expected_path) if convert_path_from_docker else expected_path}"
+                "/usr/local/bin/charm diff "
+                f"{convert_path_from_docker(result_path)}"
+                f"{convert_path_from_docker(expected_path)}"
             )
             os.fchmod(compare_sh.fileno(), 0o7777)
 

@@ -1,11 +1,8 @@
 import logging
 import os
 import shutil
-
-# noinspection PyPackageRequirements
 from typing import Any
 
-import pytest
 from pyspark.sql.session import SparkSession
 
 # make sure env variables are set correctly
@@ -63,16 +60,21 @@ def clean_close(session: SparkSession) -> None:
     session.stop()
 
 
-@pytest.fixture(scope="session")
-def spark_session(request: Any) -> SparkSession:
+def create_spark_session(request: Any) -> SparkSession:
     # make sure env variables are set correctly
     if "SPARK_HOME" not in os.environ:
         os.environ["SPARK_HOME"] = "/usr/local/opt/spark"
-
     clean_spark_dir()
-
     master = "local[2]"
-
+    jars = [
+        "mysql:mysql-connector-java:8.0.24",
+        "org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0",
+        "io.delta:delta-core_2.12:2.1.0",
+        "com.johnsnowlabs.nlp:spark-nlp_2.12:4.2.2",
+        "org.apache.spark:spark-hadoop-cloud_2.12:3.3.1",
+        "com.amazonaws:aws-java-sdk-bundle:1.12.339",
+        "com.databricks:spark-xml_2.12:0.15.0",
+    ]
     session = (
         SparkSession.builder.appName("pytest-pyspark-local-testing")
         .master(master)
@@ -80,10 +82,15 @@ def spark_session(request: Any) -> SparkSession:
         .config("spark.sql.shuffle.partitions", "2")
         .config("spark.default.parallelism", "4")
         .config("spark.sql.broadcastTimeout", "2400")
+        .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+        .config(
+            "spark.sql.catalog.spark_catalog",
+            "org.apache.spark.sql.delta.catalog.DeltaCatalog",
+        )
+        .config("spark.jars.packages", ",".join(jars))
         .enableHiveSupport()
         .getOrCreate()
     )
-
     request.addfinalizer(lambda: clean_close(session))
     quiet_py4j()
     return session
