@@ -106,7 +106,6 @@ class MockCallValidator(Validator):
         logger: Logger,
         mock_client: Optional[MockServerFriendlyClient] = None,
     ) -> None:
-        assert MockServerFriendlyClient
         assert mock_client
         # why cant we just provide the path to the validator init if it just needs the path to the directory?
         data_folder_path: Path = test_path.joinpath(
@@ -147,8 +146,8 @@ class MockCallValidator(Validator):
                         with open(compare_sh_path, "w") as compare_sh:
                             compare_sh.write(
                                 f"/usr/local/bin/charm diff "
-                                f"{convert_path_from_docker(result_path) if convert_path_from_docker else result_path} "
-                                f"{convert_path_from_docker(expected_path) if convert_path_from_docker else expected_path}"
+                                f"{convert_path_from_docker(result_path)}"
+                                f"{convert_path_from_docker(expected_path)}"
                             )
                             os.fchmod(compare_sh.fileno(), 0o7777)
                         compare_files.append(str(compare_sh_path))
@@ -343,7 +342,6 @@ class MockRequestValidator(Validator):
         logger: Logger,
         mock_client: Optional[MockServerFriendlyClient] = None,
     ) -> None:
-        assert MockServerFriendlyClient
         assert mock_client
         data_folder_path: Optional[Path] = None
         if self.mock_requests_folder:
@@ -383,8 +381,8 @@ class MockRequestValidator(Validator):
                         with open(compare_sh_path, "w") as compare_sh:
                             compare_sh.write(
                                 f"/usr/local/bin/charm diff "
-                                f"{convert_path_from_docker(result_path) if convert_path_from_docker else result_path} "
-                                f"{convert_path_from_docker(expected_path) if convert_path_from_docker else expected_path}"
+                                f"{convert_path_from_docker(result_path)}"
+                                f"{convert_path_from_docker(expected_path)}"
                             )
                             os.fchmod(compare_sh.fileno(), 0o7777)
                         compare_files.append(str(compare_sh_path))

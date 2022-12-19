@@ -8,11 +8,11 @@ from spark_pipeline_framework.transformers.framework_fixed_width_loader.v1.frame
     ColumnSpec,
 )
 
+from create_spark_session import clean_spark_session
 from spark_pipeline_framework_testing.test_runner_v2 import (
     SparkPipelineFrameworkTestRunnerV2,
 )
 
-from library.conftest import clean_spark_session
 from spark_pipeline_framework_testing.test_classes import input_types
 
 
