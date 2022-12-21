@@ -381,7 +381,7 @@ class MockRequestValidator(Validator):
                         with open(compare_sh_path, "w") as compare_sh:
                             compare_sh.write(
                                 f"/usr/local/bin/charm diff "
-                                f"{convert_path_from_docker(result_path)}"
+                                f"{convert_path_from_docker(result_path)} "
                                 f"{convert_path_from_docker(expected_path)}"
                             )
                             os.fchmod(compare_sh.fileno(), 0o7777)
