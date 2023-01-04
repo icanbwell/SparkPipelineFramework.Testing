@@ -287,9 +287,9 @@ class MockCallValidator(Validator):
             # if there is a failure then stop the test
             if failure_message or (warning_message and self.fail_on_warning):
                 # want to print the warnings out here too to make it easier to see in test output
-                test_failure_message = "\nMOCKED REQUEST FAILURE:\n"
-                test_failure_message += failure_message
+                test_failure_message = "\nMOCKED REQUEST MATCH FAILURE:\n"
                 test_failure_message += warning_message
+                test_failure_message += "\n" + failure_message
                 all_requests: List[MockRequest] = mock_client.retrieve_requests()
                 all_expectations: List[MockExpectation] = mock_client.expectations
                 logger.info("\n ---- ALL EXPECTATIONS -------\n")
