@@ -7,6 +7,7 @@ from os.path import isfile, join
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple, Union, Callable, TYPE_CHECKING
 
+# noinspection PyPackageRequirements
 import pytest
 from deprecated import deprecated
 from mockserver_client.exceptions.mock_server_expectation_not_found_exception import (
@@ -273,18 +274,22 @@ class MockCallValidator(Validator):
             for unexpected_request in unexpected_requests:
                 for expectations_not_met_exception in expectations_not_met_exceptions:
                     # check if the url matches.  If so then the content is different
-                    if unexpected_request.url == expectations_not_met_exception.url:
+                    if unexpected_request.request.matches_without_body(
+                        expectations_not_met_exception.expectation
+                    ):
                         warning_message += (
                             "Content of request is different than expected for url: "
                             f"{unexpected_request.url}"
+                            + f"\nExpected:{expectations_not_met_exception}"
+                            + f"\nActual:{unexpected_request}\n"
                         )
 
             # if there is a failure then stop the test
             if failure_message or (warning_message and self.fail_on_warning):
                 # want to print the warnings out here too to make it easier to see in test output
-                test_failure_message = "\nMOCKED REQUEST FAILURE:\n"
-                test_failure_message += failure_message
+                test_failure_message = "\nMOCKED REQUEST MATCH FAILURE:\n"
                 test_failure_message += warning_message
+                test_failure_message += "\n" + failure_message
                 all_requests: List[MockRequest] = mock_client.retrieve_requests()
                 all_expectations: List[MockExpectation] = mock_client.expectations
                 logger.info("\n ---- ALL EXPECTATIONS -------\n")
@@ -327,8 +332,11 @@ class MockRequestValidator(Validator):
         Validates all mocked requests on the mock server. Only one of these is needed per test it will validate all
         expectations on the mock server.
 
-        :param mock_requests_folder: name of the folder where the mock request files are. if set the files in the folder will have their contents compared to the actual request and a diff will be generated
-        :param fail_on_warning: if true the test will fail if there are warnings, an example is a request for which there is no expectation
+        :param mock_requests_folder: name of the folder where the mock request files are. if set the files
+                                        in the folder will have their contents compared to the actual request and
+                                        a diff will be generated
+        :param fail_on_warning: if true the test will fail if there are warnings, an example is a request for
+                                which there is no expectation
         """
         self.fail_on_warning: bool = fail_on_warning
         self.mock_requests_folder = mock_requests_folder
@@ -375,9 +383,8 @@ class MockRequestValidator(Validator):
                             "actual_http_calls"
                         ).joinpath(expected_file_name)
                         with open(result_path, "w") as file_result:
-                            file_result.write(
-                                json.dumps(exception.actual_json, indent=2)
-                            )
+                            actual_json = exception.actual_json
+                            file_result.write(json.dumps(actual_json, indent=2))
                         with open(compare_sh_path, "w") as compare_sh:
                             compare_sh.write(
                                 f"/usr/local/bin/charm diff "
@@ -504,9 +511,8 @@ class MockRequestValidator(Validator):
             warning_message = ""
             if len(unexpected_requests) > 0:
                 warning_message += "\nUnexpected requests:\n"
-                warning_message += "\n".join(
-                    [f"{c.url}: {c.json_dict}" for c in unexpected_requests]
-                )
+                warning_message += "\n".join([f"{c}" for c in unexpected_requests])
+                warning_message += "\n"
                 logger.info(warning_message)
 
             # now try to match up unexpected requests with unmatched expectations
@@ -517,6 +523,8 @@ class MockRequestValidator(Validator):
                         warning_message += (
                             "Content of request is different than expected for url: "
                             f"{unexpected_request.url}"
+                            + f"\nExpected:{expectations_not_met_exception}"
+                            + f"\nActual:{unexpected_request}\n"
                         )
 
             # if there is a failure then stop the test
@@ -545,6 +553,7 @@ class MockRequestValidator(Validator):
             elif warning_message:
                 print(warning_message)
 
+    # noinspection PyMethodMayBeStatic
     def get_input_files(self, data_folder_path: Optional[Path]) -> List[str]:
         if data_folder_path is None:
             return []
@@ -660,7 +669,8 @@ class OutputFileValidator(Validator):
 
         if not os.path.exists(self.output_folder_path):
             os.mkdir(self.output_folder_path)
-        output_files = [
+        # noinspection PyTypeChecker
+        output_files: List[str] = [
             f
             for f in listdir(self.output_folder_path)
             if isfile(join(self.output_folder_path, f))
