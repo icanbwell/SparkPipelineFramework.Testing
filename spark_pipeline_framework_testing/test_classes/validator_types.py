@@ -7,6 +7,8 @@ from os.path import isfile, join
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple, Union, Callable, TYPE_CHECKING
 
+import dictdiffer
+
 # noinspection PyPackageRequirements
 import pytest
 from deprecated import deprecated
@@ -230,6 +232,11 @@ class MockCallValidator(Validator):
                         f"{len(content_not_matched_exceptions)} files did not match: \n"
                     )
                     failure_message += f"{compare_files_text}\n"
+                    for content_not_matched_exception in content_not_matched_exceptions:
+                        failure_message += f"----------- {content_not_matched_exception.expected_file_path} -----------\n"
+                        for difference in content_not_matched_exception.differences:
+                            failure_message += f"{difference}\n"
+
                 else:
                     failure_message += f"{len(content_not_matched_exceptions)} requests did not match: \n"
                     msg = "\n".join(
@@ -239,6 +246,11 @@ class MockCallValidator(Validator):
                         ]
                     )
                     failure_message += f"{msg}\n"
+                    for content_not_matched_exception in content_not_matched_exceptions:
+                        failure_message += f"----------- {content_not_matched_exception.expected_file_path} -----------\n"
+                        for difference in content_not_matched_exception.differences:
+                            failure_message += f"{difference}\n"
+
             expectations_not_met_exceptions: List[
                 MockServerExpectationNotFoundException
             ] = [
@@ -277,11 +289,20 @@ class MockCallValidator(Validator):
                     if unexpected_request.request.matches_without_body(
                         expectations_not_met_exception.expectation
                     ):
+                        comparison_result = list(
+                            dictdiffer.diff(
+                                expectations_not_met_exception.json_list,
+                                unexpected_request.json_dict,
+                            )
+                        )
+                        comparison_result_text = str(comparison_result)
+
                         warning_message += (
                             "Content of request is different than expected for url: "
                             f"{unexpected_request.url}"
                             + f"\nExpected:{expectations_not_met_exception}"
-                            + f"\nActual:{unexpected_request}\n"
+                            + f"\nActual:{unexpected_request}"
+                            + f"\nDifferences: \n{comparison_result_text}\n"
                         )
 
             # if there is a failure then stop the test
@@ -476,6 +497,10 @@ class MockRequestValidator(Validator):
                         f"{len(content_not_matched_exceptions)} files did not match: \n"
                     )
                     failure_message += f"{compare_files_text}\n"
+                    for content_not_matched_exception in content_not_matched_exceptions:
+                        failure_message += f"----------- {content_not_matched_exception.expected_file_path} -----------\n"
+                        for difference in content_not_matched_exception.differences:
+                            failure_message += f"{difference}\n"
                 else:
                     failure_message += f"{len(content_not_matched_exceptions)} requests did not match: \n"
                     msg = "\n".join(
@@ -485,6 +510,11 @@ class MockRequestValidator(Validator):
                         ]
                     )
                     failure_message += f"{msg}\n"
+                    for content_not_matched_exception in content_not_matched_exceptions:
+                        failure_message += f"----------- {content_not_matched_exception.expected_file_path} -----------\n"
+                        for difference in content_not_matched_exception.differences:
+                            failure_message += f"{difference}\n"
+
             expectations_not_met_exceptions: List[
                 MockServerExpectationNotFoundException
             ] = [
@@ -520,11 +550,25 @@ class MockRequestValidator(Validator):
                 for expectations_not_met_exception in expectations_not_met_exceptions:
                     # check if the url matches.  If so then the content is different
                     if unexpected_request.url == expectations_not_met_exception.url:
+                        comparison_result = list(
+                            dictdiffer.diff(
+                                expectations_not_met_exception.json_list,
+                                unexpected_request.json_dict,
+                            )
+                        )
+                        comparison_result_text = str(comparison_result)
+                        if unexpected_request.json_dict is None:
+                            comparison_result_text = "Request has no body"
+                        elif expectations_not_met_exception.json_list is None:
+                            comparison_result_text = (
+                                "Expected no body but request has a body"
+                            )
                         warning_message += (
                             "Content of request is different than expected for url: "
                             f"{unexpected_request.url}"
                             + f"\nExpected:{expectations_not_met_exception}"
-                            + f"\nActual:{unexpected_request}\n"
+                            + f"\nActual:{unexpected_request}"
+                            + f"\nDifferences: \n{comparison_result_text}\n"
                         )
 
             # if there is a failure then stop the test

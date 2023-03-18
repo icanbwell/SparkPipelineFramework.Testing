@@ -98,3 +98,12 @@ endif
 .PHONY:pipenv-setup
 pipenv-setup:devdocker ## Brings up the bash shell in dev docker
 	docker-compose run --rm --name spf_test dev pipenv-setup sync --pipfile
+
+.PHONY:show_dependency_graph
+show_dependency_graph:
+	docker-compose run --rm --name spf_test dev sh -c "pipenv install --skip-lock && pipenv graph --reverse"
+	docker-compose run --rm --name spf_test dev sh -c "pipenv install -d && pipenv graph"
+
+.PHONY:qodana
+qodana:
+	docker run --rm -it --name qodana --mount type=bind,source="${PWD}",target=/data/project -p 8080:8080 jetbrains/qodana-python:2022.3-eap --show-report
