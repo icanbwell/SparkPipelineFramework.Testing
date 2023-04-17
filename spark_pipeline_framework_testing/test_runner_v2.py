@@ -11,7 +11,7 @@ from mockserver_client.mockserver_client import MockServerFriendlyClient
 from pyspark.ml import Transformer
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import StructType
-from pyspark.sql.utils import PythonException  # type: ignore
+from pyspark.sql.utils import PythonException
 from spark_pipeline_framework.logger.yarn_logger import Logger  # type: ignore
 from spark_pipeline_framework.progress_logger.progress_logger import ProgressLogger
 from spark_pipeline_framework.proxy_generator.proxy_base import ProxyBase
@@ -212,7 +212,7 @@ class SparkPipelineFrameworkTestRunnerV2:
                 )
             elif (
                 isinstance(e.exception, PythonException)
-                and "FhirSenderException" in e.exception.desc  # type: ignore
+                and "FhirSenderException" in e.exception.desc
             ):
                 handle_fhir_sender_exception(
                     e=e,

@@ -13,11 +13,11 @@ WORKDIR /spftest
 
 RUN df -h # for space monitoring
 
-RUN python -m pip install --upgrade pip && pip install pipenv
+RUN #python -m pip install --upgrade pip && pip install pipenv
 ARG TARGETPLATFORM
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; \
-    then pipenv run pip install pyspark==3.3.0 && pipenv sync --dev --system --extra-pip-args="--prefer-binary"; \
-    else rm -rf Pipfile.lock && pipenv lock && pipenv sync --dev --system --extra-pip-args="--prefer-binary" && pipenv run pip install pyspark==3.3.0; fi
+    then pipenv run pip install pyspark==3.3.0 py4j==0.10.9.5 && pipenv sync --dev --system --extra-pip-args="--prefer-binary"; \
+    else rm -rf Pipfile.lock && pipenv lock --dev && pipenv sync --dev --system --extra-pip-args="--prefer-binary" && pipenv run pip install pyspark==3.3.0; fi
 
 
 # COPY ./jars/* /opt/bitnami/spark/jars/
