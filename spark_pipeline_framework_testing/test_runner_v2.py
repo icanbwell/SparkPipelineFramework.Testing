@@ -58,6 +58,7 @@ class SparkPipelineFrameworkTestRunnerV2:
         capture_exceptions: bool = True,
         helix_pipeline_parameters: Optional[Dict[str, Any]] = None,
         parameters_filename: str = "parameters.json",
+        progress_logger: Optional[ProgressLogger] = None,
     ) -> None:
         """
         :param auto_find_helix_transformer: find transformer based on the test location (overwrites helix_transformers)
@@ -123,6 +124,7 @@ class SparkPipelineFrameworkTestRunnerV2:
         if self.helix_pipeline_parameters:
             standard_parameters.update(self.helix_pipeline_parameters)
         self.helix_pipeline_parameters = standard_parameters  # type: ignore
+        self.progress_logger: Optional[ProgressLogger] = progress_logger
 
     def run_test2(self) -> None:
         assert self.temp_folder_path
@@ -152,9 +154,10 @@ class SparkPipelineFrameworkTestRunnerV2:
                             if self.helix_pipeline_parameters
                             else ParameterDict({}),
                             transformer_class=transformer,
+                            progress_logger=self.progress_logger,
                         )
             else:
-                transformer_class = None
+                transformer_class: Type[Transformer]
                 try:
                     transformer_class = self.find_transformer(str(self.test_path))
                 except ModuleNotFoundError:
@@ -169,6 +172,7 @@ class SparkPipelineFrameworkTestRunnerV2:
                         if self.helix_pipeline_parameters
                         else ParameterDict({}),
                         transformer_class=transformer_class,
+                        progress_logger=self.progress_logger,
                     )
                 else:
                     raise Exception(f"No Transformer found at: {str(self.test_path)}")
@@ -226,7 +230,10 @@ class SparkPipelineFrameworkTestRunnerV2:
                 del os.environ["CATALOG_LOCATION"]
 
     def run_helix_transformers(
-        self, parameters: Dict[str, Any], transformer_class: Optional[Type[Transformer]]
+        self,
+        parameters: Dict[str, Any],
+        transformer_class: Optional[Type[Transformer]],
+        progress_logger: Optional[ProgressLogger] = None,
     ) -> None:
         # read parameters.json if it exists
         if not parameters:
@@ -244,30 +251,51 @@ class SparkPipelineFrameworkTestRunnerV2:
             destination_view_name: str = "output"
             parameters["view"] = destination_view_name
 
-        with ProgressLogger() as progress_logger:
-            # now figure out the class_parameters to use when instantiating the class
-            class_parameters: Dict[str, Any] = {
-                "parameters": parameters or {},
-                "progress_logger": progress_logger,
-            }
-            my_instance: Transformer = ClassHelpers.instantiate_class_with_parameters(
-                class_parameters=class_parameters, my_class=transformer_class  # type: ignore
+        if progress_logger is not None:
+            self.run_helix_transformers_with_progress_logger(
+                parameters=parameters,
+                transformer_class=transformer_class,
+                progress_logger=progress_logger,
             )
-            # now call transform
-            schema = StructType([])
-            # create an empty dataframe to pass into transform()
-            df: DataFrame = self.spark_session.createDataFrame(
-                self.spark_session.sparkContext.emptyRDD(), schema
-            )
-            print(
-                f"---------- Running pipeline {my_instance.__class__.__name__} -------------"
-            )
-            print(f"{my_instance}")
-            print(
-                f"--------------------------------------------------------------------------"
-            )
+        else:
+            with ProgressLogger() as progress_logger1:
+                self.run_helix_transformers_with_progress_logger(
+                    parameters=parameters,
+                    transformer_class=transformer_class,
+                    progress_logger=progress_logger1,
+                )
+
+    def run_helix_transformers_with_progress_logger(
+        self,
+        *,
+        parameters: Dict[str, Any],
+        transformer_class: Optional[Type[Transformer]],
+        progress_logger: Optional[ProgressLogger] = None,
+    ) -> None:
+        # now figure out the class_parameters to use when instantiating the class
+        class_parameters: Dict[str, Any] = {
+            "parameters": parameters or {},
+            "progress_logger": progress_logger,
+        }
+        my_instance: Transformer = ClassHelpers.instantiate_class_with_parameters(
+            class_parameters=class_parameters, my_class=transformer_class  # type: ignore
+        )
+        # now call transform
+        schema = StructType([])
+        # create an empty dataframe to pass into transform()
+        df: DataFrame = self.spark_session.createDataFrame(
+            self.spark_session.sparkContext.emptyRDD(), schema
+        )
+        print(
+            f"---------- Running pipeline {my_instance.__class__.__name__} -------------"
+        )
+        print(f"{my_instance}")
+        print(
+            f"--------------------------------------------------------------------------"
+        )
+        if progress_logger:
             progress_logger.write_to_log("pipeline", str(my_instance))
-            my_instance.transform(df)
+        my_instance.transform(df)
 
     @staticmethod
     def find_transformer(

@@ -1,4 +1,4 @@
-FROM imranq2/helix.spark:3.3.0.19-slim
+FROM imranq2/helix.spark:3.3.0.24-slim
 # https://github.com/icanbwell/helix.spark
 USER root
 
@@ -12,7 +12,13 @@ COPY Pipfile* /spftest/
 WORKDIR /spftest
 
 RUN df -h # for space monitoring
-RUN pipenv sync --dev --system && pipenv run pip install pyspark==3.3.0
+
+RUN #python -m pip install --upgrade pip && pip install pipenv
+ARG TARGETPLATFORM
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; \
+    then pipenv run pip install pyspark==3.3.0 py4j==0.10.9.5 && pipenv sync --dev --system --extra-pip-args="--prefer-binary"; \
+    else rm -rf Pipfile.lock && pipenv lock --dev && pipenv sync --dev --system --extra-pip-args="--prefer-binary" && pipenv run pip install pyspark==3.3.0; fi
+
 
 # COPY ./jars/* /opt/bitnami/spark/jars/
 # COPY ./conf/* /opt/bitnami/spark/conf/
