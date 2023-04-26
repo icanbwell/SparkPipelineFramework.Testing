@@ -4,10 +4,11 @@ from abc import ABC, abstractmethod
 from os import listdir, makedirs
 from os.path import isfile, join, isdir
 from pathlib import Path
-from typing import List, Optional, Dict, Union
+from typing import List, Optional, Dict, Union, Any
 
 from mockserver_client.mock_requests_loader import (
     load_mock_fhir_requests_from_folder,
+    load_mock_fhir_requests_for_single_file,
     load_mock_source_api_json_responses,
 )
 from mockserver_client.mockserver_client import (
@@ -73,6 +74,10 @@ class FhirCalls(TestInputType):
         fhir_calls_folder: str = "fhir_calls",
         mock_url_prefix: Optional[str] = None,
         method: str = "POST",
+        relative_path: Optional[str] = None,
+        query_string: Optional[Dict[str, Any]] = None,
+        from_folder: Optional[bool] = True,
+        single_file_name: Optional[str] = None,
     ) -> None:
         super().__init__()
         self.fhir_calls_folder = fhir_calls_folder
@@ -88,6 +93,10 @@ class FhirCalls(TestInputType):
             List[str]
         ] = []  # list of files that are used in mocking
         self.method: str = method
+        self.relative_path: Optional[str] = relative_path
+        self.query_string: Optional[Dict[str, Any]] = query_string
+        self.from_folder: Optional[bool] = from_folder
+        self.single_file_name: Optional[str] = single_file_name
 
     def initialize(
         self,
@@ -112,12 +121,25 @@ class FhirCalls(TestInputType):
         self._run_mocked_fhir_test()
 
     def _run_mocked_fhir_test(self) -> None:
-        self.mocked_files = load_mock_fhir_requests_from_folder(
-            folder=self.test_path.joinpath(self.fhir_calls_folder),
-            mock_client=self.mock_client,
-            url_prefix=self.url_prefix,
-            method=self.method,
-        )
+        if self.from_folder:
+            self.mocked_files = load_mock_fhir_requests_from_folder(
+                folder=self.test_path.joinpath(self.fhir_calls_folder),
+                mock_client=self.mock_client,
+                method=self.method,
+                url_prefix=self.url_prefix,
+                relative_path=self.relative_path,
+                query_string=self.query_string,
+            )
+        else:
+            self.mocked_files = load_mock_fhir_requests_for_single_file(
+                folder=self.test_path.joinpath(self.fhir_calls_folder),
+                single_file_name=str(self.single_file_name),
+                mock_client=self.mock_client,
+                method=self.method,
+                url_prefix=self.url_prefix,
+                relative_path=self.relative_path,
+                query_string=self.query_string,
+            )
 
 
 class FileInput(TestInputType):
