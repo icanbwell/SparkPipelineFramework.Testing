@@ -47,7 +47,7 @@ fix_setuptools()
 # create the package setup
 setup(
     install_requires=[
-        "pyspark>=3.1.1",
+        "pyspark==3.3.0",
         "protobuf>=3",
         "deprecated>=1.2.12",
         "helix.fhir.client.sdk>=1.0.34",
