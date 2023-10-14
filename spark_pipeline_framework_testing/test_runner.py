@@ -501,7 +501,7 @@ class SparkPipelineFrameworkTestRunner:
             )
             with open(compare_sh_path, "w") as compare_sh:
                 compare_sh.write(
-                    f"/usr/local/bin/charm diff "
+                    'open -na "PyCharm.app" --args diff '
                     f"{func_path_modifier(result_path) if func_path_modifier else result_path} "
                     f"{func_path_modifier(expected_path) if func_path_modifier else expected_path}"
                 )

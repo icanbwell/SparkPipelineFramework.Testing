@@ -148,7 +148,7 @@ class MockCallValidator(Validator):
                             )
                         with open(compare_sh_path, "w") as compare_sh:
                             compare_sh.write(
-                                f"/usr/local/bin/charm diff "
+                                'open -na "PyCharm.app" --args diff '
                                 f"{convert_path_from_docker(result_path)}"
                                 f"{convert_path_from_docker(expected_path)}"
                             )
@@ -408,7 +408,7 @@ class MockRequestValidator(Validator):
                             file_result.write(json.dumps(actual_json, indent=2))
                         with open(compare_sh_path, "w") as compare_sh:
                             compare_sh.write(
-                                f"/usr/local/bin/charm diff "
+                                'open -na "PyCharm.app" --args diff '
                                 f"{convert_path_from_docker(result_path)} "
                                 f"{convert_path_from_docker(expected_path)}"
                             )
@@ -1039,7 +1039,7 @@ class OutputFileValidator(Validator):
             )
             with open(compare_sh_path, "w") as compare_sh:
                 compare_sh.write(
-                    f"/usr/local/bin/charm diff "
+                    'open -na "PyCharm.app" --args diff '
                     f"{func_path_modifier(result_path) if func_path_modifier else result_path} "
                     f"{func_path_modifier(expected_path) if func_path_modifier else expected_path}"
                 )
