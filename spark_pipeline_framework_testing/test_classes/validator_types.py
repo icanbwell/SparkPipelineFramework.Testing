@@ -7,6 +7,7 @@ from os.path import isfile, join
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple, Union, Callable, TYPE_CHECKING
 
+# noinspection PyPackageRequirements
 import dictdiffer
 
 # noinspection PyPackageRequirements
@@ -65,13 +66,13 @@ class Validator(ABC):
 
     @abstractmethod
     def validate(
-        self,
-        test_name: str,
-        test_path: Path,
-        spark_session: SparkSession,
-        temp_folder_path: Path,
-        logger: Logger,
-        mock_client: Optional[MockServerFriendlyClient] = None,
+            self,
+            test_name: str,
+            test_path: Path,
+            spark_session: SparkSession,
+            temp_folder_path: Path,
+            logger: Logger,
+            mock_client: Optional[MockServerFriendlyClient] = None,
     ) -> None:
         pass
 
@@ -83,16 +84,16 @@ class MockCallValidator(Validator):
     """
 
     def __init__(
-        self,
-        related_inputs: Optional[
-            Union[
-                List["FhirCalls"],
-                "FhirCalls",
-                List["MockFhirRequest"],
-                "MockFhirRequest",
-            ]
-        ],
-        fail_on_warning: bool = False,
+            self,
+            related_inputs: Optional[
+                Union[
+                    List["FhirCalls"],
+                    "FhirCalls",
+                    List["MockFhirRequest"],
+                    "MockFhirRequest",
+                ]
+            ],
+            fail_on_warning: bool = False,
     ) -> None:
         self.fail_on_warning: bool = fail_on_warning
         if related_inputs:
@@ -101,13 +102,13 @@ class MockCallValidator(Validator):
             )
 
     def validate(
-        self,
-        test_name: str,
-        test_path: Path,
-        spark_session: SparkSession,
-        temp_folder_path: Path,
-        logger: Logger,
-        mock_client: Optional[MockServerFriendlyClient] = None,
+            self,
+            test_name: str,
+            test_path: Path,
+            spark_session: SparkSession,
+            temp_folder_path: Path,
+            logger: Logger,
+            mock_client: Optional[MockServerFriendlyClient] = None,
     ) -> None:
         assert mock_client
         # why cant we just provide the path to the validator init if it just needs the path to the directory?
@@ -143,8 +144,11 @@ class MockCallValidator(Validator):
                             "actual_http_calls"
                         ).joinpath(expected_file_name)
                         with open(result_path, "w") as file_result:
+                            actual_json: List[Dict[str, Any]] | Dict[str, Any] = exception.actual_json
+                            if len(actual_json) == 1:
+                                actual_json = actual_json[0]
                             file_result.write(
-                                json.dumps(exception.actual_json, indent=2)
+                                json.dumps(actual_json, indent=2)
                             )
                         with open(compare_sh_path, "w") as compare_sh:
                             compare_sh.write(
@@ -179,8 +183,8 @@ class MockCallValidator(Validator):
                             )
                             # if folder does not exist or is empty then write out the files
                             if (
-                                resource_type_folder_name
-                                not in existing_resource_folders
+                                    resource_type_folder_name
+                                    not in existing_resource_folders
                             ):
                                 os.makedirs(resource_path, exist_ok=True)
                                 resource_file_path: Path = resource_path.joinpath(
@@ -287,7 +291,7 @@ class MockCallValidator(Validator):
                 for expectations_not_met_exception in expectations_not_met_exceptions:
                     # check if the url matches.  If so then the content is different
                     if unexpected_request.request.matches_without_body(
-                        expectations_not_met_exception.expectation
+                            expectations_not_met_exception.expectation
                     ):
                         comparison_result = list(
                             dictdiffer.diff(
@@ -298,11 +302,11 @@ class MockCallValidator(Validator):
                         comparison_result_text = str(comparison_result)
 
                         warning_message += (
-                            "Content of request is different than expected for url: "
-                            f"{unexpected_request.url}"
-                            + f"\nExpected:{expectations_not_met_exception}"
-                            + f"\nActual:{unexpected_request}"
-                            + f"\nDifferences: \n{comparison_result_text}\n"
+                                "Content of request is different than expected for url: "
+                                f"{unexpected_request.url}"
+                                + f"\nExpected:{expectations_not_met_exception}"
+                                + f"\nActual:{unexpected_request}"
+                                + f"\nDifferences: \n{comparison_result_text}\n"
                         )
 
             # if there is a failure then stop the test
@@ -345,9 +349,9 @@ class MockCallValidator(Validator):
 
 class MockRequestValidator(Validator):
     def __init__(
-        self,
-        mock_requests_folder: Optional[str] = None,
-        fail_on_warning: bool = False,
+            self,
+            mock_requests_folder: Optional[str] = None,
+            fail_on_warning: bool = False,
     ) -> None:
         """
         Validates all mocked requests on the mock server. Only one of these is needed per test it will validate all
@@ -363,13 +367,13 @@ class MockRequestValidator(Validator):
         self.mock_requests_folder = mock_requests_folder
 
     def validate(
-        self,
-        test_name: str,
-        test_path: Path,
-        spark_session: SparkSession,
-        temp_folder_path: Path,
-        logger: Logger,
-        mock_client: Optional[MockServerFriendlyClient] = None,
+            self,
+            test_name: str,
+            test_path: Path,
+            spark_session: SparkSession,
+            temp_folder_path: Path,
+            logger: Logger,
+            mock_client: Optional[MockServerFriendlyClient] = None,
     ) -> None:
         assert mock_client
         data_folder_path: Optional[Path] = None
@@ -403,9 +407,12 @@ class MockRequestValidator(Validator):
                         result_path: Path = temp_folder_path.joinpath(
                             "actual_http_calls"
                         ).joinpath(expected_file_name)
-                        with open(result_path, "w") as file_result:
-                            actual_json = exception.actual_json
-                            file_result.write(json.dumps(actual_json, indent=2))
+                        if exception.actual_json is not None:
+                            with open(result_path, "w") as file_result:
+                                actual_json = exception.actual_json
+                                if len(actual_json) == 1:
+                                    actual_json = actual_json[0]
+                                file_result.write(json.dumps(actual_json, indent=2))
                         with open(compare_sh_path, "w") as compare_sh:
                             compare_sh.write(
                                 'open -na "PyCharm.app" --args diff '
@@ -444,8 +451,8 @@ class MockRequestValidator(Validator):
                             )
                             # if folder does not exist or is empty then write out the files
                             if (
-                                resource_type_folder_name
-                                not in existing_resource_folders
+                                    resource_type_folder_name
+                                    not in existing_resource_folders
                             ):
                                 os.makedirs(resource_path, exist_ok=True)
                                 resource_file_path: Path = resource_path.joinpath(
@@ -564,11 +571,11 @@ class MockRequestValidator(Validator):
                                 "Expected no body but request has a body"
                             )
                         warning_message += (
-                            "Content of request is different than expected for url: "
-                            f"{unexpected_request.url}"
-                            + f"\nExpected:{expectations_not_met_exception}"
-                            + f"\nActual:{unexpected_request}"
-                            + f"\nDifferences: \n{comparison_result_text}\n"
+                                "Content of request is different than expected for url: "
+                                f"{unexpected_request.url}"
+                                + f"\nExpected:{expectations_not_met_exception}"
+                                + f"\nActual:{unexpected_request}"
+                                + f"\nDifferences: \n{comparison_result_text}\n"
                         )
 
             # if there is a failure then stop the test
@@ -613,20 +620,20 @@ class OutputFileValidator(Validator):
     """
 
     def __init__(
-        self,
-        related_inputs: Optional[Union[List["FileInput"], "FileInput"]] = None,
-        func_path_modifier: Optional[
-            Callable[[Union[Path, str]], Union[Path, str]]
-        ] = convert_path_from_docker,
-        sort_output_by: Optional[List[str]] = None,
-        output_as_json_only: bool = True,
-        apply_schema_to_output: bool = True,
-        ignore_views_for_output: Optional[List[str]] = None,
-        output_folder: str = "output",
-        output_schema_folder: str = "output_schema",
-        output_schema: Optional[
-            Union[StructType, Dict[str, StructType], DataType]
-        ] = None,
+            self,
+            related_inputs: Optional[Union[List["FileInput"], "FileInput"]] = None,
+            func_path_modifier: Optional[
+                Callable[[Union[Path, str]], Union[Path, str]]
+            ] = convert_path_from_docker,
+            sort_output_by: Optional[List[str]] = None,
+            output_as_json_only: bool = True,
+            apply_schema_to_output: bool = True,
+            ignore_views_for_output: Optional[List[str]] = None,
+            output_folder: str = "output",
+            output_schema_folder: str = "output_schema",
+            output_schema: Optional[
+                Union[StructType, Dict[str, StructType], DataType]
+            ] = None,
     ):
         """
 
@@ -662,13 +669,13 @@ class OutputFileValidator(Validator):
         self.input_table_names: Optional[List[str]] = None
 
     def validate(
-        self,
-        test_name: str,
-        test_path: Path,
-        spark_session: SparkSession,
-        temp_folder_path: Path,
-        logger: Logger,
-        mock_client: Optional[MockServerFriendlyClient] = None,
+            self,
+            test_name: str,
+            test_path: Path,
+            spark_session: SparkSession,
+            temp_folder_path: Path,
+            logger: Logger,
+            mock_client: Optional[MockServerFriendlyClient] = None,
     ) -> None:
         assert spark_session
         self.logger = logger
@@ -696,10 +703,10 @@ class OutputFileValidator(Validator):
             t.name
             for t in output_tables
             if not t.name.startswith("expected_")
-            and t.name not in self.input_table_names
+               and t.name not in self.input_table_names
         ]
         if (
-            "output" in output_tables_for_writing_schema
+                "output" in output_tables_for_writing_schema
         ):  # if there is an output table then ignore other output tables
             output_tables_for_writing_schema = ["output"]
         if not self.output_schema:
@@ -741,11 +748,11 @@ class OutputFileValidator(Validator):
             t.name
             for t in output_tables
             if t.name.lower() not in views_found
-            and not t.name.startswith("expected_")
-            and t.name not in self.input_table_names
+               and not t.name.startswith("expected_")
+               and t.name not in self.input_table_names
         ]
         if (
-            "output" in table_names_to_write_to_output
+                "output" in table_names_to_write_to_output
         ):  # if there is an output table then ignore other output tables
             table_names_to_write_to_output = ["output"]
         for table_name in table_names_to_write_to_output:
@@ -760,13 +767,13 @@ class OutputFileValidator(Validator):
             )
 
     def process_output_file(
-        self,
-        output_file: str,
-        output_schema_folder: Path,
-        func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path, str]]],
-        sort_output_by: Optional[List[str]],
-        apply_schema_to_output: bool,
-        output_schema: Optional[Union[StructType, Dict[str, StructType], DataType]],
+            self,
+            output_file: str,
+            output_schema_folder: Path,
+            func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path, str]]],
+            sort_output_by: Optional[List[str]],
+            apply_schema_to_output: bool,
+            output_schema: Optional[Union[StructType, Dict[str, StructType], DataType]],
     ) -> Tuple[bool, Optional[SparkDataFrameComparerException]]:
         """
         read predefined outputs and compare them with the current outputs
@@ -802,9 +809,9 @@ class OutputFileValidator(Validator):
         )
         # if there is a schema file and no schema was passed in then use that
         if (
-            apply_schema_to_output
-            and not output_schema
-            and os.path.exists(output_schema_file)
+                apply_schema_to_output
+                and not output_schema
+                and os.path.exists(output_schema_file)
         ):
             with open(output_schema_file) as file:
                 schema_json = json.loads(file.read())
@@ -820,8 +827,8 @@ class OutputFileValidator(Validator):
             output_schema_for_view = (
                 output_schema[view_name]  # type: ignore
                 if output_schema
-                and isinstance(output_schema, dict)
-                and view_name in output_schema
+                   and isinstance(output_schema, dict)
+                   and view_name in output_schema
                 else output_schema
             )
 
@@ -874,7 +881,7 @@ class OutputFileValidator(Validator):
                     file_extension="csv",
                 )
             elif (
-                file_extension.lower() == ".jsonl" or file_extension.lower() == ".json"
+                    file_extension.lower() == ".jsonl" or file_extension.lower() == ".json"
             ):
                 self.combine_spark_json_files_to_one_file(
                     source_folder=result_path_for_view,
@@ -926,10 +933,10 @@ class OutputFileValidator(Validator):
         return found_output_file, data_frame_exception
 
     def write_table_to_output(
-        self,
-        view_name: str,
-        sort_output_by: Optional[List[str]],
-        output_as_json_only: bool,
+            self,
+            view_name: str,
+            sort_output_by: Optional[List[str]],
+            output_as_json_only: bool,
     ) -> None:
         assert self.temp_folder_path
         assert self.spark_session
@@ -986,7 +993,7 @@ class OutputFileValidator(Validator):
 
     @staticmethod
     def combine_spark_csv_files_to_one_file(
-        source_folder: Path, destination_file: Path, file_extension: str
+            source_folder: Path, destination_file: Path, file_extension: str
     ) -> None:
         file_pattern_to_search: Path = source_folder.joinpath(f"*.{file_extension}")
         # find files with that extension in source_folder
@@ -1002,7 +1009,7 @@ class OutputFileValidator(Validator):
 
     @staticmethod
     def combine_spark_json_files_to_one_file(
-        source_folder: Path, destination_file: Path, file_extension: str
+            source_folder: Path, destination_file: Path, file_extension: str
     ) -> None:
         file_pattern_to_search: Path = source_folder.joinpath(f"*.{file_extension}")
         # find files with that extension in source_folder
@@ -1022,11 +1029,11 @@ class OutputFileValidator(Validator):
 
     @staticmethod
     def get_compare_path(
-        result_path: Optional[Path],
-        expected_path: Optional[Path],
-        temp_folder: Optional[Union[Path, str]],
-        func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path, str]]],
-        type_: str,
+            result_path: Optional[Path],
+            expected_path: Optional[Path],
+            temp_folder: Optional[Union[Path, str]],
+            func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path, str]]],
+            type_: str,
     ) -> Optional[Path]:
         compare_sh_path: Optional[Path] = None
         if expected_path and result_path and temp_folder:
