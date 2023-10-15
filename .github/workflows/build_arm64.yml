@@ -1,10 +1,13 @@
 name: Build Docker Image for arm64
 
+#on:
+#  push:
+#    branches: [ main ]
+#  pull_request:
+#    branches: [ main ]
+
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   docker:
@@ -35,4 +38,3 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
           # Do not push the image to any registry
           push: false
-
