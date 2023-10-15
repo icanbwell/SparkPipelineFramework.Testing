@@ -7,6 +7,7 @@ from os.path import isfile, join
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple, Union, Callable, TYPE_CHECKING
 
+# noinspection PyPackageRequirements
 import dictdiffer
 
 # noinspection PyPackageRequirements
@@ -142,13 +143,20 @@ class MockCallValidator(Validator):
                         result_path: Path = temp_folder_path.joinpath(
                             "actual_http_calls"
                         ).joinpath(expected_file_name)
-                        with open(result_path, "w") as file_result:
-                            file_result.write(
-                                json.dumps(exception.actual_json, indent=2)
-                            )
+                        if exception.actual_json is not None:
+                            with open(result_path, "w") as file_result:
+                                actual_json: List[Dict[str, Any]] | Dict[
+                                    str, Any
+                                ] = exception.actual_json
+                                if (
+                                    isinstance(actual_json, list)
+                                    and len(actual_json) == 1
+                                ):
+                                    actual_json = actual_json[0]
+                                file_result.write(json.dumps(actual_json, indent=2))
                         with open(compare_sh_path, "w") as compare_sh:
                             compare_sh.write(
-                                f"/usr/local/bin/charm diff "
+                                'open -na "PyCharm.app" --args diff '
                                 f"{convert_path_from_docker(result_path)}"
                                 f"{convert_path_from_docker(expected_path)}"
                             )
@@ -403,12 +411,20 @@ class MockRequestValidator(Validator):
                         result_path: Path = temp_folder_path.joinpath(
                             "actual_http_calls"
                         ).joinpath(expected_file_name)
-                        with open(result_path, "w") as file_result:
-                            actual_json = exception.actual_json
-                            file_result.write(json.dumps(actual_json, indent=2))
+                        if exception.actual_json is not None:
+                            with open(result_path, "w") as file_result:
+                                actual_json: List[Dict[str, Any]] | Dict[
+                                    str, Any
+                                ] = exception.actual_json
+                                if (
+                                    isinstance(actual_json, list)
+                                    and len(actual_json) == 1
+                                ):
+                                    actual_json = actual_json[0]
+                                file_result.write(json.dumps(actual_json, indent=2))
                         with open(compare_sh_path, "w") as compare_sh:
                             compare_sh.write(
-                                f"/usr/local/bin/charm diff "
+                                'open -na "PyCharm.app" --args diff '
                                 f"{convert_path_from_docker(result_path)} "
                                 f"{convert_path_from_docker(expected_path)}"
                             )
@@ -1039,7 +1055,7 @@ class OutputFileValidator(Validator):
             )
             with open(compare_sh_path, "w") as compare_sh:
                 compare_sh.write(
-                    f"/usr/local/bin/charm diff "
+                    'open -na "PyCharm.app" --args diff '
                     f"{func_path_modifier(result_path) if func_path_modifier else result_path} "
                     f"{func_path_modifier(expected_path) if func_path_modifier else expected_path}"
                 )

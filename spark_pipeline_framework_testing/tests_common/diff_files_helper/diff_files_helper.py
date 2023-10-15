@@ -29,7 +29,7 @@ class DiffFilesHelper:
             file_result.write(json.dumps(actual, indent=2))
         with open(compare_sh_path, "w") as compare_sh:
             compare_sh.write(
-                "/usr/local/bin/charm diff "
+                'open -na "PyCharm.app" --args diff '
                 f"{convert_path_from_docker(result_path)}"
                 f"{convert_path_from_docker(expected_path)}"
             )

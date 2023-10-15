@@ -7,7 +7,7 @@ name = "pypi"
 pyspark = "==3.3.0"
 protobuf=">=3"
 Deprecated = ">=1.2.12"
-"helix.fhir.client.sdk" = ">=1.0.34"
+"helix.fhir.client.sdk" = ">=1.0.44"
 helix-mockserver-client=">=1.0.6"
 
 [dev-packages]
@@ -24,10 +24,10 @@ py4j = "==0.10.9.5" # https://spark.apache.org/docs/latest/api/python/getting_st
 pyspark="==3.3.0"  # should match the version of spark we use for testing
 pygments = ">=2.8.1" # not directly required, pinned by Snyk to avoid a vulnerability
 types-Deprecated=">=0.1.2"
-sparkautomapper = "==2.0.1"
+sparkautomapper = "==2.0.6"
 "sparkautomapper.fhir" = "==2.0.0"
-"sparkfhirschemas" = "==1.0.14"
-sparkpipelineframework = "==2.0.1"
+"sparkfhirschemas" = "==1.0.16"
+sparkpipelineframework = "==2.0.10"
 "sparkdataframecomparer" = "==2.0.2"
 requests = ">=2.25.1"
 dictdiffer = ">=0.9.0"
