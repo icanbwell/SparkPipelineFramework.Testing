@@ -31,7 +31,7 @@ class DiffFilesHelper:
             compare_sh.write(
                 'open -na "PyCharm.app" --args diff '
                 f"{convert_path_from_docker(result_path)}"
-                f"{convert_path_from_docker(expected_path)}"
+                f" {convert_path_from_docker(expected_path)}"
             )
             os.fchmod(compare_sh.fileno(), 0o7777)
 

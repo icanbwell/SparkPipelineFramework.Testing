@@ -502,8 +502,8 @@ class SparkPipelineFrameworkTestRunner:
             with open(compare_sh_path, "w") as compare_sh:
                 compare_sh.write(
                     'open -na "PyCharm.app" --args diff '
-                    f"{func_path_modifier(result_path) if func_path_modifier else result_path} "
-                    f"{func_path_modifier(expected_path) if func_path_modifier else expected_path}"
+                    f"{func_path_modifier(result_path) if func_path_modifier else result_path}"
+                    f" {func_path_modifier(expected_path) if func_path_modifier else expected_path}"
                 )
                 os.fchmod(compare_sh.fileno(), 0o7777)
         return compare_sh_path

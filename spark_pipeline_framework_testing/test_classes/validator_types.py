@@ -158,7 +158,7 @@ class MockCallValidator(Validator):
                             compare_sh.write(
                                 'open -na "PyCharm.app" --args diff '
                                 f"{convert_path_from_docker(result_path)}"
-                                f"{convert_path_from_docker(expected_path)}"
+                                f" {convert_path_from_docker(expected_path)}"
                             )
                             os.fchmod(compare_sh.fileno(), 0o7777)
                         compare_files.append(str(compare_sh_path))
@@ -425,8 +425,8 @@ class MockRequestValidator(Validator):
                         with open(compare_sh_path, "w") as compare_sh:
                             compare_sh.write(
                                 'open -na "PyCharm.app" --args diff '
-                                f"{convert_path_from_docker(result_path)} "
-                                f"{convert_path_from_docker(expected_path)}"
+                                f"{convert_path_from_docker(result_path)}"
+                                f" {convert_path_from_docker(expected_path)}"
                             )
                             os.fchmod(compare_sh.fileno(), 0o7777)
                         compare_files.append(str(compare_sh_path))
@@ -1056,8 +1056,8 @@ class OutputFileValidator(Validator):
             with open(compare_sh_path, "w") as compare_sh:
                 compare_sh.write(
                     'open -na "PyCharm.app" --args diff '
-                    f"{func_path_modifier(result_path) if func_path_modifier else result_path} "
-                    f"{func_path_modifier(expected_path) if func_path_modifier else expected_path}"
+                    f"{func_path_modifier(result_path) if func_path_modifier else result_path}"
+                    f" {func_path_modifier(expected_path) if func_path_modifier else expected_path}"
                 )
                 os.fchmod(compare_sh.fileno(), 0o7777)
         return compare_sh_path
