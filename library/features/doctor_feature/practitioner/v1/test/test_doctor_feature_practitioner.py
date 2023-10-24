@@ -22,7 +22,7 @@ def test_doctor_feature_practitioner(spark_session: SparkSession) -> None:
     logger = get_logger(__name__)
 
     mock_server_url = "http://mock-server:1080"
-    mock_client = MockServerFriendlyClient(mock_server_url)
+    mock_client = MockServerFriendlyClient(base_url=mock_server_url)
     mock_client.clear(f"/{test_name}/")
     mock_client.expect_default()
 

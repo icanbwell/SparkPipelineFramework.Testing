@@ -104,7 +104,7 @@ class FhirValidator(MockCallValidator):
                 assert resource_type
                 full_uri /= resource_type
                 headers = {"Content-Type": "application/fhir+json"}
-                full_uri /= "1"
+                full_uri /= row_dict.get("id") or "1"
                 full_uri /= "$merge"
                 json_payload: str = json.dumps([row_dict])
                 json_payload_bytes: bytes = json_payload.encode("utf-8")
