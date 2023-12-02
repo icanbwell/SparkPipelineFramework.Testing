@@ -8,7 +8,7 @@ pyspark = "==3.3.0"
 protobuf=">=3"
 Deprecated = ">=1.2.12"
 "helix.fhir.client.sdk" = ">=2.0.2"
-helix-mockserver-client=">=1.1.0"
+helix-mockserver-client=">=1.1.1"
 
 [dev-packages]
 setuptools=">=68.0.0"
