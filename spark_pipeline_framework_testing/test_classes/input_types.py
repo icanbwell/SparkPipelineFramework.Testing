@@ -10,6 +10,7 @@ from mockserver_client.mock_requests_loader import (
     load_mock_fhir_requests_from_folder,
     load_mock_fhir_requests_for_single_file,
     load_mock_source_api_json_responses,
+    load_mock_source_api_responses_from_folder,
 )
 from mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
@@ -401,6 +402,39 @@ class HttpJsonRequest(TestInputType):
             mock_client=mock_client,
             url_prefix=self.url_prefix,
             add_file_name=self.add_file_name_to_request,
+        )
+
+
+class HttpApiRequest(TestInputType):
+    def __init__(
+        self,
+        response_data_folder: str,
+        mock_url_prefix: Optional[str] = None,
+    ) -> None:
+        super().__init__()
+        self.response_data_folder = response_data_folder
+        self.test_path: Path
+        self.url_prefix = mock_url_prefix
+
+    def initialize(
+        self,
+        test_name: str,
+        test_path: Path,
+        logger: Logger,
+        mock_client: Optional[MockServerFriendlyClient] = None,
+        spark_session: Optional[SparkSession] = None,
+    ) -> None:
+        assert mock_client
+        self.test_path = test_path
+        self.logger = logger
+        if self.url_prefix is None:
+            self.url_prefix = test_name
+        response_data_path = self.test_path.joinpath(self.response_data_folder)
+        self.raise_if_not_exist(response_data_path)
+        load_mock_source_api_responses_from_folder(
+            folder=response_data_path,
+            mock_client=mock_client,
+            url_prefix=self.url_prefix,
         )
 
 
