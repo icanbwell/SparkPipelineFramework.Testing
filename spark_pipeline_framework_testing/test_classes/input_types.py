@@ -262,6 +262,7 @@ class FileInput(TestInputType):
             ".csv",
             ".json",
             ".jsonl",
+            ".ndjson",
             ".parquet",
             ".txt",
             ".xml",
@@ -311,7 +312,11 @@ class FileInput(TestInputType):
                 comment="#",
                 emptyValue=None,
             ).limit(self.row_limit)
-        elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
+        elif (
+            file_extension.lower() == ".jsonl"
+            or file_extension.lower() == ".json"
+            or file_extension.lower() == ".ndjson"
+        ):
             # create json_input_folder if it does not exist
             json_input_folder = os.path.join(input_folder, "..", "input_jsonl")
             if not os.path.exists(json_input_folder):

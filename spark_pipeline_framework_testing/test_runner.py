@@ -336,7 +336,13 @@ class SparkPipelineFrameworkTestRunner:
         view_name: str = SparkPipelineFrameworkTestRunner.get_view_name_from_file_path(
             output_file
         )
-        if file_extension.lower() not in [".csv", ".json", ".jsonl", ".parquet"]:
+        if file_extension.lower() not in [
+            ".csv",
+            ".json",
+            ".jsonl",
+            ".ndjson",
+            ".parquet",
+        ]:
             return True, data_frame_exception
         result_df: DataFrame = spark_session.table(view_name)
         sort_columns: List[str] = (
@@ -393,7 +399,11 @@ class SparkPipelineFrameworkTestRunner:
                 path=output_file_path, header=True, comment="#", emptyValue=None
             )
             found_output_file = True
-        elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
+        elif (
+            file_extension.lower() == ".jsonl"
+            or file_extension.lower() == ".json"
+            or file_extension.lower() == ".ndjson"
+        ):
             output_df = reader.option("multiLine", True).json(path=output_file_path)
             found_output_file = True
         elif file_extension.lower() == ".parquet":
@@ -426,7 +436,9 @@ class SparkPipelineFrameworkTestRunner:
                     file_extension="csv",
                 )
             elif (
-                file_extension.lower() == ".jsonl" or file_extension.lower() == ".json"
+                file_extension.lower() == ".jsonl"
+                or file_extension.lower() == ".json"
+                or file_extension.lower() == ".ndjson"
             ):
                 SparkPipelineFrameworkTestRunner.combine_spark_json_files_to_one_file(
                     source_folder=result_path_for_view,
@@ -521,7 +533,13 @@ class SparkPipelineFrameworkTestRunner:
                 input_file
             )
         )
-        if file_extension.lower() not in [".csv", ".json", ".jsonl", ".parquet"]:
+        if file_extension.lower() not in [
+            ".csv",
+            ".json",
+            ".jsonl",
+            ".ndjson",
+            ".parquet",
+        ]:
             return
 
         view_name: str = SparkPipelineFrameworkTestRunner.get_view_name_from_file_path(
@@ -567,7 +585,11 @@ class SparkPipelineFrameworkTestRunner:
                 comment="#",
                 emptyValue=None,
             ).limit(SparkPipelineFrameworkTestRunner.row_limit)
-        elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
+        elif (
+            file_extension.lower() == ".jsonl"
+            or file_extension.lower() == ".json"
+            or file_extension.lower() == ".ndjson"
+        ):
             # create json_input_folder if it does not exist
             json_input_folder = os.path.join(input_folder, "..", "input_jsonl")
             if not os.path.exists(json_input_folder):

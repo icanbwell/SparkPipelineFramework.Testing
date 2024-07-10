@@ -794,7 +794,13 @@ class OutputFileValidator(Validator):
         data_frame_exception: Optional[SparkDataFrameComparerException] = None
         file_extension: str = get_file_extension_from_file_path(output_file)
         view_name: str = get_view_name_from_file_path(output_file)
-        if file_extension.lower() not in [".csv", ".json", ".jsonl", ".parquet"]:
+        if file_extension.lower() not in [
+            ".csv",
+            ".json",
+            ".jsonl",
+            ".ndjson",
+            ".parquet",
+        ]:
             return True, data_frame_exception
         result_df: DataFrame = self.spark_session.table(view_name)
         sort_columns: List[str] = (
@@ -855,7 +861,11 @@ class OutputFileValidator(Validator):
                 path=str(output_file_path), header=True, comment="#", emptyValue=None
             )
             found_output_file = True
-        elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
+        elif (
+            file_extension.lower() == ".jsonl"
+            or file_extension.lower() == ".json"
+            or file_extension.lower() == ".ndjson"
+        ):
             output_df = reader.option("multiLine", True).json(
                 path=str(output_file_path)
             )
@@ -890,7 +900,9 @@ class OutputFileValidator(Validator):
                     file_extension="csv",
                 )
             elif (
-                file_extension.lower() == ".jsonl" or file_extension.lower() == ".json"
+                file_extension.lower() == ".jsonl"
+                or file_extension.lower() == ".json"
+                or file_extension.lower() == ".ndjson"
             ):
                 self.combine_spark_json_files_to_one_file(
                     source_folder=result_path_for_view,
