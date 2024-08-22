@@ -22,17 +22,9 @@ init: devdocker up setup-pre-commit  ## Initializes the local developer environm
 
 .PHONY: up
 up: Pipfile.lock
-	docker compose up --build -d --remove-orphans && \
-	echo "\nwaiting for Mongo server to become healthy" && \
-	while [ "`docker inspect --format {{.State.Health.Status}} sparkpipelineframework-mongo-1`" != "healthy" ] && [ "`docker inspect --format {{.State.Health.Status}} sparkpipelineframework-mongo-1`" != "unhealthy" ] && [ "`docker inspect --format {{.State.Status}} sparkpipelineframework-mongo-1`" != "restarting" ]; do printf "." && sleep 2; done && \
-	if [ "`docker inspect --format {{.State.Health.Status}} sparkpipelineframework-mongo-1`" != "healthy" ]; then docker ps && docker logs sparkpipelineframework-mongo-1 && printf "========== ERROR: sparkpipelineframework-mongo-1 did not start. Run docker logs sparkpipelineframework-mongo-1 =========\n" && exit 1; fi && \
-	echo "\nwaiting for Fhir server to become healthy" && \
-	while [ "`docker inspect --format {{.State.Health.Status}} sparkpipelineframework-fhir-1`" != "healthy" ] && [ "`docker inspect --format {{.State.Health.Status}} sparkpipelineframework-fhir-1`" != "unhealthy" ] && [ "`docker inspect --format {{.State.Status}} sparkpipelineframework-fhir-1`" != "restarting" ]; do printf "." && sleep 2; done && \
-	if [ "`docker inspect --format {{.State.Health.Status}} sparkpipelineframework-fhir-1`" != "healthy" ]; then docker ps && docker logs sparkpipelineframework-fhir-1 && printf "========== ERROR: sparkpipelineframework-fhir-1 did not start. Run docker logs sparkpipelineframework-fhir-1 =========\n" && exit 1; fi
+	docker compose up --build -d --remove-orphans
 	@echo MockServer dashboard: http://localhost:1080/mockserver/dashboard
-	@echo Spark dashboard: http://localhost:8080/
 	@echo Fhir server dashboard http://localhost:3000/
-	@echo Keycloak OAuth dashboard http://admin:password@localhost:8080/
 
 .PHONY: down
 down:
