@@ -23,11 +23,13 @@ except IOError:
 # create the package setup
 setup(
     install_requires=[
-        "pyspark==3.3.0",
         "protobuf>=3",
+        "pyspark==3.5.1",
+        "pyarrow>=17.0.0",
+        "delta-spark==3.2.0",
         "deprecated>=1.2.12",
-        "helix.fhir.client.sdk>=1.0.34",
-        "helix-mockserver-client>=1.0.4",
+        "helix.fhir.client.sdk>=3.0.2",
+        "helix-mockserver-client>=2.0.0",
     ],
     name=package_name,
     version=version,
