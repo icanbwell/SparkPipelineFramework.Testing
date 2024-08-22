@@ -106,3 +106,14 @@ show_dependency_graph:
 .PHONY:qodana
 qodana:
 	docker run --rm -it --name qodana --mount type=bind,source="${PWD}",target=/data/project -p 8080:8080 jetbrains/qodana-python:2022.3-eap --show-report
+
+.PHONY:build
+build: ## Builds the docker for dev
+	docker compose build --progress=plain --parallel
+
+.PHONY:clean
+clean: down
+	find . -type d -name "__pycache__" | xargs rm -r
+	find . -type d -name "metastore_db" | xargs rm -r
+	find . -type f -name "derby.log" | xargs rm -r
+	find . -type d -name "temp" | xargs rm -r

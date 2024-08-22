@@ -40,9 +40,9 @@ def handle_fhir_sender_exception(
     result_path: Path = temp_folder.joinpath(expected_file_name)
     if json_content_mismatch_exception.actual_json is not None:
         with open(result_path, "w") as file_result:
-            actual_json: List[Dict[str, Any]] | Dict[
-                str, Any
-            ] = json_content_mismatch_exception.actual_json
+            actual_json: List[Dict[str, Any]] | Dict[str, Any] = (
+                json_content_mismatch_exception.actual_json
+            )
             if isinstance(actual_json, list) and len(actual_json) == 1:
                 actual_json = actual_json[0]
             file_result.write(json.dumps(actual_json, indent=2))

@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+from logging import Logger
 from pathlib import Path
 from re import search
 from typing import List, Optional, Match, Dict, Any, Type, TYPE_CHECKING
@@ -11,8 +12,6 @@ from mockserver_client.mockserver_client import MockServerFriendlyClient
 from pyspark.ml import Transformer
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import StructType
-from pyspark.sql.utils import PythonException
-from spark_pipeline_framework.logger.yarn_logger import Logger  # type: ignore
 from spark_pipeline_framework.progress_logger.progress_logger import ProgressLogger
 from spark_pipeline_framework.proxy_generator.proxy_base import ProxyBase
 from spark_pipeline_framework.utilities.FriendlySparkException import (
@@ -80,9 +79,9 @@ class SparkPipelineFrameworkTestRunnerV2:
 
         self.test_path: Path = test_path
         self.spark_session: SparkSession = spark_session
-        self.helix_pipeline_parameters: Optional[
-            Dict[str, Any]
-        ] = helix_pipeline_parameters
+        self.helix_pipeline_parameters: Optional[Dict[str, Any]] = (
+            helix_pipeline_parameters
+        )
         self.test_name: str = test_name
         self.test_validators: Optional[List[Validator]] = test_validators
         self.test_inputs: Optional[List["TestInputType"]] = test_inputs
@@ -110,14 +109,16 @@ class SparkPipelineFrameworkTestRunnerV2:
                 "fhir_server_url": fhir_server_url,
                 "fhir_validation_url": fhir_validation_url,
                 "athena_schema": "fake_schema",
-                "cache_handler": self.extra_params.get("cache_handler")
-                if self.extra_params
-                else None,
-                "address_standardization_class": self.extra_params.get(
-                    "address_standardization_class"
-                )
-                if self.extra_params
-                else None,
+                "cache_handler": (
+                    self.extra_params.get("cache_handler")
+                    if self.extra_params
+                    else None
+                ),
+                "address_standardization_class": (
+                    self.extra_params.get("address_standardization_class")
+                    if self.extra_params
+                    else None
+                ),
                 "batch_size": 1,
             }
         )
@@ -150,9 +151,11 @@ class SparkPipelineFrameworkTestRunnerV2:
                 if self.helix_transformers:
                     for transformer in self.helix_transformers:
                         self.run_helix_transformers(
-                            parameters=self.helix_pipeline_parameters  # type: ignore
-                            if self.helix_pipeline_parameters
-                            else ParameterDict({}),
+                            parameters=(
+                                self.helix_pipeline_parameters  # type: ignore
+                                if self.helix_pipeline_parameters
+                                else ParameterDict({})
+                            ),
                             transformer_class=transformer,
                             progress_logger=self.progress_logger,
                         )
@@ -168,9 +171,11 @@ class SparkPipelineFrameworkTestRunnerV2:
 
                 if transformer_class:
                     self.run_helix_transformers(
-                        parameters=self.helix_pipeline_parameters  # type: ignore
-                        if self.helix_pipeline_parameters
-                        else ParameterDict({}),
+                        parameters=(
+                            self.helix_pipeline_parameters  # type: ignore
+                            if self.helix_pipeline_parameters
+                            else ParameterDict({})
+                        ),
                         transformer_class=transformer_class,
                         progress_logger=self.progress_logger,
                     )
@@ -210,15 +215,15 @@ class SparkPipelineFrameworkTestRunnerV2:
                     temp_folder=self.temp_folder_path,
                     func_path_modifier=convert_path_from_docker,
                 )
-            elif (
-                isinstance(e.exception, PythonException)
-                and "FhirSenderException" in e.exception.desc
-            ):
-                handle_fhir_sender_exception(
-                    e=e,
-                    temp_folder=self.temp_folder_path,
-                    func_path_modifier=convert_path_from_docker,
-                )
+            # elif (
+            #     isinstance(e.exception, PythonException)
+            #     and "FhirSenderException" in e.exception.desc
+            # ):
+            #     handle_fhir_sender_exception(
+            #         e=e,
+            #         temp_folder=self.temp_folder_path,
+            #         func_path_modifier=convert_path_from_docker,
+            #     )
             else:
                 raise
         except ModuleNotFoundError:

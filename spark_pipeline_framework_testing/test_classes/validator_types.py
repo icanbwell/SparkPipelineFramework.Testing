@@ -145,9 +145,9 @@ class MockCallValidator(Validator):
                         ).joinpath(expected_file_name)
                         if exception.actual_json is not None:
                             with open(result_path, "w") as file_result:
-                                actual_json: List[Dict[str, Any]] | Dict[
-                                    str, Any
-                                ] = exception.actual_json
+                                actual_json: List[Dict[str, Any]] | Dict[str, Any] = (
+                                    exception.actual_json
+                                )
                                 if (
                                     isinstance(actual_json, list)
                                     and len(actual_json) == 1
@@ -413,9 +413,9 @@ class MockRequestValidator(Validator):
                         ).joinpath(expected_file_name)
                         if exception.actual_json is not None:
                             with open(result_path, "w") as file_result:
-                                actual_json: List[Dict[str, Any]] | Dict[
-                                    str, Any
-                                ] = exception.actual_json
+                                actual_json: List[Dict[str, Any]] | Dict[str, Any] = (
+                                    exception.actual_json
+                                )
                                 if (
                                     isinstance(actual_json, list)
                                     and len(actual_json) == 1
@@ -740,7 +740,10 @@ class OutputFileValidator(Validator):
         for output_file in output_files:
             found_output_file: bool
             data_frame_exception: Optional[SparkDataFrameComparerException]
-            (found_output_file, data_frame_exception,) = self.process_output_file(
+            (
+                found_output_file,
+                data_frame_exception,
+            ) = self.process_output_file(
                 output_file=output_file,
                 output_schema_folder=output_schema_folder,
                 func_path_modifier=self.func_path_modifier,

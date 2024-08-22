@@ -90,9 +90,9 @@ class FhirCalls(TestInputType):
         self.mock_client: MockServerFriendlyClient
         self.spark_session: SparkSession
         self.temp_folder_path: Path
-        self.mocked_files: Optional[
-            List[str]
-        ] = []  # list of files that are used in mocking
+        self.mocked_files: Optional[List[str]] = (
+            []
+        )  # list of files that are used in mocking
         self.method: str = method
         self.relative_path: Optional[str] = relative_path
         self.query_string: Optional[Dict[str, Any]] = query_string
@@ -460,9 +460,9 @@ class MockFhirRequest(TestInputType):
         self.test_path: Path
         self.fhir_resource_type = fhir_resource_type
         self.fhir_endpoint = fhir_endpoint
-        self.mocked_files: Optional[
-            List[str]
-        ] = []  # list of files that are used in mocking
+        self.mocked_files: Optional[List[str]] = (
+            []
+        )  # list of files that are used in mocking
 
     def initialize(
         self,
