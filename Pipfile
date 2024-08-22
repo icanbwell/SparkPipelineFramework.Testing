@@ -64,7 +64,7 @@ Sphinx="==8.0.2"
 sphinx-autoapi="==3.2.1"
 sphinx-rtd-theme=">=0.5.1"
 myst-parser="==4.0.0"
-#recommonmark="==0.7.1"
+recommonmark="==0.7.1"
 # types-requests is needed for type hints for requests
 types-requests=">=2.31.0"
 types-Pygments="*"
