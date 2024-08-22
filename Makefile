@@ -3,11 +3,11 @@ LANG=en_US.utf-8
 export LANG
 
 Pipfile.lock: Pipfile
-	docker compose run --rm --name spf_test dev sh -c "rm -f Pipfile.lock && pipenv lock --dev"
+	docker compose run --rm --name spftest dev sh -c "rm -f Pipfile.lock && pipenv lock --dev"
 
 .PHONY: install_types
 install_types: Pipfile
-	docker compose run --rm --name spf_test dev pipenv run mypy --install-types --non-interactive
+	docker compose run --rm --name spftest dev pipenv run mypy --install-types --non-interactive
 
 .PHONY:devdocker
 devdocker: ## Builds the docker for dev
@@ -52,15 +52,11 @@ update: down Pipfile.lock setup-pre-commit  ## Updates all the packages using Pi
 
 .PHONY:tests
 tests:
-	docker compose run --rm --name spf_tests dev pytest tests spf_test
-
-.PHONY:proxies
-proxies:
-	docker compose run --rm --name spf_proxies dev python /SparkpipelineFramework/spf_test/proxy_generator/generate_proxies.py
+	docker compose run --rm --name spftests dev pytest tests library
 
 .PHONY: sphinx-html
 sphinx-html:
-	docker compose run --rm --name spf_test dev make -C docsrc html
+	docker compose run --rm --name spftest dev make -C docsrc html
 	@echo "copy html to docs... why? https://github.com/sphinx-doc/sphinx/issues/3382#issuecomment-470772316"
 	@rm -rf docs/*
 	@touch docs/.nojekyll
@@ -68,7 +64,7 @@ sphinx-html:
 
 .PHONY:pipenv-setup
 pipenv-setup:devdocker ## Run pipenv-setup to update setup.py with latest dependencies
-	docker compose run --rm --name spf_test dev sh -c "pipenv run pipenv install --skip-lock --categories \"pipenvsetup\" && pipenv run pipenv-setup sync --pipfile" && \
+	docker compose run --rm --name spftest dev sh -c "pipenv run pipenv install --skip-lock --categories \"pipenvsetup\" && pipenv run pipenv-setup sync --pipfile" && \
 	make run-pre-commit
 
 .PHONY: clean_data
@@ -79,8 +75,8 @@ endif
 
 .PHONY:show_dependency_graph
 show_dependency_graph:
-	docker compose run --rm --name spf_test dev sh -c "pipenv install --skip-lock -d && pipenv graph --reverse"
-	docker compose run --rm --name spf_test dev sh -c "pipenv install -d && pipenv graph"
+	docker compose run --rm --name spftest dev sh -c "pipenv install --skip-lock -d && pipenv graph --reverse"
+	docker compose run --rm --name spftest dev sh -c "pipenv install -d && pipenv graph"
 
 .PHONY:build
 build: ## Builds the docker for dev
