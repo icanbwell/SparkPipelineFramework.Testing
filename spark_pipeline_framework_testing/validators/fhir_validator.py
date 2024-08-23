@@ -9,6 +9,9 @@ from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import to_json, struct
 from pyspark.sql.session import SparkSession
 from requests import Session
+from spark_pipeline_framework.utilities.spark_data_frame_helpers import (
+    spark_list_catalog_table_names,
+)
 
 from spark_pipeline_framework_testing.test_classes.input_types import (
     FhirCalls,
@@ -20,8 +23,6 @@ from spark_pipeline_framework_testing.test_classes.validator_types import (
 )
 
 from spark_pipeline_framework.logger.yarn_logger import Logger  # type: ignore
-
-from pyspark.sql.catalog import Table
 
 
 class FhirValidator(MockCallValidator):
@@ -67,11 +68,11 @@ class FhirValidator(MockCallValidator):
         if "output" in input_table_names:
             input_table_names.remove("output")
         # write out any missing output schemas
-        output_tables: List[Table] = spark_session.catalog.listTables("default")
         output_tables_for_writing_schema: List[str] = [
-            t.name
-            for t in output_tables
-            if not t.name.startswith("expected_") and t.name not in input_table_names
+            table_name
+            for table_name in spark_list_catalog_table_names(spark_session)
+            if not table_name.startswith("expected_")
+            and table_name not in input_table_names
         ]
 
         # for each output table

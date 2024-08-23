@@ -20,6 +20,10 @@ jobs:
         with:
           python-version: '3.10'
 
+      # show docker version
+      - name: show docker version
+        run: docker --version
+
 
       - name: pre-commit
         run: make run-pre-commit

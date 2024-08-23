@@ -11,7 +11,6 @@ from typing import List, Optional, Match, Dict, Any, Tuple, Union, Callable, Typ
 
 from pyspark.ml import Transformer
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.catalog import Table
 from pyspark.sql.types import StructType, DataType
 from spark_data_frame_comparer.spark_data_frame_comparer import (
     assert_compare_data_frames,
@@ -24,6 +23,9 @@ from spark_pipeline_framework.progress_logger.progress_logger import ProgressLog
 from spark_pipeline_framework.utilities.class_helpers import ClassHelpers
 from spark_pipeline_framework.utilities.json_to_jsonl_converter.json_to_jsonl_converter import (
     convert_json_to_jsonl,
+)
+from spark_pipeline_framework.utilities.spark_data_frame_helpers import (
+    spark_list_catalog_table_names,
 )
 
 from spark_pipeline_framework_testing.testing_exception import (
@@ -124,10 +126,10 @@ class SparkPipelineFrameworkTestRunner:
                 )
 
             # write out any input schemas
-            input_tables: List[Table] = spark_session.catalog.listTables("default")
-
             input_table_names = [
-                t.name for t in input_tables if not t.name.startswith("expected_")
+                table_name
+                for table_name in spark_list_catalog_table_names(spark_session)
+                if not table_name.startswith("expected_")
             ]
             if not input_schema:
                 table_name: str
@@ -167,22 +169,19 @@ class SparkPipelineFrameworkTestRunner:
 
         if check_output:
             # write out any missing schemas
-            output_tables: List[Table] = spark_session.catalog.listTables("default")
-
-            if ignore_views_for_output is not None:
-                output_tables = [
-                    table
-                    for table in output_tables
-                    if table.name not in ignore_views_for_output
-                ]
-
             output_schema_folder: Path = Path(folder_path).joinpath("output_schema")
             tables_for_writing_schema: List[str] = [
-                t.name
-                for t in output_tables
-                if not t.name.startswith("expected_")
-                and t.name not in input_table_names
+                table_name
+                for table_name in spark_list_catalog_table_names(spark_session)
+                if not table_name.startswith("expected_")
+                and table_name not in input_table_names
             ]
+            if ignore_views_for_output is not None:
+                tables_for_writing_schema = [
+                    table
+                    for table in tables_for_writing_schema
+                    if table not in ignore_views_for_output
+                ]
             if (
                 "output" in tables_for_writing_schema
             ):  # if there is an output table then ignore other input_tables
@@ -242,11 +241,11 @@ class SparkPipelineFrameworkTestRunner:
 
             # write out any missing output files
             table_names_to_write_to_output: List[str] = [
-                t.name
-                for t in output_tables
-                if t.name.lower() not in views_found
-                and not t.name.startswith("expected_")
-                and t.name not in input_table_names
+                table_name
+                for table_name in spark_list_catalog_table_names(spark_session)
+                if table_name.lower() not in views_found
+                and not table_name.startswith("expected_")
+                and table_name not in input_table_names
             ]
             if (
                 "output" in table_names_to_write_to_output
@@ -336,7 +335,13 @@ class SparkPipelineFrameworkTestRunner:
         view_name: str = SparkPipelineFrameworkTestRunner.get_view_name_from_file_path(
             output_file
         )
-        if file_extension.lower() not in [".csv", ".json", ".jsonl", ".parquet"]:
+        if file_extension.lower() not in [
+            ".csv",
+            ".json",
+            ".jsonl",
+            ".ndjson",
+            ".parquet",
+        ]:
             return True, data_frame_exception
         result_df: DataFrame = spark_session.table(view_name)
         sort_columns: List[str] = (
@@ -393,7 +398,11 @@ class SparkPipelineFrameworkTestRunner:
                 path=output_file_path, header=True, comment="#", emptyValue=None
             )
             found_output_file = True
-        elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
+        elif (
+            file_extension.lower() == ".jsonl"
+            or file_extension.lower() == ".json"
+            or file_extension.lower() == ".ndjson"
+        ):
             output_df = reader.option("multiLine", True).json(path=output_file_path)
             found_output_file = True
         elif file_extension.lower() == ".parquet":
@@ -426,7 +435,9 @@ class SparkPipelineFrameworkTestRunner:
                     file_extension="csv",
                 )
             elif (
-                file_extension.lower() == ".jsonl" or file_extension.lower() == ".json"
+                file_extension.lower() == ".jsonl"
+                or file_extension.lower() == ".json"
+                or file_extension.lower() == ".ndjson"
             ):
                 SparkPipelineFrameworkTestRunner.combine_spark_json_files_to_one_file(
                     source_folder=result_path_for_view,
@@ -521,7 +532,13 @@ class SparkPipelineFrameworkTestRunner:
                 input_file
             )
         )
-        if file_extension.lower() not in [".csv", ".json", ".jsonl", ".parquet"]:
+        if file_extension.lower() not in [
+            ".csv",
+            ".json",
+            ".jsonl",
+            ".ndjson",
+            ".parquet",
+        ]:
             return
 
         view_name: str = SparkPipelineFrameworkTestRunner.get_view_name_from_file_path(
@@ -567,7 +584,11 @@ class SparkPipelineFrameworkTestRunner:
                 comment="#",
                 emptyValue=None,
             ).limit(SparkPipelineFrameworkTestRunner.row_limit)
-        elif file_extension.lower() == ".jsonl" or file_extension.lower() == ".json":
+        elif (
+            file_extension.lower() == ".jsonl"
+            or file_extension.lower() == ".json"
+            or file_extension.lower() == ".ndjson"
+        ):
             # create json_input_folder if it does not exist
             json_input_folder = os.path.join(input_folder, "..", "input_jsonl")
             if not os.path.exists(json_input_folder):
@@ -756,15 +777,21 @@ def clean_spark_session(session: SparkSession) -> None:
     :param session:
     :return:
     """
-    tables = session.catalog.listTables("default")
+    table_names = spark_list_catalog_table_names(session)
 
-    for table in tables:
-        print(f"clear_tables() is dropping table/view: {table.name}")
-        # noinspection SqlDialectInspection,SqlNoDataSourceInspection
-        session.sql(f"DROP TABLE IF EXISTS default.{table.name}")
-        # noinspection SqlDialectInspection,SqlNoDataSourceInspection
-        session.sql(f"DROP VIEW IF EXISTS default.{table.name}")
-        # noinspection SqlDialectInspection,SqlNoDataSourceInspection
-        session.sql(f"DROP VIEW IF EXISTS {table.name}")
+    for table_name in table_names:
+        print(f"clear_tables() is dropping table/view: {table_name}")
+        # Drop the table if it exists
+        if session.catalog.tableExists(f"default.{table_name}"):
+            # noinspection SqlNoDataSourceInspection
+            session.sql(f"DROP TABLE default.{table_name}")
+
+        # Drop the view if it exists in the default database
+        if session.catalog.tableExists(f"default.{table_name}"):
+            session.catalog.dropTempView(f"default.{table_name}")
+
+        # Drop the view if it exists in the global context
+        if session.catalog.tableExists(f"{table_name}"):
+            session.catalog.dropTempView(f"{table_name}")
 
     session.catalog.clearCache()

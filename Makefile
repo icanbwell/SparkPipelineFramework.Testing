@@ -2,39 +2,35 @@ LANG=en_US.utf-8
 
 export LANG
 
-BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
-VERSION=$(shell cat VERSION)
-VENV_NAME=venv
-GIT_HASH=${CIRCLE_SHA1}
-SPARK_VER=3.1.1
-HADOOP_VER=3.2
-PACKAGES_FOLDER=/usr/local/lib/python3.7/dist-packages
-SPF_BASE=${PACKAGES_FOLDER}
-
 Pipfile.lock: Pipfile
-	docker-compose run --rm --name spftest_pip dev sh -c "rm -f Pipfile.lock && pipenv lock --dev"
+	docker compose run --rm --name spftest dev sh -c "rm -f Pipfile.lock && pipenv lock --dev"
+
+.PHONY: install_types
+install_types: Pipfile
+	docker compose run --rm --name spftest dev pipenv run mypy --install-types --non-interactive
 
 .PHONY:devdocker
 devdocker: ## Builds the docker for dev
-	docker-compose build
+	docker compose build
 
 .PHONY:shell
 shell:devdocker ## Brings up the bash shell in dev docker
-	docker-compose run --rm --name spf_test_shell dev /bin/bash
+	docker compose run --rm --name helix_shell dev /bin/bash
 
 .PHONY:init
 init: devdocker up setup-pre-commit  ## Initializes the local developer environment
 
 .PHONY: up
 up: Pipfile.lock
-	docker-compose up --build -d --remove-orphans
+	docker compose up --build -d --remove-orphans
 	@echo MockServer dashboard: http://localhost:1080/mockserver/dashboard
 	@echo Fhir server dashboard http://localhost:3000/
 
 .PHONY: down
 down:
-	docker-compose down --remove-orphans && \
-	docker system prune -f
+	docker compose down --remove-orphans && \
+	docker system prune -f && \
+	docker volume prune --filter label=mlflow -f
 
 .PHONY:clean-pre-commit
 clean-pre-commit: ## removes pre-commit hook
@@ -50,59 +46,45 @@ run-pre-commit: setup-pre-commit
 
 .PHONY:update
 update: down Pipfile.lock setup-pre-commit  ## Updates all the packages using Pipfile
-	docker-compose run --rm --name spftest_pipenv dev pipenv sync --dev && \
-	make devdocker
-
+	make devdocker && \
+	make pipenv-setup && \
+	make up
 
 .PHONY:tests
-tests: up
-	docker-compose run --rm --name spftest_tests dev pytest tests library
-
-.PHONY:proxies
-proxies:devdocker ## Generates proxies for all the library transformers, auto mappers and pipelines
-	docker-compose run --rm --name helix_proxies dev \
-	python ${SPF_BASE}/spark_pipeline_framework/proxy_generator/generate_proxies.py
-
-.PHONY:continuous_integration
-continuous_integration: venv
-	. $(VENV_NAME)/bin/activate && \
-	pip install --upgrade pip && \
-    pip install --upgrade -r requirements.txt && \
-    pip install --upgrade -r requirements-test.txt && \
-    python setup.py install && \
-    pre-commit run --all-files && \
-    pytest tests
+tests:
+	docker compose run --rm --name spftests dev pytest tests library
 
 .PHONY: sphinx-html
 sphinx-html:
-	docker-compose run --rm --name sam_fhir dev make -C docsrc html
+	docker compose run --rm --name spftest dev make -C docsrc html
 	@echo "copy html to docs... why? https://github.com/sphinx-doc/sphinx/issues/3382#issuecomment-470772316"
-	@rm -rf docs
-	@mkdir docs
+	@rm -rf docs/*
 	@touch docs/.nojekyll
 	cp -a docsrc/_build/html/. docs
 
-.DEFAULT_GOAL := help
-.PHONY: help
-help: ## Show this help.
-	# from https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+.PHONY:pipenv-setup
+pipenv-setup:devdocker ## Run pipenv-setup to update setup.py with latest dependencies
+	docker compose run --rm --name spftest dev sh -c "pipenv run pipenv install --skip-lock --categories \"pipenvsetup\" && pipenv run pipenv-setup sync --pipfile" && \
+	make run-pre-commit
 
 .PHONY: clean_data
 clean_data: down ## Cleans all the local docker setup
-ifneq ($(shell docker volume ls | grep "sparkpipelineframeworktesting"| awk '{print $$2}'),)
-	docker volume ls | grep "sparkpipelineframeworktesting" | awk '{print $$2}' | xargs docker volume rm
+ifneq ($(shell docker volume ls | grep "sparkpipelineframework"| awk '{print $$2}'),)
+	docker volume ls | grep "sparkpipelineframework" | awk '{print $$2}' | xargs docker volume rm
 endif
-
-.PHONY:pipenv-setup
-pipenv-setup:devdocker ## Brings up the bash shell in dev docker
-	docker-compose run --rm --name spf_test dev pipenv-setup sync --pipfile
 
 .PHONY:show_dependency_graph
 show_dependency_graph:
-	docker-compose run --rm --name spf_test dev sh -c "pipenv install --skip-lock && pipenv graph --reverse"
-	docker-compose run --rm --name spf_test dev sh -c "pipenv install -d && pipenv graph"
+	docker compose run --rm --name spftest dev sh -c "pipenv install --skip-lock -d && pipenv graph --reverse"
+	docker compose run --rm --name spftest dev sh -c "pipenv install -d && pipenv graph"
 
-.PHONY:qodana
-qodana:
-	docker run --rm -it --name qodana --mount type=bind,source="${PWD}",target=/data/project -p 8080:8080 jetbrains/qodana-python:2022.3-eap --show-report
+.PHONY:build
+build: ## Builds the docker for dev
+	docker compose build --progress=plain --parallel
+
+.PHONY:clean
+clean: down
+	find . -type d -name "__pycache__" | xargs rm -r
+	find . -type d -name "metastore_db" | xargs rm -r
+	find . -type f -name "derby.log" | xargs rm -r
+	find . -type d -name "temp" | xargs rm -r
