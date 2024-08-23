@@ -27,7 +27,6 @@ from mockserver_client.mock_request import MockRequest
 from mockserver_client.mockserver_client import MockServerFriendlyClient
 from mockserver_client.mockserver_verify_exception import MockServerVerifyException
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.catalog import Table
 from pyspark.sql.types import StructType, DataType
 from spark_data_frame_comparer.spark_data_frame_comparer import (
     assert_compare_data_frames,
@@ -37,6 +36,9 @@ from spark_data_frame_comparer.spark_data_frame_comparer_exception import (
     ExceptionType,
 )
 from spark_pipeline_framework.logger.yarn_logger import Logger  # type: ignore
+from spark_pipeline_framework.utilities.spark_data_frame_helpers import (
+    spark_list_catalog_table_names,
+)
 
 from spark_pipeline_framework_testing.tests_common.path_converter import (
     convert_path_from_docker,
@@ -145,9 +147,9 @@ class MockCallValidator(Validator):
                         ).joinpath(expected_file_name)
                         if exception.actual_json is not None:
                             with open(result_path, "w") as file_result:
-                                actual_json: List[Dict[str, Any]] | Dict[
-                                    str, Any
-                                ] = exception.actual_json
+                                actual_json: List[Dict[str, Any]] | Dict[str, Any] = (
+                                    exception.actual_json
+                                )
                                 if (
                                     isinstance(actual_json, list)
                                     and len(actual_json) == 1
@@ -413,9 +415,9 @@ class MockRequestValidator(Validator):
                         ).joinpath(expected_file_name)
                         if exception.actual_json is not None:
                             with open(result_path, "w") as file_result:
-                                actual_json: List[Dict[str, Any]] | Dict[
-                                    str, Any
-                                ] = exception.actual_json
+                                actual_json: List[Dict[str, Any]] | Dict[str, Any] = (
+                                    exception.actual_json
+                                )
                                 if (
                                     isinstance(actual_json, list)
                                     and len(actual_json) == 1
@@ -698,22 +700,22 @@ class OutputFileValidator(Validator):
         self.temp_folder_path = temp_folder_path
 
         # write out any missing output schemas
-        output_tables: List[Table] = self.spark_session.catalog.listTables("default")
-        if self.ignore_views_for_output is not None:
-            output_tables = [
-                table
-                for table in output_tables
-                if table.name not in self.ignore_views_for_output
-            ]
         output_schema_folder: Path = Path(self.test_path).joinpath(
             self.output_schema_folder
         )
         output_tables_for_writing_schema: List[str] = [
-            t.name
-            for t in output_tables
-            if not t.name.startswith("expected_")
-            and t.name not in self.input_table_names
+            table_name
+            for table_name in spark_list_catalog_table_names(spark_session)
+            if not table_name.startswith("expected_")
+            and table_name not in self.input_table_names
         ]
+        if self.ignore_views_for_output is not None:
+            output_tables_for_writing_schema = [
+                table
+                for table in output_tables_for_writing_schema
+                if table not in self.ignore_views_for_output
+            ]
+
         if (
             "output" in output_tables_for_writing_schema
         ):  # if there is an output table then ignore other output tables
@@ -740,7 +742,10 @@ class OutputFileValidator(Validator):
         for output_file in output_files:
             found_output_file: bool
             data_frame_exception: Optional[SparkDataFrameComparerException]
-            (found_output_file, data_frame_exception,) = self.process_output_file(
+            (
+                found_output_file,
+                data_frame_exception,
+            ) = self.process_output_file(
                 output_file=output_file,
                 output_schema_folder=output_schema_folder,
                 func_path_modifier=self.func_path_modifier,
@@ -754,11 +759,11 @@ class OutputFileValidator(Validator):
                     data_frame_exceptions.append(data_frame_exception)
         # write out any missing output files
         table_names_to_write_to_output: List[str] = [
-            t.name
-            for t in output_tables
-            if t.name.lower() not in views_found
-            and not t.name.startswith("expected_")
-            and t.name not in self.input_table_names
+            table_name
+            for table_name in spark_list_catalog_table_names(spark_session)
+            if table_name.lower() not in views_found
+            and not table_name.startswith("expected_")
+            and table_name not in self.input_table_names
         ]
         if (
             "output" in table_names_to_write_to_output

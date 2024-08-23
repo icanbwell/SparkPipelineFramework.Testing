@@ -1,6 +1,5 @@
 # noinspection Mypy
 from os import path, getcwd
-from typing import Any
 
 from setuptools import setup, find_packages
 
@@ -19,39 +18,18 @@ except IOError:
     raise
 
 
-def fix_setuptools() -> None:
-    """Work around bugs in setuptools.
-
-    Some versions of setuptools are broken and raise SandboxViolation for normal
-    operations in a virtualenv. We therefore disable the sandbox to avoid these
-    issues.
-    """
-    try:
-        from setuptools.sandbox import DirectorySandbox
-
-        # noinspection PyUnusedLocal
-        def violation(operation: Any, *args: Any, **_: Any) -> None:
-            print("SandboxViolation: %s" % (args,))
-
-        DirectorySandbox._violation = violation
-    except ImportError:
-        pass
-
-
-# Fix bugs in setuptools.
-fix_setuptools()
-
-
 # classifiers list is here: https://pypi.org/classifiers/
 
 # create the package setup
 setup(
     install_requires=[
-        "pyspark==3.3.0",
         "protobuf>=3",
+        "pyspark==3.5.1",
+        "pyarrow>=17.0.0",
+        "delta-spark==3.2.0",
         "deprecated>=1.2.12",
-        "helix.fhir.client.sdk>=1.0.34",
-        "helix-mockserver-client>=1.0.4",
+        "helix.fhir.client.sdk>=3.0.2",
+        "helix-mockserver-client>=2.0.0",
     ],
     name=package_name,
     version=version,
@@ -61,14 +39,30 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/imranq2/SparkPipelineFramework.Testing",
-    packages=find_packages(),
+    packages=find_packages(
+        exclude=[
+            "*/test",
+            "*/test/*",
+            "*tests/*",
+            "*library/*",
+            "*library",
+            "docs",
+            "docs/*",
+            "docsrc",
+            "docsrc/*",
+            "keycloak-config",
+            "keycloak-config/*",
+            ".gihub",
+            ".github/*",
+        ]
+    ),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.10",
     dependency_links=[],
     include_package_data=True,
     zip_safe=False,

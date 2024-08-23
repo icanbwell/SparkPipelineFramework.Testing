@@ -1,4 +1,4 @@
-FROM imranq2/helix.spark:3.3.0.33-slim
+FROM imranq2/helix.spark:3.5.1.3-slim
 # https://github.com/icanbwell/helix.spark
 USER root
 
@@ -11,20 +11,14 @@ RUN apt-get remove python3-entrypoints -y
 COPY Pipfile* /spftest/
 WORKDIR /spftest
 
-RUN df -h # for space monitoring
-
-RUN #python -m pip install --upgrade pip && pip install pipenv
-ARG TARGETPLATFORM
-RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; \
-    then pipenv run pip install pyspark==3.3.0 py4j==0.10.9.5 && pipenv sync --dev --system --extra-pip-args="--prefer-binary"; \
-    else rm -rf Pipfile.lock && pipenv lock --dev && pipenv sync --dev --system --extra-pip-args="--prefer-binary" && pipenv run pip install pyspark==3.3.0; fi
-
-
-# COPY ./jars/* /opt/bitnami/spark/jars/
-# COPY ./conf/* /opt/bitnami/spark/conf/
+#COPY ./jars/* /opt/spark/jars/
+#COPY ./conf/* /opt/spark/conf/
 # run this to install any needed jars by Spark
 COPY ./test.py ./
 RUN /opt/spark/bin/spark-submit --master local[*] test.py
+
+ARG TARGETPLATFORM
+RUN pipenv sync --dev --system --extra-pip-args="--prefer-binary"
 
 COPY . /spftest
 
@@ -32,7 +26,15 @@ COPY . /spftest
 RUN mv /opt/minimal_entrypoint.sh /opt/entrypoint.sh
 
 # run pre-commit once so it installs all the hooks and subsequent runs are fast
-
+# RUN pre-commit install
 RUN mkdir -p /fhir && chmod 777 /fhir
 RUN mkdir -p /.local/share/virtualenvs && chmod 777 /.local/share/virtualenvs
-# USER 1001
+
+# Run as non-root user
+# Change ownership of the directory and its subdirectories
+RUN chown -R spark:spark /spftest
+
+# Set permissions to allow writing (read, write, execute for owner)
+RUN chmod -R 755 /spftest
+# https://spark.apache.org/docs/latest/running-on-kubernetes.html#user-identity
+USER spark

@@ -16,7 +16,6 @@ from mockserver_client.mockserver_client import (
     MockServerFriendlyClient,
 )
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.catalog import Table
 from pyspark.sql.functions import trim, col
 from pyspark.sql.types import StructType, DataType
 from spark_pipeline_framework.logger.yarn_logger import Logger  # type: ignore
@@ -25,6 +24,9 @@ from spark_pipeline_framework.transformers.framework_fixed_width_loader.v1.frame
 )
 from spark_pipeline_framework.utilities.json_to_jsonl_converter.json_to_jsonl_converter import (
     convert_json_to_jsonl,
+)
+from spark_pipeline_framework.utilities.spark_data_frame_helpers import (
+    spark_list_catalog_table_names,
 )
 
 from spark_pipeline_framework_testing.tests_common.common_functions import (
@@ -90,9 +92,9 @@ class FhirCalls(TestInputType):
         self.mock_client: MockServerFriendlyClient
         self.spark_session: SparkSession
         self.temp_folder_path: Path
-        self.mocked_files: Optional[
-            List[str]
-        ] = []  # list of files that are used in mocking
+        self.mocked_files: Optional[List[str]] = (
+            []
+        )  # list of files that are used in mocking
         self.method: str = method
         self.relative_path: Optional[str] = relative_path
         self.query_string: Optional[Dict[str, Any]] = query_string
@@ -226,11 +228,10 @@ class FileInput(TestInputType):
             )
 
         # get list of input tables
-        all_tables: List[Table] = self.spark_session.catalog.listTables("default")
         input_table_names: List[str] = [
-            t.name
-            for t in all_tables
-            if not t.name.startswith("expected_")  # it's an output table
+            table_name
+            for table_name in spark_list_catalog_table_names(self.spark_session)
+            if not table_name.startswith("expected_")  # it's an output table
         ]
         # write out any input schemas if it's not explicitly defined
         if not input_schema:
@@ -460,9 +461,9 @@ class MockFhirRequest(TestInputType):
         self.test_path: Path
         self.fhir_resource_type = fhir_resource_type
         self.fhir_endpoint = fhir_endpoint
-        self.mocked_files: Optional[
-            List[str]
-        ] = []  # list of files that are used in mocking
+        self.mocked_files: Optional[List[str]] = (
+            []
+        )  # list of files that are used in mocking
 
     def initialize(
         self,

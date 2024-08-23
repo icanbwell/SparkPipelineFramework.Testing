@@ -4,6 +4,9 @@ import shutil
 from typing import Any
 
 from pyspark.sql.session import SparkSession
+from spark_pipeline_framework.utilities.spark_data_frame_helpers import (
+    spark_list_catalog_table_names,
+)
 
 # make sure env variables are set correctly
 if "SPARK_HOME" not in os.environ:
@@ -35,16 +38,22 @@ def clean_spark_session(session: SparkSession) -> None:
     :param session:
     :return:
     """
-    tables = session.catalog.listTables("default")
+    table_names = spark_list_catalog_table_names(session)
 
-    for table in tables:
-        print(f"clear_tables() is dropping table/view: {table.name}")
-        # noinspection SqlDialectInspection,SqlNoDataSourceInspection
-        session.sql(f"DROP TABLE IF EXISTS default.{table.name}")
-        # noinspection SqlDialectInspection,SqlNoDataSourceInspection
-        session.sql(f"DROP VIEW IF EXISTS default.{table.name}")
-        # noinspection SqlDialectInspection,SqlNoDataSourceInspection
-        session.sql(f"DROP VIEW IF EXISTS {table.name}")
+    for table_name in table_names:
+        print(f"clear_tables() is dropping table/view: {table_name}")
+        # Drop the table if it exists
+        if session.catalog.tableExists(f"default.{table_name}"):
+            # noinspection SqlNoDataSourceInspection
+            session.sql(f"DROP TABLE default.{table_name}")
+
+        # Drop the view if it exists in the default database
+        if session.catalog.tableExists(f"default.{table_name}"):
+            session.catalog.dropTempView(f"default.{table_name}")
+
+        # Drop the view if it exists in the global context
+        if session.catalog.tableExists(f"{table_name}"):
+            session.catalog.dropTempView(f"{table_name}")
 
     session.catalog.clearCache()
 

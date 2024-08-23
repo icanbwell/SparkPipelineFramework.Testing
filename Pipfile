@@ -4,43 +4,84 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pyspark = "==3.3.0"
+# protobuf is needed for serializing data
 protobuf=">=3"
+# PySpark has to match the version of Spark we use for testing
+pyspark = "==3.5.1"
+# pyarrow is needed for Pandas UDF and mapInPandas
+# https://spark.apache.org/docs/latest/api/python/user_guide/sql/arrow_pandas.html#recommended-pandas-and-pyarrow-versions
+# https://spark.apache.org/docs/latest/api/python/getting_started/install.html#dependencies
+pyarrow=">=17.0.0"
+# delta-spark is needed for Delta Lake
+delta-spark="==3.2.0"
 Deprecated = ">=1.2.12"
-"helix.fhir.client.sdk" = ">=2.0.2"
-helix-mockserver-client=">=1.1.1"
+# helix.fhir.client.sdk is needed for interacting with FHIR servers
+"helix.fhir.client.sdk" = ">=3.0.2"
+# helix-mockserver-client is needed for mocking servers
+helix-mockserver-client=">=2.0.0"
 
 [dev-packages]
-setuptools=">=68.0.0"
-wheel=">=0.40.0"
-twine=">=3.8.0"
-pre-commit=">=3.4.0"
-autoflake=">=2.2.1"
-mypy = ">=1.7.0"
-pytest = ">=7.4.3"
-black = ">=22.12.0"
-importlib-metadata = ">=4.0.1"
-py4j = "==0.10.9.5" # https://spark.apache.org/docs/latest/api/python/getting_started/install.html#dependencies
-pyspark="==3.3.0"  # should match the version of spark we use for testing
-pygments = ">=2.8.1" # not directly required, pinned by Snyk to avoid a vulnerability
+# setuptools is needed for building the package
+setuptools=">=72.1.0"
+# wheel is needed for building the package
+wheel = ">=0.43.0"
+# twine is needed for uploading the package to PyPI
+twine=">=5.1.1"
+# pre-commit is needed for running code quality checks
+pre-commit=">=3.7.1"
+# autoflake is needed for removing unused imports
+autoflake=">=2.3.1"
+# mypy is needed for type checking
+mypy = ">=1.11.1"
+# pytest is needed for running tests
+pytest = ">=8.3.2"
+# pytest-ayncio is needed for running async tests
+pytest-asyncio = ">=0.23.8"
+# black is needed for formatting code
+black = ">=24.8.0"
+# py4j is needed for connecting to the JVM from Spark
+py4j = "==0.10.9.7" # https://spark.apache.org/docs/latest/api/python/getting_started/install.html#dependencies
+# pyspark is needed for running Spark jobs
+pyspark="==3.5.1"  # should match the version of spark we use for testing
+# pygments is needed for syntax highlighting
+pygments=">=2.18.0" # not directly required, pinned by Snyk to avoid a vulnerability
 types-Deprecated=">=0.1.2"
-sparkautomapper = "==2.0.6"
-"sparkautomapper.fhir" = ">=2.0.0"
-"sparkfhirschemas" = ">=1.0.16"
-sparkpipelineframework = ">=2.0.19"
-"sparkdataframecomparer" = ">=2.0.2"
-requests = ">=2.25.1"
+# sparkautomapper is needed for mapping data
+sparkautomapper = "==3.0.0"
+# sparkautomapper.fhir is needed for mapping FHIR data
+"sparkautomapper.fhir" = "==3.0.0"
+# sparkfhirschemas is needed for FHIR schemas
+"sparkfhirschemas" = "==2.0.0"
+# sparkpipelineframework is needed for building pipelines
+sparkpipelineframework = "==3.0.4"
+# sparkdataframecomparer is needed for comparing Spark DataFrames
+"sparkdataframecomparer" = "==2.0.5"
+# requests is needed for making HTTP requests
+requests = ">=2.31.0"
 dictdiffer = ">=0.9.0"
-Sphinx="==4.1.2"
-sphinx-autoapi="==1.8.4"
-sphinx-rtd-theme="==0.5.2"
-myst-parser="==0.15.1"
+# for creating documentation
+Sphinx="==8.0.2"
+sphinx-autoapi="==3.2.1"
+sphinx-rtd-theme=">=0.5.1"
+myst-parser="==4.0.0"
 recommonmark="==0.7.1"
+# types-requests is needed for type hints for requests
+types-requests=">=2.31.0"
+types-Pygments="*"
+
+# These dependencies are required for pipenv-setup.  They conflict with ones above, so we install these
+# only when running pipenv-setup
+[pipenvsetup]
+# vistr is needed for visualizing the dependency graph
+vistir=">=0.6.1, <0.7.0" # https://github.com/Madoshakalaka/pipenv-setup/issues/138
+# plete is needed for tab completion
+plette = "<1.0.0" # https://github.com/Madoshakalaka/pipenv-setup/issues/138
+# pipenv-setup is needed for updating setup.py with the dependencies for anyone installing this package
 pipenv-setup = ">=3.2.0"
-vistir="==0.6.1" # https://github.com/Madoshakalaka/pipenv-setup/issues/138
+
 
 [requires]
-python_version = "3.10"
+python_version = "3.12"
 
 [pipenv]
 allow_prereleases = false

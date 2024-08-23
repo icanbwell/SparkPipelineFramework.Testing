@@ -1,14 +1,14 @@
-FROM imranq2/helix.spark:3.3.0.33-precommit-slim
+FROM imranq2/helix.spark:3.5.1.3-precommit-slim
 
 RUN apt-get update && \
     apt-get install -y git && \
     pip install pipenv
 
-COPY ${project_root}/Pipfile* ./
+COPY Pipfile* ./
 
-# separate this so the above gets cached
-RUN pipenv sync --dev --system
+ARG TARGETPLATFORM
+RUN pipenv sync --dev --system --extra-pip-args="--prefer-binary"
 
 WORKDIR /sourcecode
 RUN git config --global --add safe.directory /sourcecode
-CMD pre-commit run --all-files
+CMD ["pre-commit", "run", "--all-files"]
