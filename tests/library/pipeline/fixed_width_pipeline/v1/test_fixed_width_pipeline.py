@@ -59,9 +59,11 @@ def test_fixed_width_pipeline(
         spark_session=spark_session,
         test_path=data_dir,
         test_name=test_name,
-        test_validators=[validator_types.OutputFileValidator(
-            output_folder="output", ignore_views_for_output=["test"]
-        )],
+        test_validators=[
+            validator_types.OutputFileValidator(
+                output_folder="output", ignore_views_for_output=["test"]
+            )
+        ],
         logger=logger,
         test_inputs=[test_input],
         temp_folder="output/temp",

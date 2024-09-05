@@ -732,11 +732,13 @@ class OutputFileValidator(Validator):
         if not os.path.exists(self.output_folder_path):
             os.mkdir(self.output_folder_path)
         # noinspection PyTypeChecker
-        output_files: List[str] = [
+        output_files = [
             f
             for f in listdir(self.output_folder_path)
-            if isfile(join(self.output_folder_path, f))
-            and Path(f).stem not in self.ignore_views_for_output
+            if (
+                isfile(join(self.output_folder_path, f))
+                and Path(f).stem not in self.ignore_views_for_output  # type: ignore
+            )
         ]
         views_found: List[str] = []
         data_frame_exceptions: List[SparkDataFrameComparerException] = []
@@ -765,7 +767,7 @@ class OutputFileValidator(Validator):
             if table_name.lower() not in views_found
             and not table_name.startswith("expected_")
             and table_name not in self.input_table_names
-            and table_name not in self.ignore_views_for_output
+            and table_name not in self.ignore_views_for_output  # type: ignore
         ]
         if (
             "output" in table_names_to_write_to_output
