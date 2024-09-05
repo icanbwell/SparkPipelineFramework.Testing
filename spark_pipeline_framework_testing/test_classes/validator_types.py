@@ -735,7 +735,8 @@ class OutputFileValidator(Validator):
         output_files: List[str] = [
             f
             for f in listdir(self.output_folder_path)
-            if isfile(join(self.output_folder_path, f))
+            if isfile(join(self.output_folder_path, f)) # and file without extension is not in ignore_views_for_output
+            and f.split(".")[0] not in self.ignore_views_for_output
         ]
         views_found: List[str] = []
         data_frame_exceptions: List[SparkDataFrameComparerException] = []
@@ -764,6 +765,7 @@ class OutputFileValidator(Validator):
             if table_name.lower() not in views_found
             and not table_name.startswith("expected_")
             and table_name not in self.input_table_names
+            and table_name not in self.ignore_views_for_output
         ]
         if (
             "output" in table_names_to_write_to_output
