@@ -639,7 +639,7 @@ class OutputFileValidator(Validator):
         sort_output_by: Optional[List[str]] = None,
         output_as_json_only: bool = True,
         apply_schema_to_output: bool = True,
-        ignore_views_for_output: Optional[List[str]] = None,
+        ignore_views_for_output: List[str] = [],
         output_folder: str = "output",
         output_schema_folder: str = "output_schema",
         output_schema: Optional[
@@ -709,7 +709,7 @@ class OutputFileValidator(Validator):
             if not table_name.startswith("expected_")
             and table_name not in self.input_table_names
         ]
-        if self.ignore_views_for_output is not None:
+        if self.ignore_views_for_output:
             output_tables_for_writing_schema = [
                 table
                 for table in output_tables_for_writing_schema
@@ -737,7 +737,7 @@ class OutputFileValidator(Validator):
             for f in listdir(self.output_folder_path)
             if (
                 isfile(join(self.output_folder_path, f))
-                and Path(f).stem not in self.ignore_views_for_output  # type: ignore
+                and Path(f).stem not in self.ignore_views_for_output
             )
         ]
         views_found: List[str] = []
@@ -767,7 +767,7 @@ class OutputFileValidator(Validator):
             if table_name.lower() not in views_found
             and not table_name.startswith("expected_")
             and table_name not in self.input_table_names
-            and table_name not in self.ignore_views_for_output  # type: ignore
+            and table_name not in self.ignore_views_for_output
         ]
         if (
             "output" in table_names_to_write_to_output

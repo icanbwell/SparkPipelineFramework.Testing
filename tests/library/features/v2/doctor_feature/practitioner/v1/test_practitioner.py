@@ -25,7 +25,6 @@ def test_practitioner(spark_session: SparkSession) -> None:
     input_file = FileInput()
 
     logger = get_logger(__name__)
-    logger = get_logger(__name__)
     SparkPipelineFrameworkTestRunnerV2(
         spark_session=spark_session,
         test_path=test_path,
