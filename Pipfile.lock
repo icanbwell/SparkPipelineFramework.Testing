@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "13ef70859e66fcb3887a5fffaf56347856a4ee91ea39a65d106a864eebb86cf8"
+            "sha256": "a2c5390e0262e02a709c42fbc6c34841cee8b7f3e0abdfaf8366e00d730c9835"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -406,6 +406,12 @@
             "markers": "python_version >= '3.8'",
             "version": "==8.5.0"
         },
+        "logger": {
+            "hashes": [
+                "sha256:4ecac57133c6376fa215f0fe6b4dc4d60e4d1ad8be005cab4e8a702df682f8b3"
+            ],
+            "version": "==1.4"
+        },
         "multidict": {
             "hashes": [
                 "sha256:052e10d2d37810b99cc170b785945421141bf7bb7d2f8799d431e7db229c385f",
@@ -677,6 +683,15 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
             "version": "==1.16.0"
+        },
+        "sparkdataframecomparer": {
+            "hashes": [
+                "sha256:039639d053e3dc836f1e36ad28943d1734a20aad08fdf6ced24fa05ff974a201",
+                "sha256:bd4643f5feeed6fd36bee0c4cf13942775f265dc30a4ab83bf53e35c4e59dda3"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3'",
+            "version": "==2.0.7"
         },
         "urllib3": {
             "hashes": [
@@ -2418,6 +2433,7 @@
         },
         "pyasn1": {
             "hashes": [
+                "sha256:0d632f46f2ba09143da3a8afe9e33fb6f92fa2320ab7e886e2d0f7672af84629",
                 "sha256:6f580d2bdd84365380830acf45550f2511469f673cb4a5ae3857a3170128b034"
             ],
             "markers": "python_version >= '3.8'",
@@ -2425,6 +2441,7 @@
         },
         "pyasn1-modules": {
             "hashes": [
+                "sha256:49bfa96b45a292b711e986f222502c1c9a5e1f4e568fc30e2574a6c7d07838fd",
                 "sha256:c28e2dbf9c06ad61c71a075c7e0f9fd0f1b0bb2d2ad4377f240d33ac2ab60a7c"
             ],
             "markers": "python_version >= '3.8'",
