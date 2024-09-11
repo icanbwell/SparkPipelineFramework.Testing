@@ -7,10 +7,8 @@ from os.path import isfile, join
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple, Union, Callable, TYPE_CHECKING
 
-# noinspection PyPackageRequirements
 import dictdiffer
 
-# noinspection PyPackageRequirements
 import pytest
 from deprecated import deprecated
 from mockserver_client.exceptions.mock_server_expectation_not_found_exception import (
@@ -177,7 +175,9 @@ class MockCallValidator(Validator):
                     )
                     if resource_obj:
                         # assert "resourceType" in resource_obj, resource_obj
-                        resource_type = resource_obj.get("resourceType", None)
+                        resource_type: Optional[str] = resource_obj.get(
+                            "resourceType", None
+                        )
                         if resource_type:
                             assert "id" in resource_obj, resource_obj
                             resource_id = resource_obj["id"]
@@ -450,7 +450,9 @@ class MockRequestValidator(Validator):
                     )
                     if resource_obj and data_folder_path:
                         # assert "resourceType" in resource_obj, resource_obj
-                        resource_type = resource_obj.get("resourceType", None)
+                        resource_type: Optional[str] = resource_obj.get(
+                            "resourceType", None
+                        )
                         if resource_type:
                             assert "id" in resource_obj, resource_obj
                             resource_id = resource_obj["id"]
@@ -637,6 +639,7 @@ class OutputFileValidator(Validator):
             Callable[[Union[Path, str]], Union[Path, str]]
         ] = convert_path_from_docker,
         sort_output_by: Optional[List[str]] = None,
+        auto_sort: Optional[bool] = None,
         output_as_json_only: bool = True,
         apply_schema_to_output: bool = True,
         ignore_views_for_output: Optional[List[str]] = None,
@@ -678,6 +681,7 @@ class OutputFileValidator(Validator):
         self.output_folder_path: Path
         self.temp_folder_path: Optional[Path] = None
         self.input_table_names: Optional[List[str]] = None
+        self.auto_sort: Optional[bool] = auto_sort
 
     def validate(
         self,
@@ -752,6 +756,7 @@ class OutputFileValidator(Validator):
                 sort_output_by=self.sort_output_by,
                 apply_schema_to_output=self.apply_schema_to_output,
                 output_schema=self.output_schema,
+                auto_sort=self.auto_sort,
             )
             if found_output_file:
                 views_found.append(get_view_name_from_file_path(output_file).lower())
@@ -782,17 +787,29 @@ class OutputFileValidator(Validator):
 
     def process_output_file(
         self,
+        *,
         output_file: str,
         output_schema_folder: Path,
         func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path, str]]],
         sort_output_by: Optional[List[str]],
         apply_schema_to_output: bool,
         output_schema: Optional[Union[StructType, Dict[str, StructType], DataType]],
+        auto_sort: Optional[bool] = None,
     ) -> Tuple[bool, Optional[SparkDataFrameComparerException]]:
         """
         read predefined outputs and compare them with the current outputs
-        write outputs to disk if doesn't exists
+        write outputs to disk if it doesn't exist
 
+
+        :param output_file: the output file
+        :param output_schema_folder: the folder containing the output schema
+        :param func_path_modifier: function to modify the path
+        :param sort_output_by: order of column names [col1, col2,...]
+        :param apply_schema_to_output: apply schema to output
+        :param output_schema: the schema of the output
+        :param auto_sort: auto sort the output
+
+        :return: found_output_file, data_frame_exception
         """
         assert self.spark_session
 
@@ -932,6 +949,7 @@ class OutputFileValidator(Validator):
                         temp_folder=self.temp_folder_path,
                         func_path_modifier=func_path_modifier,
                         order_by=sort_columns if len(sort_columns) > 0 else None,
+                        auto_sort=auto_sort,
                     )
                 except SparkDataFrameComparerException as e:
                     data_frame_exception = e
@@ -960,6 +978,7 @@ class OutputFileValidator(Validator):
 
     def write_table_to_output(
         self,
+        *,
         view_name: str,
         sort_output_by: Optional[List[str]],
         output_as_json_only: bool,
