@@ -24,6 +24,8 @@ jobs:
       - name: show docker version
         run: docker --version
 
+      - name: build
+        run: make build
 
       - name: pre-commit
         run: make run-pre-commit
@@ -31,5 +33,6 @@ jobs:
       # setup and install everything and run tests
       - name: up
         run: make up
+
       - name: tests
         run: make tests
