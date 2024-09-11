@@ -28,7 +28,7 @@ setup(
         "pyarrow>=17.0.0",
         "delta-spark==3.2.0",
         "deprecated>=1.2.13",
-        "helix.fhir.client.sdk>=3.0.4",
+        "helix.fhir.client.sdk>=3.0.5",
         "helix-mockserver-client>=2.0.1",
     ],
     name=package_name,
