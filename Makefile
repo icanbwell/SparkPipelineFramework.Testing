@@ -2,8 +2,9 @@ LANG=en_US.utf-8
 
 export LANG
 
-Pipfile.lock: Pipfile
-	docker compose run --rm --name spftest dev sh -c "rm -f Pipfile.lock && pipenv lock --dev"
+.PHONY: Pipfile.lock
+Pipfile.lock: build
+	docker compose run --rm --name spftest dev /bin/bash -c "rm -f Pipfile.lock && pipenv lock --dev"
 
 .PHONY: install_types
 install_types: Pipfile

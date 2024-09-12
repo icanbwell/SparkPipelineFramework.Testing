@@ -2,6 +2,7 @@ from glob import glob
 import json
 import os
 from abc import ABC, abstractmethod
+from logging import Logger
 from os import listdir
 from os.path import isfile, join
 from pathlib import Path
@@ -31,9 +32,8 @@ from spark_data_frame_comparer.spark_data_frame_comparer import (
 )
 from spark_data_frame_comparer.spark_data_frame_comparer_exception import (
     SparkDataFrameComparerException,
-    ExceptionType,
 )
-from spark_pipeline_framework.logger.yarn_logger import Logger  # type: ignore
+from spark_data_frame_comparer.spark_data_frame_exception_type import ExceptionType
 from spark_pipeline_framework.utilities.spark_data_frame_helpers import (
     spark_list_catalog_table_names,
 )

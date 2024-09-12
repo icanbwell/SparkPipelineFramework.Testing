@@ -21,7 +21,7 @@ Deprecated = ">=1.2.13"
 # helix-mockserver-client is needed for mocking servers
 helix-mockserver-client=">=2.0.1"
 # sparkdataframecomparer is needed for comparing Spark DataFrames
-"sparkdataframecomparer" = ">=2.0.7"
+"sparkdataframecomparer" = ">=2.0.8"
 
 [dev-packages]
 # setuptools is needed for building the package
