@@ -22,7 +22,7 @@ shell:devdocker ## Brings up the bash shell in dev docker
 init: devdocker up setup-pre-commit  ## Initializes the local developer environment
 
 .PHONY: up
-up: Pipfile.lock
+up:
 	docker compose up --build -d --remove-orphans
 	@echo MockServer dashboard: http://localhost:1080/mockserver/dashboard
 	@echo Fhir server dashboard http://localhost:3000/
@@ -38,7 +38,7 @@ clean-pre-commit: ## removes pre-commit hook
 	rm -f .git/hooks/pre-commit
 
 .PHONY:setup-pre-commit
-setup-pre-commit: Pipfile.lock
+setup-pre-commit:
 	cp ./pre-commit-hook ./.git/hooks/pre-commit
 
 .PHONY:run-pre-commit
