@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "97e9fa595bf9f734823847430804c5d6fcd14169a56595ecce20349178ff6a56"
+            "sha256": "8fef87240772958c366b2d59e9fa4979f80b6e909a961a2b16aa70cad48d66c1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -686,12 +686,12 @@
         },
         "sparkdataframecomparer": {
             "hashes": [
-                "sha256:660475f5260e8e5c440d645abe21a500ed00c5733eba586f9f138807eed87b3a",
-                "sha256:892e8165a0e5244d77cc0d1eb0963c3128d70acc0037dcc4591773db9067a62d"
+                "sha256:556e6daabbe9d7b0712bc5000b2f627b501f29c8207fe0f1bba2f69f92735648",
+                "sha256:ead9e066c1609de95332943f509441bfef20ac207a380464611c0c6c4fb07749"
             ],
             "index": "pypi",
             "markers": "python_version >= '3'",
-            "version": "==2.0.10"
+            "version": "==2.0.11"
         },
         "urllib3": {
             "hashes": [
@@ -877,11 +877,11 @@
         },
         "zipp": {
             "hashes": [
-                "sha256:9960cd8967c8f85a56f920d5d507274e74f9ff813a0ab8889a5b5be2daf44064",
-                "sha256:c22b14cc4763c5a5b04134207736c107db42e9d3ef2d9779d465f5f1bcba572b"
+                "sha256:a817ac80d6cf4b23bf7f2828b7cabf326f15a001bea8b1f9b49631780ba28350",
+                "sha256:bc9eb26f4506fda01b81bcde0ca78103b6e62f991b381fec825435c836edbc29"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==3.20.1"
+            "version": "==3.20.2"
         }
     },
     "develop": {
@@ -2969,12 +2969,12 @@
         },
         "sparkdataframecomparer": {
             "hashes": [
-                "sha256:660475f5260e8e5c440d645abe21a500ed00c5733eba586f9f138807eed87b3a",
-                "sha256:892e8165a0e5244d77cc0d1eb0963c3128d70acc0037dcc4591773db9067a62d"
+                "sha256:556e6daabbe9d7b0712bc5000b2f627b501f29c8207fe0f1bba2f69f92735648",
+                "sha256:ead9e066c1609de95332943f509441bfef20ac207a380464611c0c6c4fb07749"
             ],
             "index": "pypi",
             "markers": "python_version >= '3'",
-            "version": "==2.0.10"
+            "version": "==2.0.11"
         },
         "sparkfhirschemas": {
             "hashes": [
@@ -3445,11 +3445,11 @@
         },
         "zipp": {
             "hashes": [
-                "sha256:9960cd8967c8f85a56f920d5d507274e74f9ff813a0ab8889a5b5be2daf44064",
-                "sha256:c22b14cc4763c5a5b04134207736c107db42e9d3ef2d9779d465f5f1bcba572b"
+                "sha256:a817ac80d6cf4b23bf7f2828b7cabf326f15a001bea8b1f9b49631780ba28350",
+                "sha256:bc9eb26f4506fda01b81bcde0ca78103b6e62f991b381fec825435c836edbc29"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==3.20.1"
+            "version": "==3.20.2"
         },
         "zstandard": {
             "hashes": [

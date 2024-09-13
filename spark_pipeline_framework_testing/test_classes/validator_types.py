@@ -632,14 +632,15 @@ class OutputFileValidator(Validator):
     Validates the output files from a feature or pipeline
     """
 
+    # noinspection PyDefaultArgument
     def __init__(
         self,
         related_inputs: Optional[Union[List["FileInput"], "FileInput"]] = None,
         func_path_modifier: Optional[
             Callable[[Union[Path, str]], Union[Path, str]]
         ] = convert_path_from_docker,
-        sort_output_by: Optional[List[str]] = None,
-        auto_sort: Optional[bool] = None,
+        sort_output_by: Optional[List[str]] = ["id"],
+        auto_sort: Optional[bool] = True,
         output_as_json_only: bool = True,
         apply_schema_to_output: bool = True,
         ignore_views_for_output: Optional[List[str]] = None,
@@ -650,13 +651,15 @@ class OutputFileValidator(Validator):
         ] = None,
     ):
         """
+        Validates the output files from a feature or pipeline
+
 
         :param related_inputs: the corresponding input for this validator, optional if the pipeline input comes
             from calling an api
         :param func_path_modifier: in case you want to change paths e.g. docker to local
-        :param sort_output_by: order of column names [col1, col2,...]
+        :param sort_output_by: order of column names [col1, col2,...]  (default is ["id"])
         :param output_as_json_only: save output as json
-        :param apply_schema_to_output:
+        :param apply_schema_to_output:  whether to apply schema to output
         :param ignore_views_for_output: don't save these views
         :param output_folder: name of the output folder
         :param output_schema_folder: name of the folder containing output schema
@@ -692,6 +695,18 @@ class OutputFileValidator(Validator):
         logger: Logger,
         mock_client: Optional[MockServerFriendlyClient] = None,
     ) -> None:
+        """
+        Validates the output files from a feature or pipeline
+
+
+        :param test_name: the name of the test
+        :param test_path: the path to the test
+        :param spark_session: the spark session
+        :param temp_folder_path: the path to the temp folder
+        :param logger: the logger
+        :param mock_client: the mock client
+        :return: None
+        """
         assert spark_session
         self.logger = logger
 
