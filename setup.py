@@ -30,7 +30,7 @@ setup(
         "deprecated>=1.2.13",
         "helix.fhir.client.sdk>=3.0.5",
         "helix-mockserver-client>=2.0.1",
-        "sparkdataframecomparer>=2.0.11",
+        "sparkdataframecomparer>=2.0.12",
     ],
     name=package_name,
     version=version,

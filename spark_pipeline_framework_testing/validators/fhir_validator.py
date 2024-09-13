@@ -9,6 +9,7 @@ from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import to_json, struct
 from pyspark.sql.session import SparkSession
 from requests import Session
+from spark_pipeline_framework.logger.yarn_logger import Logger  # type: ignore
 from spark_pipeline_framework.utilities.spark_data_frame_helpers import (
     spark_list_catalog_table_names,
 )
@@ -17,12 +18,9 @@ from spark_pipeline_framework_testing.test_classes.input_types import (
     FhirCalls,
     FileInput,
 )
-
 from spark_pipeline_framework_testing.test_classes.validator_types import (
     MockCallValidator,
 )
-
-from spark_pipeline_framework.logger.yarn_logger import Logger  # type: ignore
 
 
 class FhirValidator(MockCallValidator):
