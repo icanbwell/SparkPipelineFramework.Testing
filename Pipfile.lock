@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b56667070aa67fb0d175c523d8de9bdf1d3c16dd7fc04620f0c62ccdc1ebdac4"
+            "sha256": "97e9fa595bf9f734823847430804c5d6fcd14169a56595ecce20349178ff6a56"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -686,12 +686,12 @@
         },
         "sparkdataframecomparer": {
             "hashes": [
-                "sha256:17c9aab414c1f25600a6a64a322e3eb401fa6022682e38b8473f1f1b103f7b2c",
-                "sha256:23fd8b06faf10613241721cb12d005494053783538e05e58fe438be6f18152a4"
+                "sha256:660475f5260e8e5c440d645abe21a500ed00c5733eba586f9f138807eed87b3a",
+                "sha256:892e8165a0e5244d77cc0d1eb0963c3128d70acc0037dcc4591773db9067a62d"
             ],
             "index": "pypi",
             "markers": "python_version >= '3'",
-            "version": "==2.0.8"
+            "version": "==2.0.10"
         },
         "urllib3": {
             "hashes": [
@@ -2969,12 +2969,12 @@
         },
         "sparkdataframecomparer": {
             "hashes": [
-                "sha256:17c9aab414c1f25600a6a64a322e3eb401fa6022682e38b8473f1f1b103f7b2c",
-                "sha256:23fd8b06faf10613241721cb12d005494053783538e05e58fe438be6f18152a4"
+                "sha256:660475f5260e8e5c440d645abe21a500ed00c5733eba586f9f138807eed87b3a",
+                "sha256:892e8165a0e5244d77cc0d1eb0963c3128d70acc0037dcc4591773db9067a62d"
             ],
             "index": "pypi",
             "markers": "python_version >= '3'",
-            "version": "==2.0.8"
+            "version": "==2.0.10"
         },
         "sparkfhirschemas": {
             "hashes": [
