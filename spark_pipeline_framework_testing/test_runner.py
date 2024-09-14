@@ -17,8 +17,8 @@ from spark_data_frame_comparer.spark_data_frame_comparer import (
 )
 from spark_data_frame_comparer.spark_data_frame_comparer_exception import (
     SparkDataFrameComparerException,
-    ExceptionType,
 )
+from spark_data_frame_comparer.spark_data_frame_exception_type import ExceptionType
 from spark_pipeline_framework.progress_logger.progress_logger import ProgressLogger
 from spark_pipeline_framework.utilities.class_helpers import ClassHelpers
 from spark_pipeline_framework.utilities.json_to_jsonl_converter.json_to_jsonl_converter import (
@@ -47,6 +47,7 @@ class SparkPipelineFrameworkTestRunner:
         temp_folder: Optional[Path] = None,
         transformer_type: Optional[Type[Transformer]] = None,
         sort_output_by: Optional[List[str]] = None,
+        auto_sort: Optional[bool] = None,
         output_as_json_only: bool = True,
         apply_schema_to_output: bool = True,
         check_output: bool = True,
@@ -79,9 +80,10 @@ class SparkPipelineFrameworkTestRunner:
         :param temp_folder: folder to use for temporary files.  Any existing files in this folder will be deleted.
         :param transformer_type: (Optional) the transformer to run
         :param sort_output_by: (Optional) sort by these columns before comparing or writing output files
+        :param auto_sort: (Optional) if set to True then automatically sort the output before comparing
         :param output_as_json_only: (Optional) if set to True then do not output as csv
         :param apply_schema_to_output: If true applies schema to output file
-        :param check_output: if set, check the output of the test.  Otherwise don't check the output.
+        :param check_output: if set, check the output of the test.  Otherwise, don't check the output.
         :param ignore_views_for_output: list of view names to ignore when writing output schema and output json
         :param input_schema: Optional input_schema to apply to the input data. Can be a schema or a dictionary
                                 of schemas where the key is name of the view
@@ -229,6 +231,7 @@ class SparkPipelineFrameworkTestRunner:
                     sort_output_by=sort_output_by,
                     apply_schema_to_output=apply_schema_to_output,
                     output_schema=output_schema,
+                    auto_sort=auto_sort,
                 )
                 if found_output_file:
                     views_found.append(
@@ -325,6 +328,7 @@ class SparkPipelineFrameworkTestRunner:
         apply_schema_to_output: bool,
         output_schema: Optional[Union[StructType, Dict[str, StructType], DataType]],
         temp_folder: Optional[Union[Path, str]] = None,
+        auto_sort: Optional[bool] = None,
     ) -> Tuple[bool, Optional[SparkDataFrameComparerException]]:
         data_frame_exception: Optional[SparkDataFrameComparerException] = None
         file_extension: str = (
@@ -462,6 +466,7 @@ class SparkPipelineFrameworkTestRunner:
                         temp_folder=temp_folder,
                         func_path_modifier=func_path_modifier,
                         order_by=sort_columns if len(sort_columns) > 0 else None,
+                        auto_sort=auto_sort,
                     )
                 except SparkDataFrameComparerException as e:
                     data_frame_exception = e
