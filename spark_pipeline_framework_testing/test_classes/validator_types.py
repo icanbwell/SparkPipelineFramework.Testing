@@ -643,7 +643,7 @@ class OutputFileValidator(Validator):
         auto_sort: Optional[bool] = True,
         output_as_json_only: bool = True,
         apply_schema_to_output: bool = True,
-        ignore_views_for_output: Optional[List[str]] = None,
+        ignore_views_for_output: List[str] = [],
         output_folder: str = "output",
         output_schema_folder: str = "output_schema",
         output_schema: Optional[
@@ -728,7 +728,7 @@ class OutputFileValidator(Validator):
             if not table_name.startswith("expected_")
             and table_name not in self.input_table_names
         ]
-        if self.ignore_views_for_output is not None:
+        if self.ignore_views_for_output:
             output_tables_for_writing_schema = [
                 table
                 for table in output_tables_for_writing_schema
@@ -751,10 +751,13 @@ class OutputFileValidator(Validator):
         if not os.path.exists(self.output_folder_path):
             os.mkdir(self.output_folder_path)
         # noinspection PyTypeChecker
-        output_files: List[str] = [
+        output_files = [
             f
             for f in listdir(self.output_folder_path)
-            if isfile(join(self.output_folder_path, f))
+            if (
+                isfile(join(self.output_folder_path, f))
+                and Path(f).stem not in self.ignore_views_for_output
+            )
         ]
         views_found: List[str] = []
         data_frame_exceptions: List[SparkDataFrameComparerException] = []
@@ -784,6 +787,7 @@ class OutputFileValidator(Validator):
             if table_name.lower() not in views_found
             and not table_name.startswith("expected_")
             and table_name not in self.input_table_names
+            and table_name not in self.ignore_views_for_output
         ]
         if (
             "output" in table_names_to_write_to_output

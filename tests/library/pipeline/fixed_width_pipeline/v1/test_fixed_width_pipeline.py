@@ -13,7 +13,7 @@ from spark_pipeline_framework_testing.test_runner_v2 import (
     SparkPipelineFrameworkTestRunnerV2,
 )
 
-from spark_pipeline_framework_testing.test_classes import input_types
+from spark_pipeline_framework_testing.test_classes import input_types, validator_types
 
 
 def test_fixed_width_pipeline(
@@ -59,7 +59,11 @@ def test_fixed_width_pipeline(
         spark_session=spark_session,
         test_path=data_dir,
         test_name=test_name,
-        test_validators=[],
+        test_validators=[
+            validator_types.OutputFileValidator(
+                output_folder="output", ignore_views_for_output=["test"]
+            )
+        ],
         logger=logger,
         test_inputs=[test_input],
         temp_folder="output/temp",
