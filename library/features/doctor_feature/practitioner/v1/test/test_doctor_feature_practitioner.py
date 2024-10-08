@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from mockserver_client.mockserver_client import MockServerFriendlyClient
+import requests
 from spark_pipeline_framework.logger.yarn_logger import get_logger
 
 from pyspark.sql import SparkSession
@@ -31,6 +32,21 @@ def test_doctor_feature_practitioner(spark_session: SparkSession) -> None:
         "mock_server_url": mock_server_url,
     }
 
+    fhir_server_auth_config = requests.get(
+        url="http://fhir:3000/.well-known/smart-configuration"
+    )
+    assert (
+        fhir_server_auth_config.status_code == 200
+    ), f"{fhir_server_auth_config.status_code}: {fhir_server_auth_config.text}"
+    access_token_response = requests.post(
+        url=fhir_server_auth_config.json()["token_endpoint"],
+        data="grant_type=client_credentials&client_id=bwell-client-id&client_secret=bwell-secret",
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    assert (
+        access_token_response.status_code == 200
+    ), f"{access_token_response.status_code}: {access_token_response.text}"
+
     # initialize the mock calls
     test_fhir.initialize(
         test_name=test_name,
@@ -46,6 +62,7 @@ def test_doctor_feature_practitioner(spark_session: SparkSession) -> None:
         mock_server_url=mock_server_url,
         test_name=test_name,
         fhir_validation_url="http://fhir:3000/4_0_0",
+        fhir_server_access_token=f"{access_token_response.json()['access_token']}",
     )
 
     SparkPipelineFrameworkTestRunnerV2(

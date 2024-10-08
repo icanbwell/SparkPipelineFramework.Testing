@@ -36,6 +36,7 @@ class FhirValidator(MockCallValidator):
         mock_server_url: str,
         test_name: str,
         fhir_validation_url: Optional[str] = None,
+        fhir_server_access_token: Optional[str] = None,
     ) -> None:
         super().__init__(related_inputs=related_inputs)
         self.related_file_inputs = (
@@ -48,6 +49,7 @@ class FhirValidator(MockCallValidator):
         assert test_name
         self.test_name: str = test_name
         self.fhir_validation_url: Optional[str] = fhir_validation_url
+        self.fhir_server_access_token: Optional[str] = fhir_server_access_token
 
     def validate(
         self,
@@ -94,6 +96,7 @@ class FhirValidator(MockCallValidator):
                     # validate the resource
                     self.validate_resource(
                         fhir_validation_url=self.fhir_validation_url,
+                        fhir_server_access_token=self.fhir_server_access_token,
                         resource_dict=row_dict,
                         resource_type=resource_type,
                     )
@@ -143,6 +146,7 @@ class FhirValidator(MockCallValidator):
     @staticmethod
     def validate_resource(
         fhir_validation_url: str,
+        fhir_server_access_token: Optional[str],
         resource_dict: Dict[str, Any],
         resource_type: str,
     ) -> None:
@@ -150,6 +154,8 @@ class FhirValidator(MockCallValidator):
         assert resource_type
         full_uri /= resource_type
         headers = {"Content-Type": "application/fhir+json"}
+        if fhir_server_access_token:
+            headers["Authorization"] = f"Bearer {fhir_server_access_token}"
         full_uri /= "$validate"
         json_payload: str = json.dumps(resource_dict)
         json_payload_bytes: bytes = json_payload.encode("utf-8")
