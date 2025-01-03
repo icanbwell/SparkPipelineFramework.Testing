@@ -323,20 +323,15 @@ class MockCallValidator(Validator):
                 test_failure_message += "\n" + failure_message
                 all_requests: List[MockRequest] = mock_client.retrieve_requests()
                 all_expectations: List[MockExpectation] = mock_client.expectations
-                logger.info("\n ---- ALL EXPECTATIONS -------\n")
-                for expectation in all_expectations:
-                    logger.info(
-                        "\n-----------------------\n"
-                        + str(expectation.request)
-                        + "\n-----------------------\n"
-                    )
-                logger.info("\n ---- ALL REQUESTS -------\n")
-                for request in all_requests:
-                    logger.info(
-                        "\n-----------------------\n"
-                        + str(request)
-                        + "\n-----------------------\n"
-                    )
+
+                all_expectations_str = "\n".join(
+                    [f"{expectation.request}" for expectation in all_expectations]
+                )
+                logger.info(f"\n ---- ALL EXPECTATIONS -------\n{all_expectations_str}")
+
+                all_requests_str = "\n".join([f"{request}" for request in all_requests])
+                logger.info(f"\n ---- ALL REQUESTS -------\n{all_requests_str}")
+
                 pytest.fail(test_failure_message)
             elif warning_message:
                 print(warning_message)
@@ -525,7 +520,7 @@ class MockRequestValidator(Validator):
                     failure_message += f"{len(content_not_matched_exceptions)} requests did not match: \n"
                     msg = "\n".join(
                         [
-                            f"expected: {c.expected_json}\nactual: {c.actual_json}"
+                            f"{c.method} {c.url}\nexpected: {c.expected_json}\nactual: {c.actual_json}"
                             for c in content_not_matched_exceptions
                         ]
                     )
@@ -599,20 +594,14 @@ class MockRequestValidator(Validator):
                 test_failure_message += warning_message
                 all_requests: List[MockRequest] = mock_client.retrieve_requests()
                 all_expectations: List[MockExpectation] = mock_client.expectations
-                logger.info("\n ---- ALL EXPECTATIONS -------\n")
-                for expectation in all_expectations:
-                    logger.info(
-                        "\n-----------------------\n"
-                        + str(expectation.request)
-                        + "\n-----------------------\n"
-                    )
-                logger.info("\n ---- ALL REQUESTS -------\n")
-                for request in all_requests:
-                    logger.info(
-                        "\n-----------------------\n"
-                        + str(request)
-                        + "\n-----------------------\n"
-                    )
+                all_expectations_str = "\n".join(
+                    [f"{expectation.request}" for expectation in all_expectations]
+                )
+                logger.info(f"\n ---- ALL EXPECTATIONS -------\n{all_expectations_str}")
+
+                all_requests_str = "\n".join([f"{request}" for request in all_requests])
+                logger.info(f"\n ---- ALL REQUESTS -------\n{all_requests_str}")
+
                 pytest.fail(test_failure_message)
             elif warning_message:
                 print(warning_message)
