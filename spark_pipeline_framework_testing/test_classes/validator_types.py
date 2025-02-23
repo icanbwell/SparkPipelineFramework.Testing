@@ -127,6 +127,7 @@ class MockCallValidator(Validator):
             for exception in e.exceptions:
                 if isinstance(exception, MockServerJsonContentMismatchException):
                     expected_path = exception.expected_file_path
+                    assert expected_path
                     if len(expected_path.parts) > 0:
                         expected_file_name: str = os.path.basename(expected_path)
                         # create a temp file to launch the diff tool
@@ -391,6 +392,7 @@ class MockRequestValidator(Validator):
             for exception in e.exceptions:
                 if isinstance(exception, MockServerJsonContentMismatchException):
                     expected_path = exception.expected_file_path
+                    assert expected_path
                     if len(expected_path.parts) > 0:
                         expected_file_name: str = os.path.basename(expected_path)
                         # create a temp file to launch the diff tool
