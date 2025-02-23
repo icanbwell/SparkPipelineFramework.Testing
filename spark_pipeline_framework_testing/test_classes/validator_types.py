@@ -799,7 +799,7 @@ class OutputFileValidator(Validator):
         apply_schema_to_output: bool,
         output_schema: Optional[Union[StructType, Dict[str, StructType], DataType]],
         auto_sort: Optional[bool] = None,
-    ) -> Tuple[bool, Optional[SparkDataFrameComparerException]]:
+    ) -> Tuple[bool, SparkDataFrameComparerException | None]:
         """
         read predefined outputs and compare them with the current outputs
         write outputs to disk if it doesn't exist
