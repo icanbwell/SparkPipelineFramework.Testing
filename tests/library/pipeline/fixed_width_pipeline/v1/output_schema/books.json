@@ -1,0 +1,48 @@
+{
+    "type": "struct",
+    "fields": [
+        {
+            "name": "_id",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "author",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "description",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "genre",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "price",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "publish_date",
+            "type": "date",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "title",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        }
+    ],
+    "$schema": "https://raw.githubusercontent.com/imranq2/SparkPipelineFramework.Testing/main/spark_json_schema.json "
+}
