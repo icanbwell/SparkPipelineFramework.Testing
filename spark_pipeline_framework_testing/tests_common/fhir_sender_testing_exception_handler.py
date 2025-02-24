@@ -30,6 +30,7 @@ def handle_fhir_sender_exception(
         fhir_sender_exception.exception
     )
     expected_path = json_content_mismatch_exception.expected_file_path
+    assert expected_path is not None
     expected_file_name: str = os.path.basename(expected_path)
     # create a temp file to launch the diff tool
     # use .command: https://stackoverflow.com/questions/5125907/how-to-run-a-shell-script-in-os-x-by-double-clicking

@@ -127,6 +127,7 @@ class MockCallValidator(Validator):
             for exception in e.exceptions:
                 if isinstance(exception, MockServerJsonContentMismatchException):
                     expected_path = exception.expected_file_path
+                    assert expected_path
                     if len(expected_path.parts) > 0:
                         expected_file_name: str = os.path.basename(expected_path)
                         # create a temp file to launch the diff tool
@@ -243,21 +244,16 @@ class MockCallValidator(Validator):
                     )
                     failure_message += f"{compare_files_text}\n"
                     for content_not_matched_exception in content_not_matched_exceptions:
-                        failure_message += f"----------- {content_not_matched_exception.expected_file_path} -----------\n"
+                        failure_message += f"-----------  {content_not_matched_exception.url} File: {content_not_matched_exception.expected_file_path} -----------\n"
                         for difference in content_not_matched_exception.differences:
                             failure_message += f"{difference}\n"
 
                 else:
                     failure_message += f"{len(content_not_matched_exceptions)} requests did not match: \n"
-                    msg = "\n".join(
-                        [
-                            f"expected: {c.expected_json}\nactual: {c.actual_json}"
-                            for c in content_not_matched_exceptions
-                        ]
-                    )
+                    msg = "\n".join([str(c) for c in content_not_matched_exceptions])
                     failure_message += f"{msg}\n"
                     for content_not_matched_exception in content_not_matched_exceptions:
-                        failure_message += f"----------- {content_not_matched_exception.expected_file_path} -----------\n"
+                        failure_message += f"-----------  {content_not_matched_exception.url} File:  {content_not_matched_exception.expected_file_path} -----------\n"
                         for difference in content_not_matched_exception.differences:
                             failure_message += f"{difference}\n"
 
@@ -323,20 +319,19 @@ class MockCallValidator(Validator):
                 test_failure_message += "\n" + failure_message
                 all_requests: List[MockRequest] = mock_client.retrieve_requests()
                 all_expectations: List[MockExpectation] = mock_client.expectations
-                logger.info("\n ---- ALL EXPECTATIONS -------\n")
-                for expectation in all_expectations:
-                    logger.info(
-                        "\n-----------------------\n"
-                        + str(expectation.request)
-                        + "\n-----------------------\n"
-                    )
-                logger.info("\n ---- ALL REQUESTS -------\n")
-                for request in all_requests:
-                    logger.info(
-                        "\n-----------------------\n"
-                        + str(request)
-                        + "\n-----------------------\n"
-                    )
+
+                all_expectations_str = "\n".join(
+                    [f"{expectation.request}" for expectation in all_expectations]
+                )
+                logger.info(
+                    f"\n ---- ALL EXPECTATIONS -------\n{all_expectations_str}\n--- END EXPECTATIONS ---\n"
+                )
+
+                all_requests_str = "\n".join([f"{request}" for request in all_requests])
+                logger.info(
+                    f"\n ---- ALL REQUESTS -------\n{all_requests_str}\n--- END REQUESTS ---\n"
+                )
+
                 pytest.fail(test_failure_message)
             elif warning_message:
                 print(warning_message)
@@ -397,6 +392,7 @@ class MockRequestValidator(Validator):
             for exception in e.exceptions:
                 if isinstance(exception, MockServerJsonContentMismatchException):
                     expected_path = exception.expected_file_path
+                    assert expected_path
                     if len(expected_path.parts) > 0:
                         expected_file_name: str = os.path.basename(expected_path)
                         # create a temp file to launch the diff tool
@@ -518,20 +514,15 @@ class MockRequestValidator(Validator):
                     )
                     failure_message += f"{compare_files_text}\n"
                     for content_not_matched_exception in content_not_matched_exceptions:
-                        failure_message += f"----------- {content_not_matched_exception.expected_file_path} -----------\n"
+                        failure_message += f"-----------  {content_not_matched_exception.url} File {content_not_matched_exception.expected_file_path} -----------\n"
                         for difference in content_not_matched_exception.differences:
                             failure_message += f"{difference}\n"
                 else:
-                    failure_message += f"{len(content_not_matched_exceptions)} requests did not match: \n"
-                    msg = "\n".join(
-                        [
-                            f"expected: {c.expected_json}\nactual: {c.actual_json}"
-                            for c in content_not_matched_exceptions
-                        ]
-                    )
+                    failure_message += f"{len(content_not_matched_exceptions)} requests did not match: \n\n"
+                    msg = "\n".join([str(c) for c in content_not_matched_exceptions])
                     failure_message += f"{msg}\n"
                     for content_not_matched_exception in content_not_matched_exceptions:
-                        failure_message += f"----------- {content_not_matched_exception.expected_file_path} -----------\n"
+                        failure_message += f"----------- {content_not_matched_exception.url} File: {content_not_matched_exception.expected_file_path} -----------\n"
                         for difference in content_not_matched_exception.differences:
                             failure_message += f"{difference}\n"
 
@@ -599,20 +590,18 @@ class MockRequestValidator(Validator):
                 test_failure_message += warning_message
                 all_requests: List[MockRequest] = mock_client.retrieve_requests()
                 all_expectations: List[MockExpectation] = mock_client.expectations
-                logger.info("\n ---- ALL EXPECTATIONS -------\n")
-                for expectation in all_expectations:
-                    logger.info(
-                        "\n-----------------------\n"
-                        + str(expectation.request)
-                        + "\n-----------------------\n"
-                    )
-                logger.info("\n ---- ALL REQUESTS -------\n")
-                for request in all_requests:
-                    logger.info(
-                        "\n-----------------------\n"
-                        + str(request)
-                        + "\n-----------------------\n"
-                    )
+                all_expectations_str = "\n".join(
+                    [f"{expectation.request}" for expectation in all_expectations]
+                )
+                logger.info(
+                    f"\n ---- ALL EXPECTATIONS -------\n{all_expectations_str}\n--- END EXPECTATIONS ---\n"
+                )
+
+                all_requests_str = "\n".join([f"{request}" for request in all_requests])
+                logger.info(
+                    f"\n ---- ALL REQUESTS -------\n{all_requests_str}\n--- END REQUESTS ---\n"
+                )
+
                 pytest.fail(test_failure_message)
             elif warning_message:
                 print(warning_message)
@@ -810,7 +799,7 @@ class OutputFileValidator(Validator):
         apply_schema_to_output: bool,
         output_schema: Optional[Union[StructType, Dict[str, StructType], DataType]],
         auto_sort: Optional[bool] = None,
-    ) -> Tuple[bool, Optional[SparkDataFrameComparerException]]:
+    ) -> Tuple[bool, SparkDataFrameComparerException | None]:
         """
         read predefined outputs and compare them with the current outputs
         write outputs to disk if it doesn't exist

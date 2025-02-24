@@ -22,7 +22,7 @@ services:
     depends_on:
       - mongo
       - keycloak
-    image: imranq2/node-fhir-server-mongo:5.6.7
+    image: imranq2/node-fhir-server-mongo:5.10.21
     # To use local fhir code, comment above line and uncomment below
 #    build:
 #      dockerfile: Dockerfile
@@ -59,7 +59,7 @@ services:
         test: ["CMD-SHELL", "wget --spider --quiet localhost:3000/health || exit 1"]
 
   mongo:
-      image: mongo:7.0.12
+      image: mongo:8.0.4
       ports:
           - '27017:27017'
       environment:
