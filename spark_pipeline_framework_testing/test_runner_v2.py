@@ -17,6 +17,7 @@ from spark_pipeline_framework.proxy_generator.proxy_base import ProxyBase
 from spark_pipeline_framework.utilities.FriendlySparkException import (
     FriendlySparkException,
 )
+from spark_pipeline_framework.utilities.async_helper.v1.async_helper import AsyncHelper
 from spark_pipeline_framework.utilities.class_helpers import ClassHelpers
 from spark_pipeline_framework.utilities.parameter_dict import ParameterDict
 
@@ -128,6 +129,9 @@ class SparkPipelineFrameworkTestRunnerV2:
         self.progress_logger: Optional[ProgressLogger] = progress_logger
 
     def run_test2(self) -> None:
+        AsyncHelper.run(fn=self.run_test_async())
+
+    async def run_test_async(self) -> None:
         assert self.temp_folder_path
         try:
             os.environ["CATALOG_LOCATION"] = str(self.test_path)
@@ -150,7 +154,7 @@ class SparkPipelineFrameworkTestRunnerV2:
             if not self.auto_find_helix_transformer:
                 if self.helix_transformers:
                     for transformer in self.helix_transformers:
-                        self.run_helix_transformers(
+                        await self.run_helix_transformers_async(
                             parameters=(
                                 self.helix_pipeline_parameters  # type: ignore
                                 if self.helix_pipeline_parameters
@@ -170,7 +174,7 @@ class SparkPipelineFrameworkTestRunnerV2:
                     )
 
                 if transformer_class:
-                    self.run_helix_transformers(
+                    await self.run_helix_transformers_async(
                         parameters=(
                             self.helix_pipeline_parameters  # type: ignore
                             if self.helix_pipeline_parameters
@@ -215,15 +219,6 @@ class SparkPipelineFrameworkTestRunnerV2:
                     temp_folder=self.temp_folder_path,
                     func_path_modifier=convert_path_from_docker,
                 )
-            # elif (
-            #     isinstance(e.exception, PythonException)
-            #     and "FhirSenderException" in e.exception.desc
-            # ):
-            #     handle_fhir_sender_exception(
-            #         e=e,
-            #         temp_folder=self.temp_folder_path,
-            #         func_path_modifier=convert_path_from_docker,
-            #     )
             else:
                 raise
         except ModuleNotFoundError:
@@ -234,7 +229,7 @@ class SparkPipelineFrameworkTestRunnerV2:
             if "CATALOG_LOCATION" in os.environ:
                 del os.environ["CATALOG_LOCATION"]
 
-    def run_helix_transformers(
+    async def run_helix_transformers_async(
         self,
         parameters: Dict[str, Any],
         transformer_class: Optional[Type[Transformer]],
@@ -257,20 +252,20 @@ class SparkPipelineFrameworkTestRunnerV2:
             parameters["view"] = destination_view_name
 
         if progress_logger is not None:
-            self.run_helix_transformers_with_progress_logger(
+            await self.run_helix_transformers_with_progress_logger_async(
                 parameters=parameters,
                 transformer_class=transformer_class,
                 progress_logger=progress_logger,
             )
         else:
             with ProgressLogger() as progress_logger1:
-                self.run_helix_transformers_with_progress_logger(
+                await self.run_helix_transformers_with_progress_logger_async(
                     parameters=parameters,
                     transformer_class=transformer_class,
                     progress_logger=progress_logger1,
                 )
 
-    def run_helix_transformers_with_progress_logger(
+    async def run_helix_transformers_with_progress_logger_async(
         self,
         *,
         parameters: Dict[str, Any],
@@ -300,7 +295,10 @@ class SparkPipelineFrameworkTestRunnerV2:
         )
         if progress_logger:
             progress_logger.write_to_log("pipeline", str(my_instance))
-        my_instance.transform(df)
+
+        assert hasattr(my_instance, "transform_async")
+        # noinspection PyUnresolvedReferences
+        await my_instance.transform_async(df)
 
     @staticmethod
     def find_transformer(
