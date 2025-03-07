@@ -17,7 +17,7 @@ delta-spark="==3.2.0"
 # Deprecated is needed for marking deprecated functions
 Deprecated = ">=1.2.13"
 # helix.fhir.client.sdk is needed for interacting with FHIR servers
-"helix.fhir.client.sdk" = ">=3.0.26"
+"helix.fhir.client.sdk" = ">=3.0.27"
 # helix-mockserver-client is needed for mocking servers
 helix-mockserver-client=">=2.0.4"
 # sparkdataframecomparer is needed for comparing Spark DataFrames
@@ -31,17 +31,17 @@ wheel = ">=0.44.0"
 # twine is needed for uploading the package to PyPI
 twine=">=5.1.1"
 # pre-commit is needed for running code quality checks
-pre-commit=">=3.7.1"
+pre-commit=">=4.1.0"
 # autoflake is needed for removing unused imports
 autoflake=">=2.3.1"
 # mypy is needed for type checking
-mypy = ">=1.11.2"
+mypy = ">=1.15.0"
 # pytest is needed for running tests
-pytest = ">=8.3.3"
+pytest = ">=8.3.5"
 # pytest-ayncio is needed for running async tests
-pytest-asyncio = ">=0.23.8"
+pytest-asyncio = ">=0.25.3"
 # black is needed for formatting code
-black = ">=24.8.0"
+black = ">=25.1.0"
 # py4j is needed for connecting to the JVM from Spark
 py4j = "==0.10.9.7" # https://spark.apache.org/docs/latest/api/python/getting_started/install.html#dependencies
 # pyspark is needed for running Spark jobs
@@ -56,7 +56,7 @@ sparkautomapper = "==3.0.2"
 # sparkfhirschemas is needed for FHIR schemas
 "sparkfhirschemas" = "==2.0.2"
 # sparkpipelineframework is needed for building pipelines
-sparkpipelineframework = "==3.0.47"
+sparkpipelineframework = "==3.0.55"
 # requests is needed for making HTTP requests
 requests = ">=2.31.0"
 dictdiffer = ">=0.9.0"
