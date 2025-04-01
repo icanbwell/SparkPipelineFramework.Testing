@@ -213,7 +213,7 @@ class SparkPipelineFrameworkTestRunnerV2:
                 raise e
         except FriendlySparkException as e:
             # has PythonException from Spark
-            if isinstance(e.exception, FhirSenderException):
+            if isinstance(e.original_exception, FhirSenderException):
                 handle_fhir_sender_exception(
                     e=e,
                     temp_folder=self.temp_folder_path,

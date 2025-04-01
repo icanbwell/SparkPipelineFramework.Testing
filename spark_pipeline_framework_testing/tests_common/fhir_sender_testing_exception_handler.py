@@ -17,17 +17,17 @@ def handle_fhir_sender_exception(
     temp_folder: Path,
     func_path_modifier: Optional[Callable[[Union[Path, str]], Union[Path, str]]],
 ) -> None:
-    if not isinstance(e.exception, FhirSenderException):
+    if not isinstance(e.original_exception, FhirSenderException):
         raise
 
-    fhir_sender_exception: FhirSenderException = e.exception
+    fhir_sender_exception: FhirSenderException = e.original_exception
     if not isinstance(
-        fhir_sender_exception.exception, MockServerJsonContentMismatchException
+        fhir_sender_exception.original_exception, MockServerJsonContentMismatchException
     ):
         raise
 
     json_content_mismatch_exception: MockServerJsonContentMismatchException = (
-        fhir_sender_exception.exception
+        fhir_sender_exception.original_exception
     )
     expected_path = json_content_mismatch_exception.expected_file_path
     assert expected_path is not None
