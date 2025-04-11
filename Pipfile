@@ -17,7 +17,7 @@ delta-spark="==3.2.0"
 # Deprecated is needed for marking deprecated functions
 Deprecated = ">=1.2.13"
 # helix.fhir.client.sdk is needed for interacting with FHIR servers
-"helix.fhir.client.sdk" = ">=4.0.2"
+"helix.fhir.client.sdk" = ">=4.1.0"
 # helix-mockserver-client is needed for mocking servers
 helix-mockserver-client=">=2.0.4"
 # sparkdataframecomparer is needed for comparing Spark DataFrames
@@ -56,7 +56,7 @@ sparkautomapper = "==3.0.2"
 # sparkfhirschemas is needed for FHIR schemas
 "sparkfhirschemas" = "==2.0.2"
 # sparkpipelineframework is needed for building pipelines
-sparkpipelineframework = "==3.0.87"
+sparkpipelineframework = "==4.0.2"
 # requests is needed for making HTTP requests
 requests = ">=2.31.0"
 dictdiffer = ">=0.9.0"
