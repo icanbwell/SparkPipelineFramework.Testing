@@ -59,6 +59,7 @@ class SparkPipelineFrameworkTestRunnerV2:
         helix_pipeline_parameters: Optional[Dict[str, Any]] = None,
         parameters_filename: str = "parameters.json",
         progress_logger: Optional[ProgressLogger] = None,
+        set_default_request: Optional[bool] = True,
     ) -> None:
         """
         :param auto_find_helix_transformer: find transformer based on the test location (overwrites helix_transformers)
@@ -127,6 +128,7 @@ class SparkPipelineFrameworkTestRunnerV2:
             standard_parameters.update(self.helix_pipeline_parameters)
         self.helix_pipeline_parameters = standard_parameters  # type: ignore
         self.progress_logger: Optional[ProgressLogger] = progress_logger
+        self.set_default_request: Optional[bool] = set_default_request
 
     def run_test2(self) -> None:
         AsyncHelper.run(fn=self.run_test_async())
@@ -148,7 +150,7 @@ class SparkPipelineFrameworkTestRunnerV2:
                         self.mock_client,
                         self.spark_session,
                     )
-            if self.mock_client:
+            if self.mock_client and self.set_default_request:
                 self.mock_client.expect_default()
 
             if not self.auto_find_helix_transformer:
@@ -213,7 +215,7 @@ class SparkPipelineFrameworkTestRunnerV2:
                 raise e
         except FriendlySparkException as e:
             # has PythonException from Spark
-            if isinstance(e.exception, FhirSenderException):
+            if isinstance(e.original_exception, FhirSenderException):
                 handle_fhir_sender_exception(
                     e=e,
                     temp_folder=self.temp_folder_path,

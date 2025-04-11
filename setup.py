@@ -28,7 +28,7 @@ setup(
         "pyarrow>=17.0.0",
         "delta-spark==3.2.0",
         "deprecated>=1.2.13",
-        "helix.fhir.client.sdk>=3.0.27",
+        "helix.fhir.client.sdk>=4.1.0",
         "helix-mockserver-client>=2.0.4",
         "sparkdataframecomparer>=2.0.13",
     ],
