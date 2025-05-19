@@ -24,13 +24,13 @@ except IOError:
 setup(
     install_requires=[
         "protobuf>=3",
-        "pyspark==3.5.1",
+        "pyspark==3.5.5",
         "pyarrow>=17.0.0",
         "delta-spark==3.2.0",
         "deprecated>=1.2.13",
         "helix.fhir.client.sdk>=4.1.0",
         "helix-mockserver-client>=2.0.4",
-        "sparkdataframecomparer>=2.0.13",
+        "sparkdataframecomparer==2.0.14",
     ],
     name=package_name,
     version=version,
