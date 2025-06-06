@@ -4,10 +4,11 @@ from abc import ABC, abstractmethod
 from os import listdir, makedirs
 from os.path import isfile, join, isdir
 from pathlib import Path
-from typing import List, Optional, Dict, Union, Any
+from typing import Callable, List, Optional, Dict, Union, Any
 
 from mockserver_client.mock_requests_loader import (
     load_mock_fhir_requests_from_folder,
+    bulk_laod_mock_fhir_requests_from_folder,
     load_mock_fhir_requests_for_single_file,
     load_mock_source_api_json_responses,
     load_mock_source_api_responses_from_folder,
@@ -75,12 +76,14 @@ class FhirCalls(TestInputType):
         self,
         fhir_validation_url: str = "http://fhir:3000/4_0_0",
         fhir_calls_folder: str = "fhir_calls",
+        bulk_load: Optional[bool] = False,
         mock_url_prefix: Optional[str] = None,
         method: str = "POST",
         relative_path: Optional[str] = None,
         query_string: Optional[Dict[str, Any]] = None,
         from_folder: Optional[bool] = True,
         single_file_name: Optional[str] = None,
+        resource_type: Optional[str] = None,
     ) -> None:
         super().__init__()
         self.fhir_calls_folder = fhir_calls_folder
@@ -100,6 +103,8 @@ class FhirCalls(TestInputType):
         self.query_string: Optional[Dict[str, Any]] = query_string
         self.from_folder: Optional[bool] = from_folder
         self.single_file_name: Optional[str] = single_file_name
+        self.bulk_load: Optional[bool] = bulk_load
+        self.resource_type: Optional[str] = resource_type
 
     def initialize(
         self,
@@ -125,14 +130,24 @@ class FhirCalls(TestInputType):
 
     def _run_mocked_fhir_test(self) -> None:
         if self.from_folder:
-            self.mocked_files = load_mock_fhir_requests_from_folder(
-                folder=self.test_path.joinpath(self.fhir_calls_folder),
-                mock_client=self.mock_client,
-                method=self.method,
-                url_prefix=self.url_prefix,
-                relative_path=self.relative_path,
-                query_string=self.query_string,
-            )
+            loader_method: Callable[..., Any] = load_mock_fhir_requests_from_folder
+            loader_args = {
+                # common arguments for both:
+                #       - load_mock_fhir_requests_from_folder
+                #       - bulk_load_mock_fhir_requests_from_folder
+                "folder": self.test_path.joinpath(self.fhir_calls_folder),
+                "mock_client": self.mock_client,
+                "method": self.method,
+                "url_prefix": self.url_prefix,
+                "query_string": self.query_string,
+            }
+            if self.bulk_load:
+                loader_method = bulk_laod_mock_fhir_requests_from_folder
+                loader_args["resource_type"] = self.resource_type
+            else:
+                loader_args["relative_path"] = self.relative_path
+
+            self.mocked_files = loader_method(**loader_args)
         else:
             self.mocked_files = load_mock_fhir_requests_for_single_file(
                 folder=self.test_path.joinpath(self.fhir_calls_folder),
