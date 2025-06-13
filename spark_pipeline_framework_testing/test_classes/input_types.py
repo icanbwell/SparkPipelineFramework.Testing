@@ -8,7 +8,7 @@ from typing import Callable, List, Optional, Dict, Union, Any
 
 from mockserver_client.mock_requests_loader import (
     load_mock_fhir_requests_from_folder,
-    bulk_laod_mock_fhir_requests_from_folder,
+    bulk_load_mock_fhir_requests_from_folder,
     load_mock_fhir_requests_for_single_file,
     load_mock_source_api_json_responses,
     load_mock_source_api_responses_from_folder,
@@ -142,7 +142,7 @@ class FhirCalls(TestInputType):
                 "query_string": self.query_string,
             }
             if self.bulk_load:
-                loader_method = bulk_laod_mock_fhir_requests_from_folder
+                loader_method = bulk_load_mock_fhir_requests_from_folder
                 loader_args["resource_type"] = self.resource_type
             else:
                 loader_args["relative_path"] = self.relative_path
