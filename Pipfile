@@ -86,6 +86,8 @@ types-orjson = ">=3.6.2"
 vistir=">=0.6.1, <0.7.0" # https://github.com/Madoshakalaka/pipenv-setup/issues/138
 # plete is needed for tab completion
 plette = "<1.0.0" # https://github.com/Madoshakalaka/pipenv-setup/issues/138
+# setuptools > 81 has a breaking change that causes pipenv-setup to fail, so we need to pin it to a version < 80.9.0
+setuptools=">=60.9.3, <=80.9.0"
 # pipenv-setup is needed for updating setup.py with the dependencies for anyone installing this package
 pipenv-setup = ">=3.2.0"
 
