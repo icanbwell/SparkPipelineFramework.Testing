@@ -32,6 +32,12 @@ jobs:
       - name: pre-commit
         run: make run-pre-commit
 
+      # Grant the spark user (uid 185) write access to the workspace so it can
+      # create metastore_db and other runtime directories on the bind-mounted volume.
+      # Required because docker-compose no longer overrides USER to root.
+      - name: Permission setup for non root user
+        run: sudo chown -R 185:185 ${{ github.workspace }}
+
       # setup and install everything and run tests
       - name: up
         run: make up
