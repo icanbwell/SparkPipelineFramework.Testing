@@ -2,6 +2,23 @@ LANG=en_US.utf-8
 
 export LANG
 
+## Private services-account ECR that hosts the helix.spark base image (CIE-8032).
+AWS_SERVICES_ECR=856965016623.dkr.ecr.us-east-1.amazonaws.com
+## Local AWS profile for that account; developers name their own.
+## Explicit rather than empty, so the login can't land on the caller's default account.
+AWS_SERVICES_PROFILE ?= services
+
+## Logs docker in to the private ECR repo hosting the helix.spark base image.
+## Skipped under GitHub Actions, where the workflow authenticates with
+## aws-actions/amazon-ecr-login instead and no named profile exists.
+.PHONY: ecr-login
+ecr-login:
+ifndef GITHUB_ACTIONS
+	aws ecr get-login-password --region us-east-1 --profile $(AWS_SERVICES_PROFILE) | docker login --username AWS --password-stdin $(AWS_SERVICES_ECR)
+else
+	@echo "GITHUB_ACTIONS is set - skipping local ECR login (the workflow logs in already)"
+endif
+
 .PHONY: Pipfile.lock
 Pipfile.lock: build
 	docker compose run --rm --name spftest dev /bin/bash -c "rm -f Pipfile.lock && pipenv lock --dev"
@@ -11,7 +28,7 @@ install_types: Pipfile
 	docker compose run --rm --name spftest dev pipenv run mypy --install-types --non-interactive
 
 .PHONY:devdocker
-devdocker: ## Builds the docker for dev
+devdocker: ecr-login ## Builds the docker for dev
 	docker compose build
 
 .PHONY:shell
@@ -22,7 +39,7 @@ shell:devdocker ## Brings up the bash shell in dev docker
 init: devdocker up setup-pre-commit  ## Initializes the local developer environment
 
 .PHONY: up
-up:
+up: ecr-login
 	docker compose up --build -d --remove-orphans
 	@echo MockServer dashboard: http://localhost:1080/mockserver/dashboard
 	@echo Fhir server dashboard http://localhost:3000/
@@ -42,7 +59,7 @@ setup-pre-commit:
 	cp ./pre-commit-hook ./.git/hooks/pre-commit
 
 .PHONY:run-pre-commit
-run-pre-commit: setup-pre-commit
+run-pre-commit: setup-pre-commit ecr-login
 	./.git/hooks/pre-commit
 
 .PHONY:update
@@ -80,7 +97,7 @@ show_dependency_graph:
 	docker compose run --rm --name spftest dev sh -c "pipenv install -d && pipenv graph"
 
 .PHONY:build
-build: ## Builds the docker for dev
+build: ecr-login ## Builds the docker for dev
 	docker compose build --progress=plain --parallel
 
 .PHONY:clean
