@@ -1,5 +1,10 @@
-FROM imranq2/helix.spark:3.5.1.11-slim
+FROM 856965016623.dkr.ecr.us-east-1.amazonaws.com/helix.spark:3.5.1.11-slim
 # https://github.com/icanbwell/helix.spark
+# icanbwell/helix.spark is now a private Docker Hub repo (CIE-8032) and this image is
+# pulled from the private services-account ECR instead.  Requires an ECR login first:
+# `make ecr-login` locally, or aws-actions/amazon-ecr-login in CI.
+# The tag is dictated by the pyspark pin in Pipfile (pyspark==3.5.1 -> spark 3.5.1);
+# do not bump it here without bumping pyspark across the dependent packages.
 USER root
 
 ENV PYTHONPATH=/spftest
