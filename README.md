@@ -7,31 +7,6 @@
 # SparkPipelineFramework.Tests
 Testing framework that can tests SparkPipelineFramework library by just providing input files to setup before running the transformer and output files to use for verifying the output
 
-## Local development setup
-
-The `spark.Dockerfile` and `pre-commit.Dockerfile` base image (`helix.spark`) lives in a
-**private ECR repo in the b.well services account**
-(`856965016623.dkr.ecr.us-east-1.amazonaws.com/helix.spark`) rather than on Docker Hub -
-see [CIE-8032](https://icanbwell.atlassian.net/browse/CIE-8032). Before building anything:
-
-1. `aws sso login --profile services`
-   Pass `AWS_SERVICES_PROFILE=<name>` to `make` if your profile is not called `services`.
-2. `make build` / `make devdocker` / `make up` / `make run-pre-commit` log in to the ECR
-   for you. If you build by another route (a bare `docker compose build`, or the git
-   pre-commit hook), run `make ecr-login` first.
-
-A `pull access denied` or `no basic auth credentials` error from `docker build` means the
-ECR login has expired - re-run step 1 and `make ecr-login`.
-
-Note: because the base image is private, **external contributors and forks cannot build
-the Docker images.** Pure-Python changes can still be developed and unit-tested without
-Docker; the containerised `make tests` / `make run-pre-commit` targets cannot.
-
-When bumping the `helix.spark` tag, remember its publish workflow does not push to this
-ECR - the new tag has to be copied into `856965016623.dkr.ecr.us-east-1.amazonaws.com/helix.spark`
-manually first, or the build fails on a missing image. The tag must also stay in step with
-the `pyspark` pin in `Pipfile` (currently `==3.5.1`, matching `helix.spark:3.5.1.11`).
-
 ## Usage
 1. Create a folder structure similar to the folder structure of your library in SparkPipelineFramework (This is how the Testing Framework finds the Transformer to run)
 2. Create an input folder and put in files that represent the input views.  These files can be csv, json or parquet
@@ -65,41 +40,3 @@ You can find the test here: https://github.com/imranq2/SparkPipelineFramework.Te
 1. Create a new release
 2. The GitHub Action should automatically kick in and publish the package
 3. You can see the status in the Actions tab
-
-### Prerequisite: these base-image tags must exist in the services ECR
-
-`helix.spark`'s publish workflows push **only to Docker Hub** — there is no ECR push step —
-so the tags below do not reach `856965016623.dkr.ecr.us-east-1.amazonaws.com/helix.spark`
-unless someone copies them. Until they do, `docker build` here fails on a missing image.
-
-| tag to copy | expected digest |
-|---|---|
-| `3.5.1.11-slim` | `sha256:be956d9e2f3d3a2a032aa670f007dd14930dccb840beed3339cf21a93b8fa447` |
-| `3.5.1.11-precommit-slim` | `sha256:f3165b952b4b01a6e2d5eb062ed76da7a9e89566550cf2e0a727b5cfe2042145` |
-
-Copy with a manifest-preserving tool. These are multi-arch (`linux/amd64` + `linux/arm64`);
-a `docker pull`/`tag`/`push` cycle from an Apple-silicon Mac would push arm64 only and
-silently break amd64 CI runners.
-
-```bash
-aws sso login --profile services
-aws ecr get-login-password --region us-east-1 --profile services \
-  | crane auth login 856965016623.dkr.ecr.us-east-1.amazonaws.com --username AWS --password-stdin
-DEST=856965016623.dkr.ecr.us-east-1.amazonaws.com/helix.spark
-crane copy icanbwell/helix.spark:3.5.1.11-slim "$DEST:3.5.1.11-slim"
-crane copy icanbwell/helix.spark:3.5.1.11-precommit-slim "$DEST:3.5.1.11-precommit-slim"
-# verify:
-crane digest "$DEST:3.5.1.11-slim"
-crane digest "$DEST:3.5.1.11-precommit-slim"
-```
-
-Source is `icanbwell/helix.spark` (the icanbwell-owned namespace mandated by CIE-8032); it is
-digest-identical to the old `imranq2/helix.spark`, so the copy is the same image bytes.
-
-The tag itself is **derived, not chosen**: `A.B.C` in the tag is the Apache Spark version in
-the image and must match this repo's `pyspark` pin. Do not change the tag as part of a
-registry migration.
-
-See `CIE-8032` for the full decision trail. Copying these tags does NOT by itself make CI
-pass — this is a public repo on `ubuntu-latest` with no AWS identity, so a GitHub OIDC
-trusted role scoped to `repo:icanbwell/SparkPipelineFramework.Testing:*` is still required.
