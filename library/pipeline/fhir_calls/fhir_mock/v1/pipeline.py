@@ -7,6 +7,11 @@ from requests import Response
 from spark_pipeline_framework.pipelines.framework_pipeline import FrameworkPipeline
 from spark_pipeline_framework.progress_logger.progress_logger import ProgressLogger
 
+# Seconds to wait for the mock FHIR server. These calls previously passed no
+# timeout, so an unresponsive mock server hung the test suite indefinitely
+# instead of failing it.
+MOCK_SERVER_TIMEOUT_SECONDS = 30
+
 
 class FhirCalls(FrameworkPipeline):
     def __init__(
@@ -26,13 +31,17 @@ class FhirCalls(FrameworkPipeline):
                     url = (
                         f"{mock_server_url}/{test_name}/4_0_0/{resource_name}/1/$merge"
                     )
-                    response: Response = requests.post(f"{url}", json=resource)
+                    response: Response = requests.post(
+                        url, json=resource, timeout=MOCK_SERVER_TIMEOUT_SECONDS
+                    )
                     assert response.ok
                     print(">>>", response.text)
             elif isinstance(content, dict):
                 resource_name = content.get("resourceType")
                 url = f"{mock_server_url}/{test_name}/4_0_0/{resource_name}/1/$merge"
-                response = requests.post(f"{url}", json=[content])
+                response = requests.post(
+                    url, json=[content], timeout=MOCK_SERVER_TIMEOUT_SECONDS
+                )
                 assert response.ok
                 print(">>>", response.text)
 
