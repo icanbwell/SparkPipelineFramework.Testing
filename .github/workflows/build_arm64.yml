@@ -11,13 +11,34 @@ on:
 
 jobs:
   docker:
-    runs-on: ubuntu-latest
+    # spark.Dockerfile pulls helix.spark from the private services ECR, which a
+    # GitHub-hosted runner cannot authenticate to. Runs on the in-house ARC
+    # runner instead, same as build_and_test.yml. Safe to do unconditionally
+    # here because this workflow is workflow_dispatch only, so it can only be
+    # started by someone with write access -- never by a fork pull request.
+    runs-on: main
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      # No aws-access-key-id on purpose: with only role-to-assume set, the action
+      # uses the runner pod's ambient IRSA identity to assume this role.
+      - name: AWS Credentials (services account, for helix.spark base image pull)
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::856965016623:role/services-k8s-service-account-github-actions-runner
+          role-session-name: ${{ github.run_id }}-services
+          role-duration-seconds: 3600
+
+      # skip-logout: this runner pool is shared with other jobs.
+      - name: Login to Amazon ECR (services)
+        uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
+        with:
+          skip-logout: true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f211e3e9ded2d9377c8cadc4489a4e38014bc4c9 # v1 (2026-09-03)
