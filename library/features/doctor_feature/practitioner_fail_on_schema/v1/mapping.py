@@ -85,9 +85,7 @@ def mapping(parameters: Dict[str, Any]) -> AutoMapper:
                 ]
             ),
             # birthdate="",
-            gender=AdministrativeGenderCode(
-                A.expression(
-                    """
+            gender=AdministrativeGenderCode(A.expression("""
                     CASE
                         WHEN `provider_gender` = 'MALE'
                         THEN 'male'
@@ -95,9 +93,7 @@ def mapping(parameters: Dict[str, Any]) -> AutoMapper:
                         THEN 'female'
                         ELSE 'unknown'
                     END
-                    """
-                )
-            ),
+                    """)),
             telecom=FhirList([]),
             address=FhirList(
                 [
