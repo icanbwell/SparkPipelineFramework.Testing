@@ -915,9 +915,9 @@ class OutputFileValidator(Validator):
             )
             result_df.write.json(path=str(result_path_for_view))
             if output_schema and output_schema_for_view:
-                result_df = result_df.sql_ctx.read.schema(output_schema_for_view).json(
-                    str(result_path_for_view)
-                )
+                result_df = result_df.sparkSession.read.schema(
+                    output_schema_for_view
+                ).json(str(result_path_for_view))
             result_file: Path = self.temp_folder_path.joinpath(f"{view_name}.json")
             if file_extension.lower() == ".csv":
                 self.combine_spark_csv_files_to_one_file(

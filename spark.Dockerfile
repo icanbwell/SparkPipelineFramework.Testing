@@ -1,4 +1,4 @@
-FROM icanbwell/helix.spark:3.5.1.11-slim
+FROM icanbwell/helix.spark:4.2.0.0-slim
 # https://github.com/icanbwell/helix.spark
 USER root
 
@@ -6,7 +6,8 @@ ENV PYTHONPATH=/spftest
 ENV CLASSPATH=/spftest/jars:$CLASSPATH
 
 # remove the older version of entrypoints with apt-get because that is how it was installed
-RUN apt-get remove python3-entrypoints -y
+# (skip if package not present — helix.spark 4.x images no longer include it)
+RUN apt-get remove python3-entrypoints -y 2>/dev/null || true
 
 COPY Pipfile* /spftest/
 WORKDIR /spftest
