@@ -1,0 +1,110 @@
+[
+  {
+    "_id": "bk101",
+    "author": "Gambardella, Matthew",
+    "description": "\n\n\n         An in-depth look at creating applications\n         with XML.This manual describes Oracle XML DB, and how you can use it to store, generate, manipulate, manage,\n         and query XML data in the database.\n\n\n         After introducing you to the heart of Oracle XML DB, namely the XMLType framework and Oracle XML DB repository,\n         the manual provides a brief introduction to design criteria to consider when planning your Oracle XML DB\n         application. It provides examples of how and where you can use Oracle XML DB.\n\n\n         The manual then describes ways you can store and retrieve XML data using Oracle XML DB, APIs for manipulating\n         XMLType data, and ways you can view, generate, transform, and search on existing XML data. The remainder of\n         the manual discusses how to use Oracle XML DB repository, including versioning and security,\n         how to access and manipulate repository resources using protocols, SQL, PL/SQL, or Java, and how to manage\n         your Oracle XML DB application using Oracle Enterprise Manager. It also introduces you to XML messaging and\n         Oracle Streams Advanced Queuing XMLType support.\n      ",
+    "genre": "Computer",
+    "price": 44.95,
+    "publish_date": "2000-10-01",
+    "title": "XML Developer's Guide"
+  },
+  {
+    "_id": "bk102",
+    "author": "Ralls, Kim",
+    "description": "A former architect battles corporate zombies,\n      an evil sorceress, and her own childhood to become queen\n      of the world.",
+    "genre": "Fantasy",
+    "price": 5.95,
+    "publish_date": "2000-12-16",
+    "title": "Midnight Rain"
+  },
+  {
+    "_id": "bk103",
+    "author": "Corets, Eva",
+    "description": "After the collapse of a nanotechnology\n      society in England, the young survivors lay the\n      foundation for a new society.",
+    "genre": "Fantasy",
+    "price": 5.95,
+    "publish_date": "2000-11-17",
+    "title": "Maeve Ascendant"
+  },
+  {
+    "_id": "bk104",
+    "author": "Corets, Eva",
+    "description": "In post-apocalypse England, the mysterious\n      agent known only as Oberon helps to create a new life\n      for the inhabitants of London. Sequel to Maeve\n      Ascendant.",
+    "genre": "Fantasy",
+    "price": 5.95,
+    "publish_date": "2001-03-10",
+    "title": "Oberon's Legacy"
+  },
+  {
+    "_id": "bk105",
+    "author": "Corets, Eva",
+    "description": "The two daughters of Maeve, half-sisters,\n      battle one another for control of England. Sequel to\n      Oberon's Legacy.",
+    "genre": "Fantasy",
+    "price": 5.95,
+    "publish_date": "2001-09-10",
+    "title": "The Sundered Grail"
+  },
+  {
+    "_id": "bk106",
+    "author": "Randall, Cynthia",
+    "description": "When Carla meets Paul at an ornithology\n      conference, tempers fly as feathers get ruffled.",
+    "genre": "Romance",
+    "price": 4.95,
+    "publish_date": "2000-09-02",
+    "title": "Lover Birds"
+  },
+  {
+    "_id": "bk107",
+    "author": "Thurman, Paula",
+    "description": "A deep sea diver finds true love twenty\n      thousand leagues beneath the sea.",
+    "genre": "Romance",
+    "price": 4.95,
+    "publish_date": "2000-11-02",
+    "title": "Splish Splash"
+  },
+  {
+    "_id": "bk108",
+    "author": "Knorr, Stefan",
+    "description": "An anthology of horror stories about roaches,\n      centipedes, scorpions  and other insects.",
+    "genre": "Horror",
+    "price": 4.95,
+    "publish_date": "2000-12-06",
+    "title": "Creepy Crawlies"
+  },
+  {
+    "_id": "bk109",
+    "author": "Kress, Peter",
+    "description": "After an inadvertant trip through a Heisenberg\n      Uncertainty Device, James Salway discovers the problems\n      of being quantum.",
+    "genre": "Science Fiction",
+    "price": 6.95,
+    "publish_date": "2000-11-02",
+    "title": "Paradox Lost"
+  },
+  {
+    "_id": "bk110",
+    "author": "O'Brien, Tim",
+    "description": "Microsoft's .NET initiative is explored in\n      detail in this deep programmer's reference.",
+    "genre": "Computer",
+    "price": 36.95,
+    "publish_date": "2000-12-09",
+    "title": "Microsoft .NET: The Programming Bible"
+  },
+  {
+    "_id": "bk111",
+    "author": "O'Brien, Tim",
+    "description": "The Microsoft MSXML3 parser is covered in\n      detail, with attention to XML DOM interfaces, XSLT processing,\n      SAX and more.",
+    "genre": "Computer",
+    "price": 36.95,
+    "publish_date": "2000-12-01",
+    "title": "MSXML3: A Comprehensive Guide"
+  },
+  {
+    "_id": "bk112",
+    "author": "Galos, Mike",
+    "description": "Microsoft Visual Studio 7 is explored in depth,\n      looking at how Visual Basic, Visual C++, C#, and ASP+ are\n      integrated into a comprehensive development\n      environment.",
+    "genre": "Computer",
+    "price": 49.95,
+    "publish_date": "2001-04-16",
+    "title": "Visual Studio 7: A Comprehensive Guide"
+  }
+]

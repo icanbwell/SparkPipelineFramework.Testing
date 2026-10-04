@@ -1,0 +1,30 @@
+{
+    "type": "struct",
+    "fields": [
+        {
+            "name": "id",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "some_date",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "some_string",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+        },
+        {
+            "name": "some_integer",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+        }
+    ],
+    "$schema": "https://raw.githubusercontent.com/imranq2/SparkPipelineFramework.Testing/main/spark_json_schema.json "
+}
