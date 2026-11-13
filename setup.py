@@ -26,7 +26,7 @@ setup(
         "protobuf>=3",
         "pyarrow>=17.0.0",
         "deprecated>=1.2.13",
-        "helix.fhir.client.sdk>=4.1.0",
+        "helix.fhir.client.sdk>=5.0.25",
         "helix-mockserver-client>=2.0.4",
         "sparkdataframecomparer>=2.0.13",
     ],
