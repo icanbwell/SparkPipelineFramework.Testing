@@ -17,7 +17,7 @@ delta-spark="==4.4.0"
 # Deprecated is needed for marking deprecated functions
 Deprecated = ">=1.2.13"
 # helix.fhir.client.sdk is needed for interacting with FHIR servers
-"helix.fhir.client.sdk" = ">=4.1.0"
+"helix.fhir.client.sdk" = ">=6.2.0"
 # helix-mockserver-client is needed for mocking servers
 helix-mockserver-client=">=2.0.4"
 # sparkdataframecomparer is needed for comparing Spark DataFrames
@@ -79,6 +79,11 @@ types-orjson = ">=3.6.2"
 
 # These dependencies are required for pipenv-setup.  They conflict with ones above, so we install these
 # only when running pipenv-setup
+opentelemetry-api = "*"
+opentelemetry-sdk = "*"
+opentelemetry-exporter-otlp = "*"
+opentelemetry-instrumentation-aiohttp-client = "*"
+
 [pipenvsetup]
 # vistr is needed for visualizing the dependency graph
 vistir=">=0.6.1, <0.7.0" # https://github.com/Madoshakalaka/pipenv-setup/issues/138
@@ -86,7 +91,6 @@ vistir=">=0.6.1, <0.7.0" # https://github.com/Madoshakalaka/pipenv-setup/issues/
 plette = "<1.0.0" # https://github.com/Madoshakalaka/pipenv-setup/issues/138
 # pipenv-setup is needed for updating setup.py with the dependencies for anyone installing this package
 pipenv-setup = ">=3.2.0"
-
 
 [requires]
 python_version = "3.12"
